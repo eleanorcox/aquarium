@@ -6,6 +6,8 @@ The project is a way to learn 3D and immersive technology step by step: 2D in th
 
 ## Run it
 
+Needs Node.js 22.12 or newer (`.nvmrc` pins 24; with nvm, run `nvm install` then `nvm use`).
+
 ```sh
 npm install
 npm run dev      # local dev server
