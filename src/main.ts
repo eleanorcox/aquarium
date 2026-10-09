@@ -1,23 +1,32 @@
 import './style.css';
-import { MODELS, type ModelId } from './core/motion';
+import { MODELS, type BuiltinId } from './core/motion';
 import { Tank } from './core/tank';
 import { Canvas2DRenderer } from './render/canvas2d';
 import { createPanel } from './ui/panel';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#tank')!;
-const equation = document.querySelector<HTMLElement>('#equation')!;
+const $ = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector)!;
 
 const tank = new Tank();
-tank.addFish('sine', { A: 0.14, w: 2.2, v: 0.14, y0: 0.32 });
-tank.addFish('lissajous');
-tank.addFish('circle', { cx: 0.78, cy: 0.62, R: 0.18, w: 0.8 });
-tank.addFish('sine', { A: 0.06, w: 4.5, v: -0.09, y0: 0.78, phi: 1.2 });
+tank.addFish('sine', { A: 0.12, w: 2.2, v: 0.14, y0: 0.22 });
+tank.addFish('rose', { R: 0.3 });
+tank.addFish('circle', { cx: 0.82, cy: 0.6, R: 0.14, w: 0.8 });
+tank.addFish('zigzag', { A: 0.05, w: 3, v: -0.1, y0: 0.62 });
+tank.addFish('bounce', { A: 0.12, y0: 0.92 });
 
 const renderer = new Canvas2DRenderer(canvas);
 new ResizeObserver(() => tank.resize(renderer.resize())).observe(canvas);
 
-const controls = createPanel(tank, equation, () => {
-  const ids = Object.keys(MODELS) as ModelId[];
+const panelElements = {
+  equation: $('#equation'),
+  editor: $<HTMLFormElement>('#editor'),
+  xInput: $<HTMLInputElement>('#eq-x'),
+  yInput: $<HTMLInputElement>('#eq-y'),
+  error: $('#eq-error'),
+};
+
+const controls = createPanel(tank, panelElements, () => {
+  const ids = Object.keys(MODELS) as BuiltinId[];
   const model = ids[Math.floor(Math.random() * ids.length)] ?? 'sine';
   return tank.addFish(model, { y0: 0.2 + Math.random() * 0.6, phi: Math.random() * 6.28 }).id;
 });

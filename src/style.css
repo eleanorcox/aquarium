@@ -36,3 +36,77 @@ body {
   border-radius: 6px;
   pointer-events: none;
 }
+#editor {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  width: min(560px, calc(100vw - 32px));
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 10px;
+  align-items: center;
+  padding: 12px 14px;
+  background: rgb(6 21 33 / 0.9);
+  border: 1px solid #1f3546;
+  border-radius: 6px;
+}
+#editor[hidden],
+#equation[hidden] {
+  display: none;
+}
+.editor-title {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+#editor label {
+  font: 13px ui-monospace, monospace;
+}
+#editor input {
+  min-width: 0;
+  font: 13px ui-monospace, monospace;
+  color: var(--ink);
+  background: var(--water);
+  border: 1px solid #1f3546;
+  border-radius: 4px;
+  padding: 6px 8px;
+}
+#editor input:focus-visible,
+#editor button:focus-visible {
+  outline: 2px solid #5fe0c8;
+  outline-offset: 1px;
+}
+#eq-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #ff9b8a;
+  font-size: 12px;
+}
+.editor-foot {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+.editor-help {
+  flex: 1;
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.editor-help code {
+  color: var(--ink);
+}
+#editor button {
+  font: 600 13px system-ui, sans-serif;
+  color: #061521;
+  background: #5fe0c8;
+  border: 0;
+  border-radius: 4px;
+  padding: 7px 16px;
+  cursor: pointer;
+}

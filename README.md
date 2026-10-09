@@ -29,11 +29,30 @@ Positions are in tank units: the tank is 1 unit tall and as wide as the screen's
 
 | Model | Equations |
 | --- | --- |
-| Sine wave | x(t) = x₀ + v·t, y(t) = y₀ + A·sin(ωt + φ) |
-| Lissajous | x(t) = cₓ + A·sin(a·s + δ), y(t) = c_y + B·sin(b·s), s = speed·t |
-| Circle | x(t) = cₓ + R·cos(ωt), y(t) = c_y + R·sin(ωt) |
+| Sine wave | x = x₀ + v·t, y = y₀ + A·sin(ωt + φ) |
+| Zigzag | x = x₀ + v·t, y = y₀ + A·(2/π)·asin(sin ωt) |
+| Bounce | x = x₀ + v·t, y = y₀ − A·\|sin ωt\| |
+| Circle | x = cₓ + R·cos ωt, y = c_y + R·sin ωt |
+| Lissajous | x = cₓ + A·sin(a·s + δ), y = c_y + B·sin(b·s), s = speed·t |
+| Figure eight | lemniscate of Bernoulli: x = cₓ + A·cos s/(1 + sin²s), y = c_y + A·sin s·cos s/(1 + sin²s) |
+| Rose curve | r = R·cos(kθ), θ = ωt |
+| Spirograph | hypotrochoid: x = cₓ + (R − r)·cos θ + d·cos((R − r)/r·θ), y = c_y + (R − r)·sin θ − d·sin((R − r)/r·θ) |
+| Breathing spiral | r = R·(0.55 + 0.45·sin νt), θ = ωt |
+| Heart | x = cₓ + S·16·sin³s, y = c_y − S·(13cos s − 5cos 2s − 2cos 3s − cos 4s) |
 
-Each fish faces along its velocity, the numerical derivative of its path.
+Each fish faces along its velocity, the numerical derivative of its path. y points down, as on screen.
+
+### Your own equations
+
+Choose **Your own equation** as the motion, or press **Edit as equation** to start from the selected fish's current path. Type x(t) and y(t) in [math.js](https://mathjs.org/) syntax using:
+
+- `t`: time in seconds
+- `W`: tank width (the tank is 1 tall)
+- `cx`, `cy`: the tank centre
+- `a`, `b`, `c`: sliders you can change while the fish swims
+- functions such as `sin`, `cos`, `abs`, `sqrt`, `exp`, `pi`
+
+For example, `x = cx + 0.4 * sin(a * t / 2)` and `y = cy + 0.2 * sin(b * t) * cos(c * t)`. A typed path that leaves the tank wraps around to the other side. Equations are checked before the fish uses them, and an error message says what is wrong. Functions that could change math.js itself (`import`, `evaluate` and similar) are switched off.
 
 ## Deploying
 

@@ -8,6 +8,18 @@
   <body>
     <canvas id="tank" aria-label="Aquarium tank with swimming fish"></canvas>
     <pre id="equation" aria-live="polite"></pre>
+    <form id="editor" hidden>
+      <p class="editor-title">Your own equation</p>
+      <label for="eq-x">x(t) =</label>
+      <input id="eq-x" spellcheck="false" autocomplete="off" />
+      <label for="eq-y">y(t) =</label>
+      <input id="eq-y" spellcheck="false" autocomplete="off" />
+      <p id="eq-error" role="alert" hidden></p>
+      <div class="editor-foot">
+        <p class="editor-help">Use <code>t</code>, <code>W</code> (tank width), <code>cx</code>, <code>cy</code> (centre), sliders <code>a b c</code>, and functions like <code>sin cos abs sqrt exp</code>. y points down; the tank is 1 tall.</p>
+        <button type="submit">Swim</button>
+      </div>
+    </form>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
