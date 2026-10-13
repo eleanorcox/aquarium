@@ -96,7 +96,7 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 
 ### Stage 1: fish that can be pushed
 
-*Built. The tests are in [steering.test.ts](../src/core/steering.test.ts), [tank.test.ts](../src/core/tank.test.ts) and [pointer.test.ts](../src/input/pointer.test.ts). Still to do: fixed scenes, and judging the feel by eye.*
+*Built. The tests are in [steering.test.ts](../src/core/steering.test.ts), [tank.test.ts](../src/core/tank.test.ts) and [pointer.test.ts](../src/input/pointer.test.ts). Eleanor judged the feel by eye and was happy with it. Still to do: fixed scenes.*
 
 - An unpushed fish is exactly on its route, on every built-in path. *The first test written. A measurement beforehand showed a fish that merely chases its route cannot do this, which changed the design: see entry 19 in [decisions.md](decisions.md).*
 - All 30 earlier tests keep passing unchanged.

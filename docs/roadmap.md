@@ -23,7 +23,7 @@ As of 13 October 2026:
 
 ### Stage 1: fish that can be pushed
 
-*Status, 13 October 2026: built and tested on the `stage-1-pushable-fish` branch. Not yet judged by eye; the strengths of the forces are first guesses.*
+*Status, 13 October 2026: built, tested and merged. Eleanor tried it and said it feels good, so the strengths of the forces stay as first set. Recorded as v2.*
 
 Fish steer towards their path instead of being placed on it; curious fish approach the mouse and shy ones scatter; drift; flocking.
 
@@ -119,6 +119,5 @@ flocking ──> schools ──────────────────�
 
 ## Suggested next step
 
-1. Eleanor tries stage 1 in the browser and says what feels wrong. The strengths are tuned to match, and the branch is merged.
-2. Fixed scenes for judging by eye, described in [testing.md](testing.md), so later tuning is compared like with like.
-3. Stage 1b: a tank bigger than the screen.
+1. Fixed scenes for judging by eye, described in [testing.md](testing.md), so later changes are compared like with like.
+2. Stage 1b: a tank bigger than the screen.
