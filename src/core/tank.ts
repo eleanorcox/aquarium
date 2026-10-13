@@ -1,6 +1,7 @@
 // The simulation core. No DOM access: renderers read this state, inputs change it through the methods below.
 import { compileEquations, scopeFor, type PositionFn } from './equations';
 import { DEFAULT_CUSTOM, MODELS, defaultParams, type EquationSource, type ModelId, type Params, type Vec2 } from './motion';
+import { seededRandom } from './random';
 import {
   DRIFT_FORCE,
   MAX_OFFSET_SPEED,
@@ -78,7 +79,7 @@ export class Tank {
 
   constructor(
     public width = 1.6,
-    private random: () => number = Math.random,
+    private random: () => number = seededRandom(1),
   ) {}
 
   addFish(model: ModelId, overrides: Params = {}): Fish {

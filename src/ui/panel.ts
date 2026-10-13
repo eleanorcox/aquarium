@@ -2,6 +2,7 @@
 import GUI from 'lil-gui';
 import { MODELS, MODEL_NAMES, paramSpecs, type ModelId } from '../core/motion';
 import type { Tank } from '../core/tank';
+import type { PointerInput, PointerMode } from '../input/pointer';
 import type { ViewState } from '../render/canvas2d';
 
 export interface Controls {
@@ -19,12 +20,21 @@ export interface PanelElements {
 }
 
 const MODEL_OPTIONS = Object.fromEntries(Object.entries(MODEL_NAMES).map(([id, name]) => [name, id]));
+const POINTER_OPTIONS: Record<string, PointerMode> = {
+  'Each fish decides': 'fish-decide',
+  'Attract all': 'attract',
+  'Scatter all': 'scatter',
+  Off: 'off',
+};
 
-export function createPanel(tank: Tank, el: PanelElements, onAddFish: () => number): Controls {
+export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput, onAddFish: () => number): Controls {
   const gui = new GUI({ title: 'Equation Aquarium' });
-  const state = { fish: 0, model: 'sine' as ModelId };
+  const first = tank.fish[0]?.id ?? 0;
+  const state = { fish: first, model: 'sine' as ModelId };
+  // The selected fish's behaviour, copied here for the sliders and written back through the tank.
+  const behaviour = { pathStrength: 1, curiosity: 0, drift: 0, schools: false };
   const controls: Controls = {
-    view: { selected: 0, trails: true },
+    view: { selected: first, trails: true },
     paused: false,
     select,
   };
@@ -37,10 +47,23 @@ export function createPanel(tank: Tank, el: PanelElements, onAddFish: () => numb
       tank.setModel(controls.view.selected, model);
       buildParams();
     });
-  let params = gui.addFolder('Parameters');
+  const params = gui.addFolder('Parameters');
+
+  const behaviourFolder = gui.addFolder('Behaviour');
+  const setBehaviour = () => tank.setBehaviour(controls.view.selected, behaviour);
+  behaviourFolder.add(behaviour, 'pathStrength', 0, 1, 0.01).name('Holds its route').onChange(setBehaviour);
+  behaviourFolder.add(behaviour, 'curiosity', -1, 1, 0.01).name('Shy ↔ curious').onChange(setBehaviour);
+  behaviourFolder.add(behaviour, 'drift', 0, 1, 0.01).name('Drift').onChange(setBehaviour);
+  behaviourFolder.add(behaviour, 'schools').name('Schools').onChange(setBehaviour);
 
   const actions = {
     addFish: () => select(onAddFish()),
+    removeFish: () => {
+      // The panel always shows one fish, so the last one stays.
+      if (tank.fish.length < 2) return;
+      tank.removeFish(controls.view.selected);
+      select(tank.fish[0]!.id);
+    },
     editAsEquation: () => {
       tank.setModel(controls.view.selected, 'custom');
       select(controls.view.selected);
@@ -49,8 +72,16 @@ export function createPanel(tank: Tank, el: PanelElements, onAddFish: () => numb
   };
   const editButton = gui.add(actions, 'editAsEquation').name('Edit as equation');
   gui.add(actions, 'addFish').name('Add fish');
-  gui.add(controls.view, 'trails').name('Trails');
-  gui.add(controls, 'paused').name('Pause');
+  gui.add(actions, 'removeFish').name('Remove fish');
+
+  const tankFolder = gui.addFolder('Tank');
+  tankFolder.add(pointer, 'mode', POINTER_OPTIONS).name('Pointer');
+  tankFolder.add(pointer, 'radius', 0.05, 0.6, 0.01).name('Pointer reach');
+  tankFolder.add(tank.flock, 'separation', 0, 2, 0.05).name('School: keep apart');
+  tankFolder.add(tank.flock, 'alignment', 0, 2, 0.05).name('School: swim the same way');
+  tankFolder.add(tank.flock, 'cohesion', 0, 2, 0.05).name('School: stay together');
+  tankFolder.add(controls.view, 'trails').name('Trails');
+  tankFolder.add(controls, 'paused').name('Pause');
 
   el.editor.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -65,8 +96,8 @@ export function createPanel(tank: Tank, el: PanelElements, onAddFish: () => numb
   }
 
   function buildParams(): void {
-    params.destroy();
-    params = gui.addFolder('Parameters');
+    // Empty the folder instead of replacing it, so it keeps its place in the panel.
+    for (const controller of [...params.controllers]) controller.destroy();
     const fish = tank.get(controls.view.selected);
     for (const [key, spec] of Object.entries(paramSpecs(fish.model))) {
       params
@@ -97,12 +128,14 @@ export function createPanel(tank: Tank, el: PanelElements, onAddFish: () => numb
   function select(id: number): void {
     controls.view.selected = id;
     state.fish = id;
-    state.model = tank.get(id).model;
+    const fish = tank.get(id);
+    state.model = fish.model;
+    Object.assign(behaviour, { pathStrength: fish.pathStrength, curiosity: fish.curiosity, drift: fish.drift, schools: fish.schools });
     fishController.options(fishOptions());
     gui.controllersRecursive().forEach((c) => c.updateDisplay());
     buildParams();
   }
 
-  select(0);
+  select(first);
   return controls;
 }

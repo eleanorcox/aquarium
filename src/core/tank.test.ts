@@ -112,3 +112,16 @@ describe('adding and removing fish', () => {
     expect(stays.x).toBeCloseTo(0.9);
   });
 });
+
+describe('a tank given no randomness of its own', () => {
+  it('is still the same tank every time', () => {
+    const drifted = () => {
+      const tank = new Tank();
+      const fish = tank.addFish('circle');
+      tank.setBehaviour(fish.id, { drift: 1 });
+      for (let i = 0; i < 120; i++) tank.step(1 / 60);
+      return [fish.size, fish.x, fish.y];
+    };
+    expect(drifted()).toEqual(drifted());
+  });
+});

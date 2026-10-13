@@ -1,4 +1,6 @@
 // Canvas 2D renderer: reads the tank and draws it. It never changes simulation state.
+import type { Vec2 } from '../core/motion';
+import type { Influence } from '../core/steering';
 import type { Fish, Tank } from '../core/tank';
 
 export interface ViewState {
@@ -30,9 +32,7 @@ export class Canvas2DRenderer {
 
   /** Converts a pointer position to the id of the nearest fish, if one is close enough. */
   pick(clientX: number, clientY: number, tank: Tank): number | undefined {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = (clientX - rect.left) / this.scale;
-    const y = (clientY - rect.top) / this.scale;
+    const { x, y } = this.toTank(clientX, clientY);
     let best: number | undefined;
     let bestDistance = 0.08;
     for (const fish of tank.fish) {
@@ -40,6 +40,12 @@ export class Canvas2DRenderer {
       if (d < bestDistance) [best, bestDistance] = [fish.id, d];
     }
     return best;
+  }
+
+  /** Converts a pointer position on the page to a position in tank units. */
+  toTank(clientX: number, clientY: number): Vec2 {
+    const rect = this.canvas.getBoundingClientRect();
+    return { x: (clientX - rect.left) / this.scale, y: (clientY - rect.top) / this.scale };
   }
 
   render(tank: Tank, view: ViewState): void {
@@ -59,6 +65,17 @@ export class Canvas2DRenderer {
 
     if (view.trails) for (const fish of tank.fish) this.drawTrail(fish, fish.id === view.selected);
     for (const fish of tank.fish) this.drawFish(fish, fish.id === view.selected, tank.t);
+    for (const influence of tank.influences) this.drawInfluence(influence);
+  }
+
+  /** A faint ring showing how far an influence reaches. */
+  private drawInfluence(influence: Influence): void {
+    const { ctx, scale } = this;
+    ctx.strokeStyle = 'rgba(220, 233, 238, 0.18)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(influence.x * scale, influence.y * scale, influence.radius * scale, 0, Math.PI * 2);
+    ctx.stroke();
   }
 
   private drawTrail(fish: Fish, selected: boolean): void {

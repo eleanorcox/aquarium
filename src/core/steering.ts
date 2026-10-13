@@ -20,8 +20,8 @@ export interface Influence {
 export const ROUTE_STIFFNESS = 60;
 /** Push or pull on a fully shy or fully curious fish right beside an influence. */
 export const INFLUENCE_FORCE = 6;
-/** An influence moving faster than this scatters every fish, curious or not. */
-export const STARTLE_SPEED = 1.5;
+/** An influence moving faster than this scatters every fish, curious or not. Three tank heights a second. */
+export const STARTLE_SPEED = 3;
 /** A curious fish eases off inside this fraction of the radius, so it stops short of the influence. */
 export const STANDOFF = 0.3;
 /** Top speed of a fish relative to its route. */
