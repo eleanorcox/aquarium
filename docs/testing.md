@@ -109,6 +109,8 @@ The opening experiment in the roadmap, "how closely does a steering fish follow 
 - A curious fish moves nearer to an influence; a shy one moves further away; one beyond the influence's radius does nothing.
 - An influence with a scatter override sends a curious fish away too, as does one moving faster than the stated startle speed.
 - Lower path strength means a larger displacement from the same push.
+- A fish with drift strays from its route but never further than a stated distance; a fish with zero drift does not stray at all.
+- Two fish with the same route and drift do not stray identically, and the same tank replayed strays identically.
 - Two fish that are too close move apart. A fish among neighbours heading one way turns that way. A fish apart from its group moves towards it.
 - A fish that is not set to school ignores all three rules.
 - A fish can be removed, and the others keep their ids.

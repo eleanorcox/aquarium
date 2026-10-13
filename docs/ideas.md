@@ -15,6 +15,7 @@ Sizes are rough guesses for the smallest version only: **S** is a few days, **M*
 | Fish respond to a pointer | 3 | S | no | no |
 | Flocking | 3 | S | no | no |
 | Curious and shy fish | 3 | S | no | no |
+| Drift (wandering off the route a little) | 3 | S | no | no |
 | Webcam hand gestures | 3 | M | no | laptop webcam |
 | Projection | 3 | S | no | projector |
 | Body tracking in front of a projection | 3 | L | no | camera or depth sensor |
@@ -69,6 +70,16 @@ Fish follow the mouse, or scatter from it, then return to their routes.
 
 - **Smallest version:** mouse only, two behaviours (attract and scatter), a slider for how strongly fish hold to their route.
 - **Needs:** the biggest change to the core, described in [Architecture](architecture.md): fish that can be pushed off their path. Everything else in this strand builds on it.
+
+### Drift
+
+A fish swimming along a line does not hold it perfectly. It wanders a little above and below, irregularly, and comes back.
+
+- **Not the same as the sine path:** a sine wave is a regular, repeating route. Drift is small, uneven and never quite repeats, laid on top of whatever the route is.
+- **Not quite covered by steering alone:** steering lets a fish be *pushed* off its route. With nothing pushing, it would still follow the route exactly. Drift is the fish pushing itself: a gentle, slowly changing nudge added to its steering, alongside hands and the school.
+- **Smallest version:** one number per fish for how much it drifts, with its starting value from the species. Zero gives the exact route, which equation mode keeps.
+- **Why it is worth having:** ten fish on the same route stop looking like copies of each other, and routes look swum instead of drawn.
+- **Must stay repeatable:** the wandering comes from the tank's own seeded randomness, so the same tank still plays back identically.
 
 ### Curious and shy fish
 

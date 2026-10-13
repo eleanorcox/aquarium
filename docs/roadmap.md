@@ -23,7 +23,7 @@ As of 13 October 2026:
 
 ### Stage 1: fish that can be pushed
 
-Fish steer towards their path instead of being placed on it; curious fish approach the mouse and shy ones scatter; flocking.
+Fish steer towards their path instead of being placed on it; curious fish approach the mouse and shy ones scatter; drift; flocking.
 
 - **Shows:** the equation aquarium, but the fish react to the mouse and return to their routes.
 - **Decides:** whether paths and behaviour really can share one simulation.

@@ -23,6 +23,7 @@ That is ideal for strand 1: paths are exact, repeatable and easy to test. It can
 - Each fish keeps its equation. The equation gives a *target* that moves along the path.
 - Each fish also has a real position and velocity. Every step, it steers towards its target.
 - Other influences add to the steering: away from a hand, towards a hand, with the school.
+- So does drift: a small, slowly changing nudge of the fish's own, so it wanders a little either side of its route. It is generated from the tank's seeded randomness, never the real clock, so runs stay repeatable.
 - One number per fish, call it path strength, sets how hard it holds to the target.
 
 With path strength at full and no other influences, the fish sits on its target and the result is today's equation aquarium. With it lower, a hand can push the fish away and it swims back afterwards, which is the Animal Crossing fish with Swish Fish hands. With it at zero, fish flock freely.
