@@ -1,7 +1,18 @@
 // The simulation core. No DOM access: renderers read this state, inputs change it through the methods below.
 import { compileEquations, scopeFor, type PositionFn } from './equations';
 import { DEFAULT_CUSTOM, MODELS, defaultParams, type EquationSource, type ModelId, type Params, type Vec2 } from './motion';
-import { DRIFT_FORCE, MAX_OFFSET_SPEED, influenceForce, limitSpeed, routeForce, stepWander, type Influence } from './steering';
+import {
+  DRIFT_FORCE,
+  MAX_OFFSET_SPEED,
+  flockForce,
+  influenceForce,
+  limitSpeed,
+  routeForce,
+  stepWander,
+  type FlockRules,
+  type Influence,
+  type Schoolmate,
+} from './steering';
 
 export interface Fish {
   id: number;
@@ -31,11 +42,15 @@ export interface Fish {
   drift: number;
   /** The direction the fish is currently wandering in; drift pushes it this way. */
   wander: Vec2;
+  /** Whether it schools with the other schooling fish in sight. */
+  schools: boolean;
 }
 
-export type Behaviour = Pick<Fish, 'pathStrength' | 'curiosity' | 'drift'>;
+export type Behaviour = Pick<Fish, 'pathStrength' | 'curiosity' | 'drift' | 'schools'>;
 
-const BEHAVIOUR_RANGES: Record<keyof Behaviour, [number, number]> = { pathStrength: [0, 1], curiosity: [-1, 1], drift: [0, 1] };
+const BEHAVIOUR_RANGES = { pathStrength: [0, 1], curiosity: [-1, 1], drift: [0, 1] } as const;
+/** Spreads fish evenly around a circle by their order, for parting fish that start in the same place. */
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
 const NAMES = ['Sina', 'Lissa', 'Orbit', 'Cosmo', 'Theta', 'Pi', 'Euler', 'Fourier', 'Gauss', 'Noether'];
 const HUES = [172, 28, 290, 52, 205, 340, 110, 12, 240, 80];
@@ -47,11 +62,15 @@ const wrap = (v: number, size: number) => ((v % size) + size) % size;
 const unwrap = (d: number, size: number) => (Math.abs(d) > size / 2 ? d - Math.sign(d) * size : d);
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
+const velocityOf = (fish: Fish): Vec2 => ({ x: fish.speed * Math.cos(fish.heading), y: fish.speed * Math.sin(fish.heading) });
+
 export class Tank {
   t = 0;
   fish: Fish[] = [];
   /** What the fish are reacting to right now. Inputs replace this list as pointers and hands move. */
   influences: Influence[] = [];
+  /** How strongly schooling fish follow each of the three schooling rules. */
+  flock: FlockRules = { separation: 1, alignment: 1, cohesion: 1 };
   /** Compiled typed equations by fish id. Kept out of Fish so fish stay plain data. */
   private compiled = new Map<number, PositionFn>();
 
@@ -80,6 +99,7 @@ export class Tank {
       curiosity: 0,
       drift: 0,
       wander: { x: 0, y: 0 },
+      schools: false,
     };
     this.fish.push(fish);
     if (model === 'custom') this.setEquations(id, DEFAULT_CUSTOM);
@@ -119,10 +139,16 @@ export class Tank {
   /** Values outside a setting's range are brought to its nearest end. */
   setBehaviour(id: number, behaviour: Partial<Behaviour>): void {
     const fish = this.get(id);
-    for (const key of Object.keys(behaviour) as (keyof Behaviour)[]) {
+    if (behaviour.schools !== undefined) fish.schools = behaviour.schools;
+    for (const key of Object.keys(BEHAVIOUR_RANGES) as (keyof typeof BEHAVIOUR_RANGES)[]) {
       const value = behaviour[key];
-      if (value !== undefined) fish[key] = clamp(value, ...BEHAVIOUR_RANGES[key]);
+      const [min, max] = BEHAVIOUR_RANGES[key];
+      if (value !== undefined) fish[key] = clamp(value, min, max);
     }
+  }
+
+  setFlock(rules: Partial<FlockRules>): void {
+    Object.assign(this.flock, rules);
   }
 
   setInfluences(influences: Influence[]): void {
@@ -178,7 +204,28 @@ export class Tank {
       force.x += push.x;
       force.y += push.y;
     }
+    if (fish.schools) {
+      const push = flockForce(this.schoolmatesOf(fish), velocityOf(fish), this.flock, fish.id * GOLDEN_ANGLE);
+      force.x += push.x;
+      force.y += push.y;
+    }
     return force;
+  }
+
+  /** Every other schooling fish, as seen from this one. Checks every pair, which is fine for tens of fish. */
+  private schoolmatesOf(fish: Fish): Schoolmate[] {
+    const mates: Schoolmate[] = [];
+    for (const other of this.fish) {
+      if (other === fish || !other.schools) continue;
+      const velocity = velocityOf(other);
+      mates.push({
+        dx: this.wrapsX(fish) ? unwrap(other.x - fish.x, this.width) : other.x - fish.x,
+        dy: this.wrapsY(fish) ? unwrap(other.y - fish.y, 1) : other.y - fish.y,
+        vx: velocity.x,
+        vy: velocity.y,
+      });
+    }
+    return mates;
   }
 
   /**

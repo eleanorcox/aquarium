@@ -200,6 +200,100 @@ describe('drift', () => {
   });
 });
 
+describe('schooling', () => {
+  const ONLY = {
+    separation: { separation: 1, alignment: 0, cohesion: 0 },
+    alignment: { separation: 0, alignment: 1, cohesion: 0 },
+    cohesion: { separation: 0, alignment: 0, cohesion: 1 },
+  };
+
+  /** A fish on a one-point route at the given spot, set to school or not. */
+  function at(tank: Tank, x: number, y: number, schools = true): Fish {
+    const fish = tank.addFish('sine', { A: 0, v: 0, y0: y, x0: x / WIDTH });
+    tank.setBehaviour(fish.id, { schools, pathStrength: 0.2 });
+    return fish;
+  }
+
+  /** A schooling fish swimming steadily to the right. */
+  function swimmer(tank: Tank, x: number, y: number): Fish {
+    const fish = tank.addFish('sine', { A: 0, v: 0.2, y0: y, x0: x / WIDTH });
+    tank.setBehaviour(fish.id, { schools: true });
+    return fish;
+  }
+
+  it('two schooling fish that are too close move apart', () => {
+    const tank = makeTank();
+    tank.setFlock(ONLY.separation);
+    const a = at(tank, 0.8, 0.5);
+    const b = at(tank, 0.82, 0.5);
+    run(tank, 1);
+    expect(b.x - a.x).toBeGreaterThan(0.02 + ON_ROUTE);
+  });
+
+  it('a schooling fish among neighbours heading one way turns that way', () => {
+    const tank = makeTank();
+    tank.setFlock(ONLY.alignment);
+    const fish = at(tank, 0.8, 0.5);
+    swimmer(tank, 0.75, 0.38);
+    swimmer(tank, 0.75, 0.62);
+    run(tank, 0.5);
+    expect(fish.x).toBeGreaterThan(0.8);
+    expect(Math.cos(fish.heading)).toBeGreaterThan(0.9);
+  });
+
+  it('a schooling fish apart from its group moves towards it', () => {
+    const tank = makeTank();
+    tank.setFlock(ONLY.cohesion);
+    const fish = at(tank, 0.8, 0.5);
+    for (const y of [0.45, 0.5, 0.55]) at(tank, 1, y);
+    run(tank, 1);
+    expect(fish.x).toBeGreaterThan(0.8 + ON_ROUTE);
+  });
+
+  it('a fish that does not school ignores the school and is ignored by it', () => {
+    const tank = makeTank();
+    const loner = at(tank, 0.8, 0.5, false);
+    const schooler = at(tank, 0.82, 0.5);
+    run(tank, 1);
+    expect(strayed(loner)).toBe(0);
+    expect(strayed(schooler)).toBe(0);
+  });
+
+  it('fish beyond each other’s sight do not school together', () => {
+    const tank = makeTank();
+    const a = at(tank, 0.3, 0.5);
+    const b = at(tank, 1.3, 0.5);
+    run(tank, 1);
+    expect(strayed(a) + strayed(b)).toBe(0);
+  });
+
+  it('a rule turned down to nothing has no effect', () => {
+    const tank = makeTank();
+    tank.setFlock({ separation: 0, alignment: 0, cohesion: 0 });
+    const a = at(tank, 0.8, 0.5);
+    at(tank, 0.82, 0.5);
+    run(tank, 1);
+    expect(strayed(a)).toBe(0);
+  });
+
+  it('a school sharing one route spreads out around it instead of piling up', () => {
+    const tank = makeTank();
+    const school = Array.from({ length: 8 }, () => {
+      const fish = tank.addFish('circle');
+      tank.setBehaviour(fish.id, { schools: true });
+      return fish;
+    });
+    run(tank, 5);
+    const route = MODELS.circle.position(school[0]!.params, tank.t, WIDTH);
+    for (const [i, a] of school.entries()) {
+      // Together: every fish within a few lengths of the shared route.
+      expect(Math.hypot(a.x - route.x, a.y - route.y)).toBeLessThan(0.15);
+      // Apart: no two fish closer than half a fish length.
+      for (const b of school.slice(i + 1)) expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(0.02);
+    }
+  });
+});
+
 describe('tank edges', () => {
   it('a push cannot carry a fish out through the top or bottom', () => {
     const tank = makeTank();
@@ -229,7 +323,7 @@ describe('always true', () => {
     const tank = makeTank({ seed });
     BUILTINS.forEach((id, i) => {
       const fish = tank.addFish(id);
-      tank.setBehaviour(fish.id, { curiosity: (i % 5) / 2 - 1, pathStrength: 0.1 + (i % 4) * 0.3, drift: (i % 3) / 2 });
+      tank.setBehaviour(fish.id, { curiosity: (i % 5) / 2 - 1, pathStrength: 0.1 + (i % 4) * 0.3, drift: (i % 3) / 2, schools: i % 2 === 0 });
     });
     return tank;
   }
