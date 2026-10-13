@@ -6,6 +6,10 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ## Unreleased
 
+### Added
+
+- Fixed scenes: five named tanks that are the same every time, chosen from a Scene list in the panel or with `?scene=name` in the address.
+
 ### Changed
 
 - The project is called Equatium, as a working name, in the page title, panel, README and package name. It was "Equation Aquarium".

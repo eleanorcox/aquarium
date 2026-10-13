@@ -18,8 +18,8 @@ Two further rules:
 
 ## What exists today
 
-- 74 tests in six files, run with Vitest by `npm test`. All pass. There were 30 before stage 1.
-- They test the simulation in `src/core/` and the pointer input in `src/input/`. Nothing tests the renderer or the panel.
+- 79 tests in seven files, run with Vitest by `npm test`. All pass. There were 30 before stage 1.
+- They test the simulation in `src/core/`, the pointer input in `src/input/` and the fixed scenes in `src/scenes/`. Nothing tests the renderer or the panel.
 - The tests and the type check run automatically on every push and pull request ([ci.yml](../.github/workflows/ci.yml)).
 - `npm run test:watch` reruns tests as files change, and [testing.ts](../src/core/testing.ts) builds and advances a test tank in one line.
 
@@ -81,6 +81,18 @@ A real browser opens the app and confirms it starts, shows a tank and adds a fis
 
 Not automatic tests, but part of the plan. A scene is a named, repeatable tank (same fish, same seed) opened by a web address, for example "one fish of each swimming style" or "500 sardines and a pointer". Anything that has to be judged by eye is judged on the same scenes each time, so "it looked better last week" can be checked.
 
+The scenes are in [scenes.ts](../src/scenes/scenes.ts), each with a note on what to look for. Open one by adding `?scene=name` to the address, or choose it from the Scene list in the panel:
+
+| Address | Scene | For judging |
+| --- | --- | --- |
+| `?scene=mixed` | Mixed tank (the default) | The overall feel |
+| `?scene=paths` | Every path | That routes are exact and turns smooth |
+| `?scene=temperaments` | Shy to curious | The response to the pointer, slow and fast |
+| `?scene=drift` | Drift | Drift from none to full |
+| `?scene=school` | One school | Schooling, and a school parting round the pointer |
+
+Tests check that every scene is the same tank each time and keeps its fish inside the tank. A new scene is covered by those tests as soon as it is added.
+
 ## Test rules
 
 - Tests sit beside the code they test, as `name.test.ts`.
@@ -96,7 +108,7 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 
 ### Stage 1: fish that can be pushed
 
-*Built. The tests are in [steering.test.ts](../src/core/steering.test.ts), [tank.test.ts](../src/core/tank.test.ts) and [pointer.test.ts](../src/input/pointer.test.ts). Eleanor judged the feel by eye and was happy with it. Still to do: fixed scenes.*
+*Built. The tests are in [steering.test.ts](../src/core/steering.test.ts), [tank.test.ts](../src/core/tank.test.ts) and [pointer.test.ts](../src/input/pointer.test.ts). Eleanor judged the feel by eye and was happy with it.*
 
 - An unpushed fish is exactly on its route, on every built-in path. *The first test written. A measurement beforehand showed a fish that merely chases its route cannot do this, which changed the design: see entry 19 in [decisions.md](decisions.md).*
 - All 30 earlier tests keep passing unchanged.

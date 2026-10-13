@@ -119,5 +119,4 @@ flocking ──> schools ──────────────────�
 
 ## Suggested next step
 
-1. Fixed scenes for judging by eye, described in [testing.md](testing.md), so later changes are compared like with like.
-2. Stage 1b: a tank bigger than the screen.
+Stage 1b: a tank bigger than the screen.

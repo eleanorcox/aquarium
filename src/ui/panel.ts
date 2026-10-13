@@ -3,6 +3,7 @@ import GUI from 'lil-gui';
 import { MODELS, MODEL_NAMES, paramSpecs, type ModelId } from '../core/motion';
 import type { Tank } from '../core/tank';
 import type { PointerInput, PointerMode } from '../input/pointer';
+import { SCENES } from '../scenes/scenes';
 import type { ViewState } from '../render/canvas2d';
 
 export interface Controls {
@@ -27,7 +28,7 @@ const POINTER_OPTIONS: Record<string, PointerMode> = {
   Off: 'off',
 };
 
-export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput, onAddFish: () => number): Controls {
+export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput, scene: string, onAddFish: () => number): Controls {
   const gui = new GUI({ title: 'Equatium' });
   const first = tank.fish[0]?.id ?? 0;
   const state = { fish: first, model: 'sine' as ModelId };
@@ -75,6 +76,14 @@ export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput
   gui.add(actions, 'removeFish').name('Remove fish');
 
   const tankFolder = gui.addFolder('Tank');
+  const sceneOptions = Object.fromEntries(Object.entries(SCENES).map(([id, s]) => [s.name, id]));
+  // Choosing a scene reloads the page with it in the address, so the address always names what is on screen.
+  tankFolder
+    .add({ scene }, 'scene', sceneOptions)
+    .name('Scene')
+    .onChange((id: string) => {
+      location.search = `?scene=${id}`;
+    });
   tankFolder.add(pointer, 'mode', POINTER_OPTIONS).name('Pointer');
   tankFolder.add(pointer, 'radius', 0.05, 0.6, 0.01).name('Pointer reach');
   tankFolder.add(tank.flock, 'separation', 0, 2, 0.05).name('School: keep apart');

@@ -60,6 +60,10 @@ The equation gives each fish its route. Its position is the route plus an offset
 
 The pointer can also attract or scatter every fish whatever its temperament, and a fast sweep startles them all. The strengths of these effects are in `src/core/steering.ts` and are first guesses.
 
+### Scenes
+
+Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift` or `school`. They are for judging by eye how a change looks and feels.
+
 ### Your own equations
 
 Choose **Your own equation** as the motion, or press **Edit as equation** to start from the selected fish's current path. Type x(t) and y(t) in [math.js](https://mathjs.org/) syntax using:

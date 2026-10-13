@@ -3,22 +3,14 @@ import { MODELS, type BuiltinId } from './core/motion';
 import { Tank } from './core/tank';
 import { PointerInput } from './input/pointer';
 import { Canvas2DRenderer } from './render/canvas2d';
+import { buildScene } from './scenes/scenes';
 import { createPanel } from './ui/panel';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#tank')!;
 const $ = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector)!;
 
 const tank = new Tank();
-// A mix of temperaments, so the pointer draws some fish in and sends others away.
-tank.setBehaviour(tank.addFish('sine', { A: 0.12, w: 2.2, v: 0.14, y0: 0.22 }).id, { curiosity: 0.8, drift: 0.3, pathStrength: 0.5 });
-tank.setBehaviour(tank.addFish('rose', { R: 0.3 }).id, { curiosity: -1, drift: 0.3, pathStrength: 0.5 });
-tank.setBehaviour(tank.addFish('circle', { cx: 0.82, cy: 0.6, R: 0.14, w: 0.8 }).id, { curiosity: 0.5, drift: 0.3, pathStrength: 0.5 });
-tank.setBehaviour(tank.addFish('zigzag', { A: 0.05, w: 3, v: -0.1, y0: 0.62 }).id, { curiosity: -0.6, drift: 0.3, pathStrength: 0.5 });
-tank.setBehaviour(tank.addFish('bounce', { A: 0.12, y0: 0.92 }).id, { curiosity: -0.3, drift: 0.3, pathStrength: 0.5 });
-// A small school sharing one route.
-for (let i = 0; i < 7; i++) {
-  tank.setBehaviour(tank.addFish('figure8', { A: 0.55, w: 0.35 }).id, { schools: true, curiosity: -0.7, drift: 0.5, pathStrength: 0.6 });
-}
+const scene = buildScene(tank, new URLSearchParams(location.search).get('scene'));
 
 const renderer = new Canvas2DRenderer(canvas);
 new ResizeObserver(() => tank.resize(renderer.resize())).observe(canvas);
@@ -39,7 +31,7 @@ canvas.addEventListener('pointermove', (e) => {
 });
 canvas.addEventListener('pointerleave', () => pointer.leave());
 
-const controls = createPanel(tank, panelElements, pointer, () => {
+const controls = createPanel(tank, panelElements, pointer, scene, () => {
   const ids = Object.keys(MODELS) as BuiltinId[];
   const model = ids[Math.floor(Math.random() * ids.length)] ?? 'sine';
   const fish = tank.addFish(model, { y0: 0.2 + Math.random() * 0.6, phi: Math.random() * 6.28 });
