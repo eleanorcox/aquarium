@@ -14,6 +14,7 @@ Sizes are rough guesses for the smallest version only: **S** is a few days, **M*
 | Formations (one description, many fish) | 2 | M | no | no |
 | Fish respond to a pointer | 3 | S | no | no |
 | Flocking | 3 | S | no | no |
+| Free swimming (fish with no route) | 3 | M | no | no |
 | Curious and shy fish | 3 | S | no | no |
 | Drift (wandering off the route a little) | 3 | S | no | no |
 | Webcam hand gestures | 3 | M | no | laptop webcam |
@@ -80,6 +81,15 @@ A fish swimming along a line does not hold it perfectly. It wanders a little abo
 - **Smallest version:** one number per fish for how much it drifts, with its starting value from the species. Zero gives the exact route, which equation mode keeps.
 - **Why it is worth having:** ten fish on the same route stop looking like copies of each other, and routes look swum instead of drawn.
 - **Must stay repeatable:** the wandering comes from the tank's own seeded randomness, so the same tank still plays back identically.
+
+### Free swimming
+
+A fish with no route at all, going where its own steering, its school and the people in front of it take it.
+
+- **Status:** wanted eventually, particularly for projection, where a tank of fish all on fixed loops may look too orderly. Put off on 13 October 2026.
+- **Why it is not already there:** every fish today is its route plus an offset. Turning "holds its route" down to zero stops a fish returning to its route, but it still moves along with it.
+- **Smallest version:** a new kind of route, "none", for which the fish keeps a cruising speed and heading of its own, turns away from the tank's edges, and otherwise obeys the same influences, drift and schooling as any other fish.
+- **Unknown:** what a free fish does when nothing is happening, so that it still looks purposeful.
 
 ### Curious and shy fish
 

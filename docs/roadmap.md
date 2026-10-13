@@ -93,6 +93,7 @@ These do not block the stages above and can be picked up when wanted.
 - **Describe a motion in words**, and **formations**. Formations are worth doing before stage 5, since they fill a tank well.
 - **Phone viewing mode.** Small once tanks can be saved.
 - **Discovering new species.** After saved tanks, and once the catalogue has enough species to make finding one mean something.
+- **Free swimming.** Fish with no route. Most useful before the projection stage.
 - **Beyond fish.** Rays, whales, seals. Later, starting with one animal to see what breaks.
 
 ## What depends on what

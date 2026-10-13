@@ -16,6 +16,7 @@ npm run build      # type check, then build into dist/
 
 - **Test-first.** A failing test before every change in behaviour, and before every bug fix. [docs/testing.md](docs/testing.md) lists the first tests for each stage and says how things that can only be judged by eye are checked. Run `npm test` and `npm run typecheck` before calling anything done.
 - **Log decisions.** When a design or architecture decision is made or changed, add an entry to [docs/decisions.md](docs/decisions.md) in the same piece of work. Never rewrite an old entry: add a new one and mark the old one "Replaced by N". Record what prompted it in gist; do not quote Eleanor's messages word for word.
+- **Log versions.** At the end of a roadmap stage, or whenever Eleanor records a screencast, add an entry to [docs/versions.md](docs/versions.md) and tag the commit `vN`. Say what changed in how it feels to use, not only what was added. At the end of a stage, remind Eleanor to record a screencast; they live outside the repo in `~/Videos/Screencasts/`.
 - **Keep the plan current.** When the plan changes, update the doc it affects. Answered questions leave [docs/open-questions.md](docs/open-questions.md). New ideas go in [docs/ideas.md](docs/ideas.md), even half-formed.
 - **Say what is unchecked.** Facts written from memory (fish biology, hardware, library behaviour) are labelled as unchecked until sourced.
 - **Git.**

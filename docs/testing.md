@@ -180,4 +180,5 @@ A piece of work is finished when:
 1. Each behaviour it adds had a failing test first, and those tests now pass.
 2. All earlier tests still pass, and the type check passes.
 3. Anything judged by eye has been looked at on its fixed scenes.
-4. Speed checks have been run if the change touches stepping or drawing.
+4. At the end of a stage: a screencast is recorded and the version is added to [versions.md](versions.md).
+5. Speed checks have been run if the change touches stepping or drawing.

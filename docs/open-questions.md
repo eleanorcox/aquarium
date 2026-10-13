@@ -11,7 +11,7 @@ Decisions that shape the plan. Roughly in order of how much they change it.
 2. **One app with modes, or separate apps sharing a core?** The docs assume one app. The case for splitting: the exhibition display and the equation editor have almost no interface in common.
 3. **Does 3D belong in the interactive strand, or only in equation mode?** Projection and camera input are both flat, so the docs treat 3D as a side branch. A 3D tank on a wall with fish swimming towards you would be striking, but is much more work to make interactive.
 4. **Are equations visible in the exhibition?** For example a visitor choosing a swimming motion and seeing its equation. Or is the maths hidden there, and equation mode a separate thing for a different audience?
-5. **What is it called?** The repo is "aquarium", the README says "Equation Aquarium", and "Swish Fish" already exists as a name.
+5. **What is it called?** The repo is "aquarium", the README says "Equation Aquarium", "Swish Fish" already exists as a name, and the screencasts are titled "Equatium". If Equatium is the name, the README, page title and panel should say so.
 
 ## Size
 
