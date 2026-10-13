@@ -43,13 +43,13 @@ Template:
 | [7](#7-the-immersive-strand-leads) | The immersive strand leads | 13 Oct 2026 | Decided |
 | [8](#8-build-first-buy-hardware-second) | Build first, buy hardware second | 13 Oct 2026 | Decided |
 | [9](#9-real-and-made-up-fish-as-a-tank-setting) | Real and made-up fish as a tank setting | 13 Oct 2026 | Proposed |
-| [10](#10-fish-steer-towards-their-path) | Fish steer towards their path | 13 Oct 2026 | Proposed, awaiting first test |
+| [10](#10-fish-steer-towards-their-path) | Fish steer towards their path | 13 Oct 2026 | Decided; refined by 19 |
 | [11](#11-the-tank-has-its-own-size-screens-are-windows-onto-it) | The tank has its own size; screens are windows onto it | 13 Oct 2026 | Proposed |
-| [12](#12-every-input-becomes-an-influence) | Every input becomes an influence | 13 Oct 2026 | Proposed |
+| [12](#12-every-input-becomes-an-influence) | Every input becomes an influence | 13 Oct 2026 | Decided |
 | [13](#13-test-first) | Test-first | 13 Oct 2026 | Decided |
 | [14](#14-move-to-webgl-through-threejs) | Move to WebGL, through Three.js | 13 Oct 2026 | Decided in direction; timing open |
 | [15](#15-keep-this-log) | Keep this log | 13 Oct 2026 | Decided |
-| [16](#16-the-fish-decides-how-to-respond-not-the-input) | The fish decides how to respond, not the input | 13 Oct 2026 | Proposed; refines 12 |
+| [16](#16-the-fish-decides-how-to-respond-not-the-input) | The fish decides how to respond, not the input | 13 Oct 2026 | Decided; refines 12 |
 | [17](#17-fish-first-built-for-any-sea-animal) | Fish first, built for any sea animal | 13 Oct 2026 | Decided |
 | [18](#18-cheaper-subagents-where-they-are-good-enough) | Cheaper subagents where they are good enough | 13 Oct 2026 | Decided |
 
@@ -141,7 +141,7 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 ## 10. Fish steer towards their path
 
 - **Date:** 13 October 2026
-- **Status:** Proposed, awaiting first test
+- **Status:** Decided 13 October 2026, when Eleanor agreed the design; refined by 19
 - **What prompted it:** Today a fish is placed exactly where its equation says, with no velocity or memory. Scattering from a hand and flocking both need a fish that can be somewhere other than on its path. The two inspirations pull the same way: Animal Crossing fish have fixed routes, Swish Fish fish are pushed by hands.
 - **Decision:** The equation gives a moving target. The fish has its own position and velocity and steers towards the target, plus any other influences. A per-fish path strength sets how hard it holds to the route. Equation mode keeps exact placement.
 - **Alternatives considered:** Two separate simulations, one for equations and one for behaviour. Adding a temporary offset to the equation position that fades out, which is simpler but cannot do flocking.
@@ -159,7 +159,7 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 ## 12. Every input becomes an influence
 
 - **Date:** 13 October 2026
-- **Status:** Proposed
+- **Status:** Decided 13 October 2026, when Eleanor agreed the design
 - **What prompted it:** The list of inputs wanted: mouse, webcam hands, a camera or depth sensor in front of a projection, touch on a phone. Plus 8, which needs everything to work without hardware.
 - **Decision:** The simulation knows one kind of input, an influence: a point in the tank with a velocity, a radius and a kind (attract or scatter). Each device has a small adapter that produces influences.
 - **Alternatives considered:** Handling each device separately in the simulation.
@@ -198,7 +198,7 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 ## 16. The fish decides how to respond, not the input
 
 - **Date:** 13 October 2026
-- **Status:** Proposed; refines 12
+- **Status:** Decided 13 October 2026, when Eleanor agreed the design; refines 12
 - **What prompted it:** Eleanor suggested a curiosity factor: curious fish go towards a hand instead of scattering from it.
 - **Decision:** An influence no longer has a kind. It is a presence, and each fish responds according to its own temperament, from shy to curious, with the starting value set by its species. Two exceptions: an influence can carry an override for gestures and the operator, and a fast-moving influence startles every fish.
 - **Alternatives considered:** Keeping attract and scatter as two kinds of influence, as first written in 12, which makes every fish in the tank react identically.
