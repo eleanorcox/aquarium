@@ -4,6 +4,7 @@ import { Tank } from './core/tank';
 import { PointerInput } from './input/pointer';
 import { ViewGestures } from './input/viewGestures';
 import { Canvas2DRenderer } from './render/canvas2d';
+import { fishInView } from './render/drawList';
 import { View } from './render/view';
 import { SCENES, buildScene } from './scenes/scenes';
 import { createPanel } from './ui/panel';
@@ -61,8 +62,11 @@ canvas.addEventListener(
   { passive: false },
 );
 
+const stats = { fish: 0, drawn: 0, stepMs: 0, drawMs: 0 };
+
 const controls = createPanel(tank, panelElements, {
   pointer,
+  stats,
   reach,
   scene,
   trails: SCENES[scene]?.trails ?? true,
@@ -83,6 +87,15 @@ canvas.addEventListener('click', (e) => {
   if (id !== undefined) controls.select(id);
 });
 
+/** Averages the timings over about half a second, so the numbers can be read. */
+function showSpeed(stepMs: number, drawMs: number): void {
+  const smooth = (old: number, now: number) => Math.round((old * 0.97 + now * 0.03) * 100) / 100;
+  stats.stepMs = smooth(stats.stepMs, stepMs);
+  stats.drawMs = smooth(stats.drawMs, drawMs);
+  stats.fish = tank.fish.length;
+  stats.drawn = fishInView(tank.fish, view).length;
+}
+
 // Fixed timestep: the simulation advances in equal 1/60 s steps whatever the screen's refresh rate,
 // so a fish follows exactly the same path on a laptop, a 144 Hz monitor or a projector.
 const DT = 1 / 60;
@@ -96,12 +109,15 @@ function frame(now: number): void {
   // The pointer reaches the same distance on screen however far the view is zoomed.
   pointer.radius = view.tankLength(reach.pixels);
   tank.setInfluences(pointer.influences(seconds()));
+  const stepStart = performance.now();
   while (accumulator >= DT) {
     tank.step(DT);
     accumulator -= DT;
   }
+  const drawStart = performance.now();
   if (controls.follow) view.follow(tank.get(controls.display.selected));
   renderer.render(tank, view, controls.display);
+  showSpeed(drawStart - stepStart, performance.now() - drawStart);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

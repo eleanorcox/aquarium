@@ -4,12 +4,13 @@ What the ideas in [ideas.md](ideas.md) mean for the code. Nothing here is built 
 
 ## What we have
 
-About 2,000 lines of TypeScript, built with Vite, tested with Vitest.
+About 2,900 lines of TypeScript, built with Vite, tested with Vitest.
 
 - [src/core/](../src/core/): the simulation. No DOM. A `Tank` holds `Fish`; each fish has a motion model and parameters.
-- [src/render/](../src/render/): a Canvas 2D renderer that only reads the tank.
+- [src/render/](../src/render/): a Canvas 2D renderer that only reads the tank, and the view it draws through.
 - [src/ui/](../src/ui/): a lil-gui panel that only changes the tank through its methods.
-- [src/input/](../src/input/): adapters that turn a device into influences. So far, the pointer.
+- [src/input/](../src/input/): adapters that turn a device into influences, and gestures into moves of the view. So far, the pointer.
+- [src/scenes/](../src/scenes/): fixed tanks for judging changes by eye.
 
 The rule that the simulation never knows how it is drawn is what makes "one project, several modes" possible. Keep it.
 
@@ -33,7 +34,7 @@ The forces live in [steering.ts](../src/core/steering.ts), each as a small funct
 Limits of what is built:
 
 - A fish with path strength zero never returns to its route but still moves with it. A fish with no route, swimming freely, does not exist yet.
-- Schooling compares every pair of schooling fish. That is fine for tens of fish; hundreds need the grid described below.
+- A fish in a dense school still looks at every schoolmate in sight. That is fine for hundreds of fish and too slow for thousands.
 - Fish school with any other schooling fish. There are no species yet to keep schools apart.
 
 ## One kind of input for all interaction
@@ -46,14 +47,16 @@ This means every behaviour is developed with a mouse first, and adding a new sen
 
 ## Tank size and screen size are separate things
 
-The aquarium has to work on a phone, a laptop and a wall several metres wide, showing a few fish on one and hundreds on another. Today it cannot: the tank's width *is* the screen's aspect ratio ([canvas2d.ts](../src/render/canvas2d.ts) hands it to `tank.resize`), so the same tank is a different shape on every device and holds the same fish on all of them.
+*Built in stage 1b. See [decisions.md](decisions.md), entries 11, 22, 23 and 24.*
 
-**Proposed approach: a tank has its own size, and each screen is a window onto it.**
+The aquarium has to work on a phone, a laptop and a wall several metres wide, showing a few fish on one and hundreds on another. Until stage 1b the tank's width was the screen's aspect ratio, so the same tank was a different shape on every device.
 
-- **The tank** has a fixed width and height in its own units, saved with it. Routes, schools and fish counts belong to the tank. A big tank holds hundreds of fish; a small one holds five.
-- **The view** belongs to the device: which part of the tank is on screen, and how zoomed in. Renderers and inputs go through the view to convert between screen and tank positions. The simulation never sees it.
-- **One rule sets the zoom:** fish must be a comfortable size to look at. On a wall, that lets the whole of a big tank fit. On a phone, only part fits, so the view can be moved.
-- **How the view moves** when the tank is bigger than the screen: drag to pan, pinch to zoom, or follow a chosen fish. Following a fish is probably the nicest way to watch on a phone.
+**A tank has its own size, and each screen is a window onto it.**
+
+- **The tank** ([tank.ts](../src/core/tank.ts)) is always one unit tall and as wide as it was made. Its size is that width, plus how small its fish are: a big tank is a wide one full of small fish. Routes, schools and fish counts belong to the tank.
+- **The view** ([view.ts](../src/render/view.ts)) belongs to the device: which part of the tank is on screen, and how zoomed in. Renderers and inputs go through it to convert between screen and tank positions. The simulation never sees it.
+- **One rule sets the zoom:** a typical fish must be at least 6 pixels in size. If the whole tank fits under that rule, it is shown whole and centred and cannot be moved. If not, the view starts zoomed in on the middle and can be moved.
+- **Moving the view** ([viewGestures.ts](../src/input/viewGestures.ts)): drag with the mouse, drag or pinch with two fingers, zoom with the wheel, or follow the selected fish. One finger on a touch screen is left for the fish.
 
 What each device gets from the same rule:
 
@@ -64,19 +67,22 @@ What each device gets from the same rule:
 | Laptop | Most or all of a medium tank | Tens | Sometimes |
 | Wall | All of a large tank | Hundreds | No |
 
-So "a few fish on a phone, hundreds on a wall" comes from two choices that can be combined freely: how big the tank is, and how much of it this screen shows.
+**What else was built with it**
 
-**Things that follow from this**
+- **Behaviour in fish sizes.** Schooling distances and drift are multiples of a fish's own size, so small fish school tightly and wander a little.
+- **Reach of a pointer.** Set in pixels, with a push in proportion to its reach, so it feels the same at any zoom.
+- **Drawing only what is on screen.** [drawList.ts](../src/render/drawList.ts) lists the fish in view.
+- **Finding schoolmates by grid.** [neighbours.ts](../src/core/neighbours.ts) sorts fish into squares so each looks only nearby.
+- **Speed.** One step of 500 schooling fish takes about a fifth of a frame; 2,000 is too slow. `npm run speed` reports it, and the panel shows step and draw times live.
 
-- **Tank units become real units.** With real species, the natural unit is the metre. A tank 4 m wide on a wall 4 m wide shows fish life-size, which eases the sardine-against-tuna scale problem exactly where there is room for it.
-- **Drawing hundreds of fish.** Skip fish outside the view. Draw distant or tiny fish more simply. Shrink fish pictures to the size they appear. This is a strong push towards WebGL, which can draw many copies of a picture cheaply; Canvas 2D will likely struggle with hundreds of bending fish.
-- **Simulating hundreds of fish.** Flocking compares each fish with its neighbours, which gets slow if every fish checks every other. The usual fix is to sort fish into a grid so each only checks nearby cells. Trails, at 240 points per fish, are switched off or shortened in large tanks.
-- **A phone viewing a large tank** still simulates the whole tank even though it shows a corner. Whether a phone can do that for several hundred fish needs measuring.
-- **Reach of a hand.** How far a hand or finger affects fish should be set by its size on the screen, then converted to tank units. A fingertip on a phone and a person at a wall then both feel right.
-- **Edges.** Routes wrap at the tank's edges, as now. If the tank also joined up left to right, like a cylinder, a phone could scroll round it for ever. Undecided.
-- **Backgrounds** are sized to the tank, not the screen, and scroll with the view.
+**Still open**
 
-*Later concern:* two devices showing the same tank at the same moment (a phone looking into the wall's tank) need to agree on where the fish are. Fish on pure equation routes agree automatically if the devices share a clock. Pushed and flocking fish do not, and would need the real-time service.
+- **Drawing speed** on a real screen, which decides when the move to WebGL happens.
+- **Real units.** One number per tank, how many metres tall it is, would turn a species' real length into a fish size. Not needed until species exist.
+- **Edges.** Routes wrap at the tank's edges, as before. Whether a tank should join up left to right, so a phone can scroll round it for ever, is undecided.
+- **Backgrounds** will be sized to the tank, not the screen, and scroll with the view.
+- **The panel on a phone** covers the tank. Phone mode needs its own layout.
+- **Two devices showing one tank at once** need to agree on where the fish are. Fish on pure equation routes agree if the devices share a clock. Pushed and schooling fish do not, and would need the real-time service.
 
 ## Smaller changes the ideas require
 

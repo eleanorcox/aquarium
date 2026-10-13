@@ -8,6 +8,7 @@ Equatium is the working name (not final; it may stop fitting once not every mode
 nvm use            # Node 24, pinned in .nvmrc; older Node fails at startup
 npm run dev        # local dev server
 npm test           # all tests, once
+npm run speed      # time the simulation; run before and after changing how it steps
 npm run typecheck  # type check only
 npm run build      # type check, then build into dist/
 ```

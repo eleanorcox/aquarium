@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "speed": "vitest run --config vitest.speed.config.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

@@ -18,8 +18,8 @@ Two further rules:
 
 ## What exists today
 
-- 79 tests in seven files, run with Vitest by `npm test`. All pass. There were 30 before stage 1.
-- They test the simulation in `src/core/`, the pointer input in `src/input/` and the fixed scenes in `src/scenes/`. Nothing tests the renderer or the panel.
+- 113 tests in eleven files, run with Vitest by `npm test`. All pass. There were 30 before stage 1.
+- They test the simulation in `src/core/`, the inputs in `src/input/`, the view and draw list in `src/render/` and the fixed scenes in `src/scenes/`. Nothing tests the canvas drawing or the panel.
 - The tests and the type check run automatically on every push and pull request ([ci.yml](../.github/workflows/ci.yml)).
 - `npm run test:watch` reruns tests as files change, and [testing.ts](../src/core/testing.ts) builds and advances a test tank in one line.
 
@@ -67,7 +67,9 @@ For cameras. A short recording of what the tracker produced (hand landmark posit
 
 ### Speed checks
 
-"500 fish step in under 4 ms" is a requirement like any other, but timing varies between machines, so these are kept apart from the main tests: run on request, reported as numbers, and compared with the last run. They do not block a change unless something gets dramatically slower.
+"500 fish step in under 4 ms" is a requirement like any other, but timing varies between machines, so these are kept apart from the main tests: run on request with `npm run speed`, reported as numbers, and compared with the last run. They do not block a change unless something gets dramatically slower. Files are named `name.speed.ts`.
+
+Drawing cannot be timed without a real screen, so the panel has a Speed section showing the time spent stepping and drawing each frame.
 
 ### Asset checks
 
@@ -90,6 +92,7 @@ The scenes are in [scenes.ts](../src/scenes/scenes.ts), each with a note on what
 | `?scene=temperaments` | Shy to curious | The response to the pointer, slow and fast |
 | `?scene=drift` | Drift | Drift from none to full |
 | `?scene=school` | One school | Schooling, and a school parting round the pointer |
+| `?scene=shoal` | Five hundred fish | Speed, and dragging and zooming around a tank bigger than the screen |
 
 Tests check that every scene is the same tank each time and keeps its fish inside the tank. A new scene is covered by those tests as soon as it is added.
 
@@ -125,6 +128,8 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 
 ### Stage 1b: a tank bigger than the screen
 
+*Built. The tests are in [view.test.ts](../src/render/view.test.ts), [viewGestures.test.ts](../src/input/viewGestures.test.ts), [drawList.test.ts](../src/render/drawList.test.ts), [neighbours.test.ts](../src/core/neighbours.test.ts) and the schooling tests in [steering.test.ts](../src/core/steering.test.ts). Still to do: judging panning, zooming and the 500-fish scene by eye.*
+
 - Changing the screen size does not change the tank's size or any fish's path. *This reverses today's behaviour, so the existing test of `resize` changes first.*
 - A screen position converted to a tank position and back gives the starting position, at any pan and zoom.
 - A tank that fits is shown whole and centred; the view cannot be moved.
@@ -134,7 +139,7 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 - Fish outside the view are left off the list of things to draw; fish straddling the edge are kept.
 - The grid-based neighbour search gives the same neighbours as checking every pair.
 - An influence's reach is the same size on screen at any zoom.
-- Speed check: time to step 100, 500 and 2,000 flocking fish.
+- Speed check: time to step 100, 500 and 2,000 flocking fish. *Run with `npm run speed`. On 13 October 2026: 0.3 ms, 3.4 ms and 33 ms a step, against a 16.7 ms frame.*
 
 ### Stage 2: hands
 

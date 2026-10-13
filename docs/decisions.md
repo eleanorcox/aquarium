@@ -37,14 +37,14 @@ Template:
 | [1](#1-the-simulation-does-not-know-how-it-is-drawn) | The simulation does not know how it is drawn | 6 Oct 2026 | Built |
 | [2](#2-fixed-timestep) | Fixed timestep | 6 Oct 2026 | Built |
 | [3](#3-canvas-2d-for-the-first-renderer) | Canvas 2D for the first renderer | 6 Oct 2026 | Built; to be replaced, see 14 |
-| [4](#4-the-tank-is-the-shape-of-the-screen) | The tank is the shape of the screen | 6 Oct 2026 | Built; replacement proposed in 11 |
+| [4](#4-the-tank-is-the-shape-of-the-screen) | The tank is the shape of the screen | 6 Oct 2026 | Replaced by 11 |
 | [5](#5-typed-equations-through-mathjs) | Typed equations through math.js | 9 Oct 2026 | Built |
 | [6](#6-one-project-with-modes) | One project with modes | 13 Oct 2026 | Decided as a working assumption |
 | [7](#7-the-immersive-strand-leads) | The immersive strand leads | 13 Oct 2026 | Decided |
 | [8](#8-build-first-buy-hardware-second) | Build first, buy hardware second | 13 Oct 2026 | Decided |
 | [9](#9-real-and-made-up-fish-as-a-tank-setting) | Real and made-up fish as a tank setting | 13 Oct 2026 | Proposed |
 | [10](#10-fish-steer-towards-their-path) | Fish steer towards their path | 13 Oct 2026 | Built, in the form set out in 19 |
-| [11](#11-the-tank-has-its-own-size-screens-are-windows-onto-it) | The tank has its own size; screens are windows onto it | 13 Oct 2026 | Proposed |
+| [11](#11-the-tank-has-its-own-size-screens-are-windows-onto-it) | The tank has its own size; screens are windows onto it | 13 Oct 2026 | Built, with the units set out in 22 |
 | [12](#12-every-input-becomes-an-influence) | Every input becomes an influence | 13 Oct 2026 | Built |
 | [13](#13-test-first) | Test-first | 13 Oct 2026 | Decided |
 | [14](#14-move-to-webgl-through-threejs) | Move to WebGL, through Three.js | 13 Oct 2026 | Decided in direction; timing open |
@@ -55,6 +55,9 @@ Template:
 | [19](#19-a-fishs-position-is-its-route-plus-an-offset) | A fish's position is its route plus an offset | 13 Oct 2026 | Built; refines 10 |
 | [20](#20-equatium-as-a-working-name) | Equatium as a working name | 13 Oct 2026 | Decided; final name open |
 | [21](#21-a-changelog-and-a-version-log) | A changelog and a version log | 13 Oct 2026 | Decided |
+| [22](#22-tank-units-stay-tank-heights) | Tank units stay tank heights | 13 Oct 2026 | Built; refines 11 |
+| [23](#23-behaviour-is-measured-in-fish-sizes) | Behaviour is measured in fish sizes | 13 Oct 2026 | Built |
+| [24](#24-canvas-2d-stays-until-drawing-is-measured-on-a-real-screen) | Canvas 2D stays until drawing is measured on a real screen | 13 Oct 2026 | Decided; settles the timing left open in 14 for now |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -90,7 +93,7 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 ## 4. The tank is the shape of the screen
 
 - **Date:** 6 October 2026 (commit `0ea49a8`)
-- **Status:** Built; replacement proposed in 11
+- **Status:** Replaced by 11 on 13 October 2026
 - **What prompted it:** One screen, one tank, filling the window.
 - **Decision:** The tank is 1 unit tall and as wide as the screen's aspect ratio. Resizing the window resizes the tank.
 - **Alternatives considered:** Not recorded.
@@ -153,7 +156,7 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 ## 11. The tank has its own size; screens are windows onto it
 
 - **Date:** 13 October 2026
-- **Status:** Proposed; replaces 4 when built
+- **Status:** Built 13 October 2026, with the units set out in 22; replaces 4
 - **What prompted it:** Eleanor asked for it to handle very different screen sizes: a phone, a laptop and a projection on a large wall. The wall should show hundreds of fish; a phone only a few, probably with scrolling around the environment.
 - **Decision:** A tank has a fixed size, saved with it. Each device has a view: which part of the tank is on screen and how zoomed in, set so fish are a comfortable size. A tank that does not fit can be panned, zoomed or watched by following a fish.
 - **Alternatives considered:** Keeping 4 and scaling the number of fish to the screen, which gives every device a different aquarium. Separate small and large tank types with different code.
@@ -259,3 +262,32 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 - **Decision:** Both, with separate jobs. [CHANGELOG.md](../CHANGELOG.md) at the top of the repo is the conventional short list of what was added and changed, updated with each change. [versions.md](versions.md) says what each version was like to use and names its screencast. Each version gets a git tag.
 - **Alternatives considered:** A changelog alone, which is where people expect to look but has no natural place for how a version feels or for the videos. A version log alone, which mixes long feature lists into the narrative.
 - **What follows from it:** Two files to keep in step. The version log links to the changelog for the lists instead of repeating them.
+
+## 22. Tank units stay tank heights
+
+- **Date:** 13 October 2026
+- **Status:** Built; refines 11
+- **What prompted it:** Building 11. The plan there said tank units could become real metres, with a tank having any width and height. But every built-in path and typed equation assumes a tank one unit tall: centre lines, amplitudes and `cy` are all written against that.
+- **Decision:** A tank is always one unit tall. Its size is its width, plus how small its fish are. A "big" tank, for a wall, is a wide one full of small fish; a phone's own tank is a narrow one with a few large fish. The default tank is 16:9.
+- **Alternatives considered:** Tanks of any width and height in metres. More literal, but it means rewriting all ten paths and the typed-equation variables, for no visible difference yet.
+- **What follows from it:** Paths and saved equations keep working unchanged. Real sizes can come later as one number per tank, how many metres tall it is, used to turn a species' real length into a fish size. A view decides how far to zoom from the size of a typical fish, so a tank of small fish is shown zoomed in on a small screen and whole on a large one.
+
+## 23. Behaviour is measured in fish sizes
+
+- **Date:** 13 October 2026
+- **Status:** Built
+- **What prompted it:** The first tank of small fish. Schooling distances and drift had been fixed lengths tuned for fish of one size, so small fish kept apart by many times their own length and wandered several lengths off their routes. Zooming in also shortened the pointer's reach in the tank without weakening its push.
+- **Decision:** How far a fish sees its schoolmates, how much space it keeps, and how far it drifts are all multiples of its own size. The pointer's reach is set in pixels, and its push is in proportion to its reach.
+- **Alternatives considered:** Separate settings per tank, which would need retuning for every fish size.
+- **What follows from it:** A school of small fish looks like a scaled-down school of large ones, and the pointer feels the same at any zoom. When species arrive, a sardine and a tuna in one tank each school at their own scale with no extra settings.
+
+## 24. Canvas 2D stays until drawing is measured on a real screen
+
+- **Date:** 13 October 2026
+- **Status:** Decided; settles the timing left open in 14 for now
+- **What prompted it:** The 500-fish test that 14 was waiting for. It measured the simulation, which could be timed here: on this machine one step takes 0.3 ms for 100 schooling fish, 3.4 ms for 500 and 33 ms for 2,000, against a frame of 16.7 ms. The first version took 9.9 ms for 500; creating nothing in the schooling loop and working out each fish's velocity once a step made it three times faster.
+- **Decision:** No move to WebGL yet. The simulation handles 500 fish in about a fifth of a frame. Drawing could not be timed here, since a headless browser without a graphics card says nothing useful, so the panel now shows step and draw times, and the move is decided once Eleanor has read them on her own screen with the 500-fish scene.
+- **Alternatives considered:** Moving to WebGL now on the expectation that Canvas 2D will be too slow. Likely right in the end, but it would be a guess, and stage 3's artwork experiment is a better moment.
+- **What follows from it:**
+  - 2,000 schooling fish is out of reach for the simulation as it stands. Fish in a dense school all see each other, so the work still grows with the square of the school's size. The usual cure is for each fish to attend only to its nearest few schoolmates. Not needed for hundreds.
+  - `npm run speed` reports these timings, to compare before and after changes to the simulation.

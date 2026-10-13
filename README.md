@@ -15,7 +15,8 @@ Needs Node.js 22.12 or newer (`.nvmrc` pins 24; with nvm, run `nvm install` then
 ```sh
 npm install
 npm run dev      # local dev server
-npm test         # unit tests for the simulation core
+npm test         # all tests
+npm run speed    # time the simulation with 100, 500 and 2,000 fish
 npm run build    # type-check and build static files into dist/
 ```
 
@@ -28,7 +29,7 @@ The simulation never knows how it is drawn.
 - `src/ui/` holds the control panel, which only changes the tank through its methods.
 - `src/input/` turns devices into influences the fish react to. Today that is the pointer; camera input comes later.
 
-Positions are in tank units: the tank is 1 unit tall and as wide as the screen's aspect ratio.
+Positions are in tank units: every tank is 1 unit tall and has a width of its own, 16:9 by default. The screen is a window onto the tank. When the whole tank fits it is shown whole; a wide tank of small fish is shown zoomed in, and you can drag to move around it, zoom with the wheel or a pinch, or follow a fish.
 
 ### Motion models
 
@@ -62,7 +63,7 @@ The pointer can also attract or scatter every fish whatever its temperament, and
 
 ### Scenes
 
-Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift` or `school`. They are for judging by eye how a change looks and feels.
+Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school` or `shoal` (500 fish in a tank wider than the screen). They are for judging by eye how a change looks and feels.
 
 ### Your own equations
 

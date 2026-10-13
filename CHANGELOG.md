@@ -8,10 +8,18 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
-- Fixed scenes: five named tanks that are the same every time, chosen from a Scene list in the panel or with `?scene=name` in the address.
+- Fixed scenes: six named tanks that are the same every time, chosen from a Scene list in the panel or with `?scene=name` in the address.
+- A tank can be bigger than the screen. Drag to move around it, zoom with the wheel or a pinch, or tick Follow selected fish.
+- A scene of 500 small fish in five schools.
+- A Speed section in the panel showing how many fish are on screen and the time spent stepping and drawing each frame.
 
 ### Changed
 
+- The tank keeps its own shape, 16:9 by default, instead of taking the shape of the window. A window of another shape shows a dark margin.
+- Small fish school more tightly and drift less, in proportion to their size.
+- The pointer's reach is set in pixels and feels the same at any zoom.
+- Scenes with schools start with the school already spread out.
+- Schooling is about three times faster.
 - The project is called Equatium, as a working name, in the page title, panel, README and package name. It was "Equation Aquarium".
 
 ## v2: schooling, drift, curiosity (13 October 2026)

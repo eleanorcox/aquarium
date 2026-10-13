@@ -84,16 +84,6 @@ export interface FlockRules {
   cohesion: number;
 }
 
-/** Another schooling fish, as seen by the fish being steered. */
-export interface Schoolmate {
-  /** From the fish to its schoolmate. */
-  dx: number;
-  dy: number;
-  /** The schoolmate's velocity. */
-  vx: number;
-  vy: number;
-}
-
 /** How far a schooling fish notices other schooling fish, as a multiple of its own size. */
 export const SIGHT = 6;
 /** Schooling fish closer than this push apart, as a multiple of the fish's own size. */
@@ -105,35 +95,58 @@ const COHESION_FORCE = 4;
 /**
  * The three schooling rules for one fish: keep clear of schoolmates that are too close, match the
  * average heading of those in sight, and move towards their middle.
- * `tiebreak` is an angle unique to the fish, used to part fish that are in exactly the same place.
  * Distances scale with the fish's `size`, so small fish school more tightly than large ones.
+ *
+ * A fish in a large school has hundreds of schoolmates in sight, so this is the busiest loop in the
+ * simulation. A Flock is filled one schoolmate at a time and reused from fish to fish, creating nothing.
  */
-export function flockForce(mates: Schoolmate[], velocity: Vec2, rules: FlockRules, tiebreak: number, size: number): Vec2 {
-  const force = { x: 0, y: 0 };
-  const sight = SIGHT * size;
-  const personalSpace = PERSONAL_SPACE * size;
-  let inSight = 0;
-  const sum = { dx: 0, dy: 0, vx: 0, vy: 0 };
-  for (const mate of mates) {
-    const distance = Math.hypot(mate.dx, mate.dy);
-    if (distance >= sight) continue;
-    inSight++;
-    sum.dx += mate.dx;
-    sum.dy += mate.dy;
-    sum.vx += mate.vx;
-    sum.vy += mate.vy;
-    if (distance < personalSpace) {
-      const push = rules.separation * SEPARATION_FORCE * (1 - distance / personalSpace);
-      force.x -= (distance === 0 ? Math.cos(tiebreak) : mate.dx / distance) * push;
-      force.y -= (distance === 0 ? Math.sin(tiebreak) : mate.dy / distance) * push;
+export class Flock {
+  private sight = 0;
+  private personalSpace = 0;
+  private tiebreak = 0;
+  private inSight = 0;
+  private pushX = 0;
+  private pushY = 0;
+  private sumDx = 0;
+  private sumDy = 0;
+  private sumVx = 0;
+  private sumVy = 0;
+
+  /** Starts again for a fish of this size. `tiebreak` is an angle unique to the fish, used to part fish in exactly the same place. */
+  start(size: number, tiebreak: number): void {
+    this.sight = SIGHT * size;
+    this.personalSpace = PERSONAL_SPACE * size;
+    this.tiebreak = tiebreak;
+    this.inSight = this.pushX = this.pushY = this.sumDx = this.sumDy = this.sumVx = this.sumVy = 0;
+  }
+
+  /** Takes account of one schoolmate: `dx`, `dy` point from the fish to it, and `vx`, `vy` is its velocity. */
+  add(dx: number, dy: number, vx: number, vy: number): void {
+    const distanceSquared = dx * dx + dy * dy;
+    if (distanceSquared >= this.sight * this.sight) return;
+    this.inSight++;
+    this.sumDx += dx;
+    this.sumDy += dy;
+    this.sumVx += vx;
+    this.sumVy += vy;
+    if (distanceSquared < this.personalSpace * this.personalSpace) {
+      const distance = Math.sqrt(distanceSquared);
+      const push = SEPARATION_FORCE * (1 - distance / this.personalSpace);
+      this.pushX -= (distance === 0 ? Math.cos(this.tiebreak) : dx / distance) * push;
+      this.pushY -= (distance === 0 ? Math.sin(this.tiebreak) : dy / distance) * push;
     }
   }
-  if (inSight === 0) return force;
-  force.x += rules.alignment * ALIGNMENT_FORCE * (sum.vx / inSight - velocity.x);
-  force.y += rules.alignment * ALIGNMENT_FORCE * (sum.vy / inSight - velocity.y);
-  force.x += (rules.cohesion * COHESION_FORCE * sum.dx) / inSight;
-  force.y += (rules.cohesion * COHESION_FORCE * sum.dy) / inSight;
-  return force;
+
+  /** The resulting push on the fish, given its own velocity and how strongly each rule applies. */
+  force(velocityX: number, velocityY: number, rules: FlockRules): Vec2 {
+    const force = { x: rules.separation * this.pushX, y: rules.separation * this.pushY };
+    if (this.inSight === 0) return force;
+    force.x += rules.alignment * ALIGNMENT_FORCE * (this.sumVx / this.inSight - velocityX);
+    force.y += rules.alignment * ALIGNMENT_FORCE * (this.sumVy / this.inSight - velocityY);
+    force.x += (rules.cohesion * COHESION_FORCE * this.sumDx) / this.inSight;
+    force.y += (rules.cohesion * COHESION_FORCE * this.sumDy) / this.inSight;
+    return force;
+  }
 }
 
 /** Limits a velocity to a top speed, keeping its direction. */

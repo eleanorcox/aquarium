@@ -33,6 +33,8 @@ Fish steer towards their path instead of being placed on it; curious fish approa
 
 ### Stage 1b: a tank bigger than the screen
 
+*Status, 13 October 2026: built and tested on the `stage-1b-tank-and-view` branch. Not yet judged by eye. The simulation handles 500 fish comfortably; drawing speed still needs reading off a real screen.*
+
 The tank gets its own size; the screen becomes a movable, zoomable window onto it. Then a 500-fish test tank.
 
 - **Shows:** the same tank whole on a laptop and as a scrolling window in a phone-sized browser, and a large school moving together.
@@ -119,4 +121,6 @@ flocking ──> schools ──────────────────�
 
 ## Suggested next step
 
-Stage 1b: a tank bigger than the screen.
+1. Eleanor tries stage 1b: dragging and zooming, the `shoal` scene, and the draw time in the panel's Speed section. The branch is merged once it feels right.
+2. That draw time decides whether WebGL comes before stage 2 or with stage 3.
+3. Stage 2: webcam hands.

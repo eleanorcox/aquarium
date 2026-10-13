@@ -36,7 +36,17 @@ export interface PanelOptions {
   reach: { pixels: number };
   scene: string;
   trails: boolean;
+  /** Timings the page keeps up to date, shown read-only for judging speed by eye. */
+  stats: Stats;
   onAddFish: () => number;
+}
+
+export interface Stats {
+  fish: number;
+  drawn: number;
+  /** Milliseconds spent stepping the simulation and drawing, per frame. A frame at 60 a second is 16.7 ms. */
+  stepMs: number;
+  drawMs: number;
 }
 
 export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions): Controls {
@@ -105,6 +115,12 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   tankFolder.add(controls, 'follow').name('Follow selected fish');
   tankFolder.add(controls.display, 'trails').name('Trails');
   tankFolder.add(controls, 'paused').name('Pause');
+
+  const speed = gui.addFolder('Speed').close();
+  speed.add(options.stats, 'fish').name('Fish in tank').listen().disable();
+  speed.add(options.stats, 'drawn').name('Fish on screen').listen().disable();
+  speed.add(options.stats, 'stepMs').name('Step, ms a frame').listen().disable();
+  speed.add(options.stats, 'drawMs').name('Draw, ms a frame').listen().disable();
 
   el.editor.addEventListener('submit', (e) => {
     e.preventDefault();

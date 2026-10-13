@@ -41,6 +41,17 @@ describe('scenes', () => {
         }
       }
     }
+    // Twenty seconds of every scene, including the one with 500 fish, takes a few seconds to run.
+  }, 30_000);
+
+  it('starts schools already spread out, not bursting from one point', () => {
+    for (const id of ['mixed', 'school', 'shoal']) {
+      const schooling = built(id).fish.filter((fish) => fish.schools);
+      for (const [i, a] of schooling.entries()) {
+        // No two closer than half a fish size.
+        for (const b of schooling.slice(i + 1)) expect(Math.hypot(a.x - b.x, a.y - b.y), id).toBeGreaterThan(a.size / 2);
+      }
+    }
   });
 
   it('falls back to the default scene for a name it does not know', () => {
