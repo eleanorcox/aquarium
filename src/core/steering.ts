@@ -18,8 +18,13 @@ export interface Influence {
 
 /** Pull back to the route, per unit of offset, at full path strength. */
 export const ROUTE_STIFFNESS = 60;
-/** Push or pull on a fully shy or fully curious fish right beside an influence. */
-export const INFLUENCE_FORCE = 6;
+/** The fish size the strengths below were set for. Drift and schooling distances scale from it. */
+export const REFERENCE_SIZE = 0.04;
+/**
+ * Push or pull on a fully shy or fully curious fish right beside an influence, per unit of the
+ * influence's radius. A short reach pushes less hard, so its effect stays the same size on screen.
+ */
+export const INFLUENCE_PUSH = 24;
 /** An influence moving faster than this scatters every fish, curious or not. Three tank heights a second. */
 export const STARTLE_SPEED = 3;
 /** A curious fish eases off inside this fraction of the radius, so it stops short of the influence. */
@@ -49,12 +54,12 @@ export function influenceForce(dx: number, dy: number, curiosity: number, influe
   // Strongest beside the influence, fading to nothing at the edge of its reach.
   const reach = 1 - distance / influence.radius;
   const easeOff = pull > 0 ? Math.min(1, distance / (STANDOFF * influence.radius)) : 1;
-  const away = -pull * INFLUENCE_FORCE * reach * easeOff;
+  const away = -pull * INFLUENCE_PUSH * influence.radius * reach * easeOff;
   // A fish exactly on the influence has no direction to flee in, so pick one.
   return distance === 0 ? { x: away, y: 0 } : { x: (dx / distance) * away, y: (dy / distance) * away };
 }
 
-/** Push on a fully drifting fish when its wander is at its strongest along one axis. */
+/** Push on a fully drifting fish of the reference size when its wander is at its strongest along one axis. */
 export const DRIFT_FORCE = 2.5;
 /** Seconds over which a fish's wander forgets where it was heading. */
 const WANDER_MEMORY = 1.5;
@@ -89,10 +94,10 @@ export interface Schoolmate {
   vy: number;
 }
 
-/** How far a schooling fish notices other schooling fish. */
-export const SIGHT = 0.25;
-/** Schooling fish closer than this push apart. About two fish lengths. */
-export const PERSONAL_SPACE = 0.08;
+/** How far a schooling fish notices other schooling fish, as a multiple of its own size. */
+export const SIGHT = 6;
+/** Schooling fish closer than this push apart, as a multiple of the fish's own size. */
+export const PERSONAL_SPACE = 2;
 const SEPARATION_FORCE = 8;
 const ALIGNMENT_FORCE = 2;
 const COHESION_FORCE = 4;
@@ -101,21 +106,24 @@ const COHESION_FORCE = 4;
  * The three schooling rules for one fish: keep clear of schoolmates that are too close, match the
  * average heading of those in sight, and move towards their middle.
  * `tiebreak` is an angle unique to the fish, used to part fish that are in exactly the same place.
+ * Distances scale with the fish's `size`, so small fish school more tightly than large ones.
  */
-export function flockForce(mates: Schoolmate[], velocity: Vec2, rules: FlockRules, tiebreak: number): Vec2 {
+export function flockForce(mates: Schoolmate[], velocity: Vec2, rules: FlockRules, tiebreak: number, size: number): Vec2 {
   const force = { x: 0, y: 0 };
+  const sight = SIGHT * size;
+  const personalSpace = PERSONAL_SPACE * size;
   let inSight = 0;
   const sum = { dx: 0, dy: 0, vx: 0, vy: 0 };
   for (const mate of mates) {
     const distance = Math.hypot(mate.dx, mate.dy);
-    if (distance >= SIGHT) continue;
+    if (distance >= sight) continue;
     inSight++;
     sum.dx += mate.dx;
     sum.dy += mate.dy;
     sum.vx += mate.vx;
     sum.vy += mate.vy;
-    if (distance < PERSONAL_SPACE) {
-      const push = rules.separation * SEPARATION_FORCE * (1 - distance / PERSONAL_SPACE);
+    if (distance < personalSpace) {
+      const push = rules.separation * SEPARATION_FORCE * (1 - distance / personalSpace);
       force.x -= (distance === 0 ? Math.cos(tiebreak) : mate.dx / distance) * push;
       force.y -= (distance === 0 ? Math.sin(tiebreak) : mate.dy / distance) * push;
     }

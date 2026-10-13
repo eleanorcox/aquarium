@@ -2,9 +2,12 @@
 import { compileEquations, scopeFor, type PositionFn } from './equations';
 import { DEFAULT_CUSTOM, MODELS, defaultParams, type EquationSource, type ModelId, type Params, type Vec2 } from './motion';
 import { seededRandom } from './random';
+import { Grid } from './neighbours';
 import {
   DRIFT_FORCE,
   MAX_OFFSET_SPEED,
+  REFERENCE_SIZE,
+  SIGHT,
   flockForce,
   influenceForce,
   limitSpeed,
@@ -77,6 +80,9 @@ export class Tank {
   private compiled = new Map<number, PositionFn>();
   /** Ids are never reused, so an id always means the same fish even after others are removed. */
   private nextId = 0;
+  /** The schooling fish and a grid of where they are, rebuilt at the start of each step. */
+  private school: Fish[] = [];
+  private schoolGrid = new Grid(1);
 
   /** Tank units are tank heights, so every tank is 1 tall. A bigger tank is a wider one with smaller fish. */
   readonly height = 1;
@@ -180,6 +186,7 @@ export class Tank {
 
   step(dt: number): void {
     // Work out every push from where the fish are now, then move them all, so the order of the fish never matters.
+    this.findSchool();
     const forces = this.fish.map((fish) => this.forceOn(fish, dt));
     this.t += dt;
     this.fish.forEach((fish, i) => {
@@ -217,8 +224,10 @@ export class Tank {
     const force = routeForce(fish.offset, fish.offsetVelocity, fish.pathStrength);
     if (fish.drift > 0) {
       stepWander(fish.wander, this.random, dt);
-      force.x += fish.drift * DRIFT_FORCE * fish.wander.x;
-      force.y += fish.drift * DRIFT_FORCE * fish.wander.y;
+      // A small fish wanders a small distance: drift is measured in fish sizes.
+      const strength = (fish.drift * DRIFT_FORCE * fish.size) / REFERENCE_SIZE;
+      force.x += strength * fish.wander.x;
+      force.y += strength * fish.wander.y;
     }
     for (const influence of this.influences) {
       // Where the tank wraps, an influence just across the edge is close, not a tank-width away.
@@ -229,25 +238,47 @@ export class Tank {
       force.y += push.y;
     }
     if (fish.schools) {
-      const push = flockForce(this.schoolmatesOf(fish), velocityOf(fish), this.flock, fish.id * GOLDEN_ANGLE);
+      const push = flockForce(this.schoolmatesOf(fish), velocityOf(fish), this.flock, fish.id * GOLDEN_ANGLE, fish.size);
       force.x += push.x;
       force.y += push.y;
     }
     return force;
   }
 
-  /** Every other schooling fish, as seen from this one. Checks every pair, which is fine for tens of fish. */
+  /** Sorts the schooling fish into a grid, so each can find its schoolmates without checking every other fish. */
+  private findSchool(): void {
+    this.school = this.fish.filter((fish) => fish.schools);
+    const furthestSight = this.school.reduce((max, fish) => Math.max(max, SIGHT * fish.size), 0);
+    this.schoolGrid = new Grid(furthestSight || 1);
+    this.school.forEach((fish, i) => this.schoolGrid.insert(i, fish.x, fish.y));
+  }
+
+  /** The schooling fish near this one, as seen from it. */
   private schoolmatesOf(fish: Fish): Schoolmate[] {
+    const sight = SIGHT * fish.size;
+    // Where the tank wraps, fish just across an edge are near too, so also look from one tank-width away.
+    const lookFrom = [{ x: fish.x, y: fish.y }];
+    if (this.wrapsX(fish)) {
+      if (fish.x < sight) lookFrom.push({ x: fish.x + this.width, y: fish.y });
+      if (fish.x > this.width - sight) lookFrom.push({ x: fish.x - this.width, y: fish.y });
+    }
+    if (this.wrapsY(fish)) {
+      if (fish.y < sight) lookFrom.push({ x: fish.x, y: fish.y + 1 });
+      if (fish.y > 1 - sight) lookFrom.push({ x: fish.x, y: fish.y - 1 });
+    }
     const mates: Schoolmate[] = [];
-    for (const other of this.fish) {
-      if (other === fish || !other.schools) continue;
-      const velocity = velocityOf(other);
-      mates.push({
-        dx: this.wrapsX(fish) ? unwrap(other.x - fish.x, this.width) : other.x - fish.x,
-        dy: this.wrapsY(fish) ? unwrap(other.y - fish.y, 1) : other.y - fish.y,
-        vx: velocity.x,
-        vy: velocity.y,
-      });
+    for (const from of lookFrom) {
+      for (const index of this.schoolGrid.near(from.x, from.y, sight)) {
+        const other = this.school[index]!;
+        if (other === fish) continue;
+        const velocity = velocityOf(other);
+        mates.push({
+          dx: this.wrapsX(fish) ? unwrap(other.x - fish.x, this.width) : other.x - fish.x,
+          dy: this.wrapsY(fish) ? unwrap(other.y - fish.y, 1) : other.y - fish.y,
+          vx: velocity.x,
+          vy: velocity.y,
+        });
+      }
     }
     return mates;
   }

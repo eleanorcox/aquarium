@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MODELS, type BuiltinId } from './motion';
-import { DRIFT_FORCE, MAX_OFFSET_SPEED, ROUTE_STIFFNESS, STARTLE_SPEED, type Influence } from './steering';
+import { DRIFT_FORCE, MAX_OFFSET_SPEED, REFERENCE_SIZE, ROUTE_STIFFNESS, STARTLE_SPEED, type Influence } from './steering';
 import type { Fish, Tank } from './tank';
 import { DT, makeTank, run } from './testing';
 
@@ -126,6 +126,18 @@ describe('how a fish responds to an influence', () => {
     expect(fish.x).toBeLessThan(0.8 - ON_ROUTE);
   });
 
+  it('an influence with a shorter reach pushes less far, in proportion', () => {
+    // So that zooming in, which shortens the pointer's reach in the tank, does not fling fish across it.
+    const pushed = (radius: number) => {
+      const tank = makeTank();
+      const fish = stillFish(tank, { curiosity: -1 });
+      tank.setInfluences([influence(0.8 + radius / 2, 0.5, { radius })]);
+      run(tank, 3);
+      return strayed(fish);
+    };
+    expect(pushed(0.1) / 0.1).toBeCloseTo(pushed(0.3) / 0.3, 2);
+  });
+
   it('turns to face the way it is pushed', () => {
     const tank = makeTank();
     const fish = stillFish(tank, { curiosity: -1 });
@@ -149,9 +161,11 @@ describe('drift', () => {
    */
   const FURTHEST = (DRIFT_FORCE * Math.SQRT2) / ROUTE_STIFFNESS;
 
+  /** A drifting fish of the size the drift strength is set for. */
   function drifter(tank: Tank, drift = 1): Fish {
     const fish = tank.addFish('circle');
     tank.setBehaviour(fish.id, { drift });
+    tank.setFishSize(fish.id, REFERENCE_SIZE);
     return fish;
   }
 
@@ -179,6 +193,21 @@ describe('drift', () => {
       return max;
     };
     expect(furthest(0.2)).toBeLessThan(furthest(1) / 2);
+  });
+
+  it('a smaller fish drifts less far, in proportion to its size', () => {
+    const furthest = (size: number) => {
+      const tank = makeTank();
+      const fish = drifter(tank);
+      tank.setFishSize(fish.id, size);
+      let max = 0;
+      for (let i = 0; i < 20 * 60; i++) {
+        tank.step(DT);
+        max = Math.max(max, strayed(fish));
+      }
+      return max;
+    };
+    expect(furthest(0.01) / 0.01).toBeCloseTo(furthest(0.04) / 0.04, 5);
   });
 
   it('two fish on the same route do not stray identically', () => {
@@ -211,6 +240,7 @@ describe('schooling', () => {
   function at(tank: Tank, x: number, y: number, schools = true): Fish {
     const fish = tank.addFish('sine', { A: 0, v: 0, y0: y, x0: x / WIDTH });
     tank.setBehaviour(fish.id, { schools, pathStrength: 0.2 });
+    tank.setFishSize(fish.id, REFERENCE_SIZE);
     return fish;
   }
 
@@ -218,6 +248,7 @@ describe('schooling', () => {
   function swimmer(tank: Tank, x: number, y: number): Fish {
     const fish = tank.addFish('sine', { A: 0, v: 0.2, y0: y, x0: x / WIDTH });
     tank.setBehaviour(fish.id, { schools: true });
+    tank.setFishSize(fish.id, REFERENCE_SIZE);
     return fish;
   }
 
@@ -265,6 +296,31 @@ describe('schooling', () => {
     const b = at(tank, 1.3, 0.5);
     run(tank, 1);
     expect(strayed(a) + strayed(b)).toBe(0);
+  });
+
+  it('small fish keep a smaller distance and see a shorter way, in proportion to their size', () => {
+    // 0.06 apart is inside the personal space of full-size fish and well outside the sight of fish a tenth the size.
+    const apart = (size: number) => {
+      const tank = makeTank();
+      const a = at(tank, 0.8, 0.5);
+      const b = at(tank, 0.86, 0.5);
+      for (const fish of [a, b]) tank.setFishSize(fish.id, size);
+      run(tank, 1);
+      return strayed(a) + strayed(b);
+    };
+    expect(apart(REFERENCE_SIZE)).toBeGreaterThan(ON_ROUTE);
+    expect(apart(REFERENCE_SIZE / 10)).toBe(0);
+  });
+
+  it('fish on a wrapping route school across the edge of the tank', () => {
+    const tank = makeTank();
+    tank.setFlock(ONLY.cohesion);
+    const nearLeft = at(tank, 0.02, 0.5);
+    const nearRight = at(tank, WIDTH - 0.02, 0.5);
+    run(tank, 1);
+    // Each is drawn towards the other the short way, across the edge, not the long way across the tank.
+    expect(nearLeft.x).toBeLessThan(0.02);
+    expect(nearRight.x).toBeGreaterThan(WIDTH - 0.02);
   });
 
   it('a rule turned down to nothing has no effect', () => {
