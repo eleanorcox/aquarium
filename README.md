@@ -1,10 +1,12 @@
-# Equation Aquarium
+# Equatium
 
-A digital aquarium where every fish swims along a mathematical equation. Pick a fish, give it a sine wave, a Lissajous figure or a circle, and change its parameters while it swims. Move the pointer over the tank and the fish react: shy ones scatter, curious ones come to look, and all of them swim back to their routes.
+Equatium is a digital aquarium where every fish swims along a mathematical equation. Pick a fish, give it a sine wave, a Lissajous figure or a circle, and change its parameters while it swims. Move the pointer over the tank and the fish react: shy ones scatter, curious ones come to look, and all of them swim back to their routes.
 
 The project is a way to learn 3D and immersive technology step by step: 2D in the browser, then 3D, then an external monitor, then a projector, and later webcam or depth-camera control.
 
-Where the project is heading is written up in [docs/](docs/README.md).
+Where the project is heading is written up in [docs/](docs/README.md). What has changed so far is in the [changelog](CHANGELOG.md).
+
+Equatium is a working name, short for equation aquarium.
 
 ## Run it
 

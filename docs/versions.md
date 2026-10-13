@@ -2,7 +2,7 @@
 
 A record of each version of the aquarium: what it could do, how interacting with it differed from the version before, and the screencast that shows it. It exists to keep track of progress and to draw on later when writing about the work.
 
-The [decision log](decisions.md) says why things were built the way they were. This log says what each version was like to use.
+Three records, three jobs. The [changelog](../CHANGELOG.md) lists what changed in each version. This log says what each version was like to use and where its screencast is. The [decision log](decisions.md) says why things were built the way they were.
 
 ## How this log works
 
@@ -21,7 +21,7 @@ Template:
 - **Tag and commit:**
 - **Screencast:**
 - **Roadmap stage:**
-- **What it does:**
+- **In short:**
 - **What changed in how it feels to use:**
 - **Rough edges at the time:**
 ```
@@ -41,11 +41,7 @@ Template:
 - **Tag and commit:** `v1`, commit `6eafa8f`
 - **Screencast:** `~/Videos/Screencasts/Equatium v1 - basic motion.webm` (28 MB)
 - **Roadmap stage:** before stage 1. This is the equation aquarium the planning started from.
-- **What it does:**
-  - Five fish in a 2D tank, each following an equation, drawn as simple glowing shapes with trails.
-  - Ten built-in paths: sine wave, zigzag, bounce, circle, Lissajous figure, figure eight, rose curve, spirograph, breathing spiral and heart.
-  - Sliders for each path's parameters, changing the path while the fish swims.
-  - Typed equations: write your own x(t) and y(t), or turn a built-in path into equations and edit it.
+- **In short:** five fish in a 2D tank, each following an equation you choose or type. Full list in the [changelog](../CHANGELOG.md#v1-basic-motion-9-october-2026).
 - **What it feels like to use:** an instrument panel. You choose a fish, change numbers and watch its path change. The fish take no notice of you; the pointer only selects them. Every fish is exactly on its path at every moment, so two fish given the same path are identical.
 - **Rough edges at the time:** the tank changes shape with the window. Fish cannot be removed.
 
@@ -55,13 +51,7 @@ Template:
 - **Tag and commit:** `v2`, commit `d53284c`, on the `stage-1-pushable-fish` branch
 - **Screencast:** `~/Videos/Screencasts/Equatium v2 - schooling, drift, curiosity.webm` (74 MB)
 - **Roadmap stage:** stage 1, fish that can be pushed
-- **What it does**, beyond v1:
-  - Fish react to the pointer. Shy fish scatter from it, curious fish come towards it and stop short, and all of them swim back to their routes afterwards.
-  - A fast sweep of the pointer startles every fish. The pointer can also be set to attract all, scatter all, or do nothing.
-  - Drift: fish wander a little either side of their routes, each in its own way.
-  - Schooling: fish set to school keep apart, swim the same way and stay together. Seven fish share one figure-of-eight route and form a school around it.
-  - Each fish has four behaviour settings in the panel: how hard it holds its route, shy to curious, drift, and whether it schools.
-  - Fish can be removed.
+- **In short:** fish react to the pointer, wander, and school. Full list in the [changelog](../CHANGELOG.md#v2-schooling-drift-curiosity-13-october-2026).
 - **What changed in how it feels to use:** the fish notice you. In v1 the pointer was a tool for choosing a fish; in v2 it is a presence in the water, and different fish respond to it differently. The tank also stopped looking mechanical: with drift and schooling, fish on the same route are no longer copies of one another, and a group moves as a group.
 - **What stayed the same:** the look, the ten paths, typed equations, and the 2D tank shaped by the window. A fish left alone with no drift is still exactly on its equation.
 - **Rough edges at the time:**

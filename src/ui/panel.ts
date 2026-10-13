@@ -28,7 +28,7 @@ const POINTER_OPTIONS: Record<string, PointerMode> = {
 };
 
 export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput, onAddFish: () => number): Controls {
-  const gui = new GUI({ title: 'Equation Aquarium' });
+  const gui = new GUI({ title: 'Equatium' });
   const first = tank.fish[0]?.id ?? 0;
   const state = { fish: first, model: 'sine' as ModelId };
   // The selected fish's behaviour, copied here for the sliders and written back through the tank.

@@ -1,5 +1,7 @@
 # Vision
 
+The project's working name is **Equatium**, short for equation aquarium. It is not final: it may stop fitting once some modes have nothing to do with equations.
+
 ## In one sentence
 
 A digital aquarium whose fish move in ways people define, by writing an equation, describing a motion in words, moving their body in front of it, or drawing a fish and releasing it into the tank.

@@ -1,6 +1,6 @@
-# Aquarium planning docs
+# Equatium planning docs
 
-Planning notes for the aquarium project. Started 13 October 2026 from a brain dump; nothing here is final.
+Planning notes for Equatium, the aquarium project. Started 13 October 2026 from a brain dump; nothing here is final.
 
 Read in this order:
 
@@ -12,7 +12,7 @@ Read in this order:
 6. [Assets wanted](assets.md): briefs for pictures, data and research that someone else can produce.
 7. [Open questions](open-questions.md): decisions that are still Eleanor's to make.
 8. [Decision log](decisions.md): what was decided, when, what prompted it and what it replaced.
-9. [Version log](versions.md): what each version could do and how it felt to use, with its screencast.
+9. [Version log](versions.md): how each version felt to use, with its screencast. The plain list of changes is the [changelog](../CHANGELOG.md) at the top of the repo.
 
 How to use them: add new ideas to [ideas.md](ideas.md) as they come up, even half-formed. When a question in [open-questions.md](open-questions.md) is answered, move the answer into the doc it affects, add an entry to [decisions.md](decisions.md) and delete the question.
 

@@ -53,6 +53,8 @@ Template:
 | [17](#17-fish-first-built-for-any-sea-animal) | Fish first, built for any sea animal | 13 Oct 2026 | Decided |
 | [18](#18-cheaper-subagents-where-they-are-good-enough) | Cheaper subagents where they are good enough | 13 Oct 2026 | Decided |
 | [19](#19-a-fishs-position-is-its-route-plus-an-offset) | A fish's position is its route plus an offset | 13 Oct 2026 | Built; refines 10 |
+| [20](#20-equatium-as-a-working-name) | Equatium as a working name | 13 Oct 2026 | Decided; final name open |
+| [21](#21-a-changelog-and-a-version-log) | A changelog and a version log | 13 Oct 2026 | Decided |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -239,3 +241,21 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - Path strength at zero means a fish never returns to its route, but it still moves with it. A fish with no route at all, swimming freely, is not built and would be a new kind of route.
   - "Top speed" is a limit on speed relative to the route. A route can still be as fast as its equation makes it.
   - Offsets wrap round where the route wraps and stop at the tank's edge otherwise.
+
+## 20. Equatium as a working name
+
+- **Date:** 13 October 2026
+- **Status:** Decided; final name open
+- **What prompted it:** Eleanor had been calling the project Equatium, including in the titles of her screencasts, while the code and README said "Equation Aquarium". She is not sold on it as the final name, because the project may end up not being an equation aquarium in every mode.
+- **Decision:** Call it Equatium everywhere for now: page title, panel, README, package name and docs. Treat the final name as open.
+- **Alternatives considered:** Keeping "Equation Aquarium", which has the same weakness and is longer. Waiting for a final name, which leaves the code and the screencasts disagreeing.
+- **What follows from it:** "Equation aquarium" in lower case still means the first strand of the project. A later rename touches the same five places.
+
+## 21. A changelog and a version log
+
+- **Date:** 13 October 2026
+- **Status:** Decided
+- **What prompted it:** Eleanor asked for a log of each version, having recorded screencasts of v1 and v2 to show how the interaction is changing, then suggested it might be a changelog instead, or both.
+- **Decision:** Both, with separate jobs. [CHANGELOG.md](../CHANGELOG.md) at the top of the repo is the conventional short list of what was added and changed, updated with each change. [versions.md](versions.md) says what each version was like to use and names its screencast. Each version gets a git tag.
+- **Alternatives considered:** A changelog alone, which is where people expect to look but has no natural place for how a version feels or for the videos. A version log alone, which mixes long feature lists into the narrative.
+- **What follows from it:** Two files to keep in step. The version log links to the changelog for the lists instead of repeating them.
