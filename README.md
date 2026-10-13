@@ -1,6 +1,6 @@
 # Equation Aquarium
 
-A digital aquarium where every fish swims along a mathematical equation. Pick a fish, give it a sine wave, a Lissajous figure or a circle, and change its parameters while it swims.
+A digital aquarium where every fish swims along a mathematical equation. Pick a fish, give it a sine wave, a Lissajous figure or a circle, and change its parameters while it swims. Move the pointer over the tank and the fish react: shy ones scatter, curious ones come to look, and all of them swim back to their routes.
 
 The project is a way to learn 3D and immersive technology step by step: 2D in the browser, then 3D, then an external monitor, then a projector, and later webcam or depth-camera control.
 
@@ -23,7 +23,8 @@ The simulation never knows how it is drawn.
 
 - `src/core/` is the simulation: fish, motion equations and the tank. Plain TypeScript with no DOM, advanced on a fixed 1/60 s timestep so paths are identical on any screen.
 - `src/render/` holds renderers that only read the tank. Today that is Canvas 2D; a Three.js renderer comes next.
-- `src/ui/` holds inputs that only change the tank through its methods. Today that is a lil-gui panel; camera input comes later.
+- `src/ui/` holds the control panel, which only changes the tank through its methods.
+- `src/input/` turns devices into influences the fish react to. Today that is the pointer; camera input comes later.
 
 Positions are in tank units: the tank is 1 unit tall and as wide as the screen's aspect ratio.
 
@@ -42,7 +43,20 @@ Positions are in tank units: the tank is 1 unit tall and as wide as the screen's
 | Breathing spiral | r = R·(0.55 + 0.45·sin νt), θ = ωt |
 | Heart | x = cₓ + S·16·sin³s, y = c_y − S·(13cos s − 5cos 2s − 2cos 3s − cos 4s) |
 
-Each fish faces along its velocity, the numerical derivative of its path. y points down, as on screen.
+Each fish faces the way it is moving. y points down, as on screen.
+
+### Behaviour
+
+The equation gives each fish its route. Its position is the route plus an offset, which a spring pulls back to zero, so a fish left alone is exactly on its route. Four settings per fish decide what moves it off:
+
+| Setting | Range | What it does |
+| --- | --- | --- |
+| Holds its route | 0 to 1 | How hard the fish is pulled back. Lower means it is pushed further and returns more slowly. |
+| Shy ↔ curious | −1 to 1 | Shy fish flee the pointer; curious fish approach and stop short of it; 0 takes no notice. |
+| Drift | 0 to 1 | How much the fish wanders either side of its route of its own accord. |
+| Schools | on or off | Schooling fish keep apart, swim the same way and stay together. Put several on one route and they form a school around it. |
+
+The pointer can also attract or scatter every fish whatever its temperament, and a fast sweep startles them all. The strengths of these effects are in `src/core/steering.ts` and are first guesses.
 
 ### Your own equations
 

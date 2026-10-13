@@ -43,15 +43,16 @@ Template:
 | [7](#7-the-immersive-strand-leads) | The immersive strand leads | 13 Oct 2026 | Decided |
 | [8](#8-build-first-buy-hardware-second) | Build first, buy hardware second | 13 Oct 2026 | Decided |
 | [9](#9-real-and-made-up-fish-as-a-tank-setting) | Real and made-up fish as a tank setting | 13 Oct 2026 | Proposed |
-| [10](#10-fish-steer-towards-their-path) | Fish steer towards their path | 13 Oct 2026 | Decided; refined by 19 |
+| [10](#10-fish-steer-towards-their-path) | Fish steer towards their path | 13 Oct 2026 | Built, in the form set out in 19 |
 | [11](#11-the-tank-has-its-own-size-screens-are-windows-onto-it) | The tank has its own size; screens are windows onto it | 13 Oct 2026 | Proposed |
-| [12](#12-every-input-becomes-an-influence) | Every input becomes an influence | 13 Oct 2026 | Decided |
+| [12](#12-every-input-becomes-an-influence) | Every input becomes an influence | 13 Oct 2026 | Built |
 | [13](#13-test-first) | Test-first | 13 Oct 2026 | Decided |
 | [14](#14-move-to-webgl-through-threejs) | Move to WebGL, through Three.js | 13 Oct 2026 | Decided in direction; timing open |
 | [15](#15-keep-this-log) | Keep this log | 13 Oct 2026 | Decided |
-| [16](#16-the-fish-decides-how-to-respond-not-the-input) | The fish decides how to respond, not the input | 13 Oct 2026 | Decided; refines 12 |
+| [16](#16-the-fish-decides-how-to-respond-not-the-input) | The fish decides how to respond, not the input | 13 Oct 2026 | Built; refines 12 |
 | [17](#17-fish-first-built-for-any-sea-animal) | Fish first, built for any sea animal | 13 Oct 2026 | Decided |
 | [18](#18-cheaper-subagents-where-they-are-good-enough) | Cheaper subagents where they are good enough | 13 Oct 2026 | Decided |
+| [19](#19-a-fishs-position-is-its-route-plus-an-offset) | A fish's position is its route plus an offset | 13 Oct 2026 | Built; refines 10 |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -141,7 +142,7 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 ## 10. Fish steer towards their path
 
 - **Date:** 13 October 2026
-- **Status:** Decided 13 October 2026, when Eleanor agreed the design; refined by 19
+- **Status:** Built 13 October 2026, in the form set out in 19
 - **What prompted it:** Today a fish is placed exactly where its equation says, with no velocity or memory. Scattering from a hand and flocking both need a fish that can be somewhere other than on its path. The two inspirations pull the same way: Animal Crossing fish have fixed routes, Swish Fish fish are pushed by hands.
 - **Decision:** The equation gives a moving target. The fish has its own position and velocity and steers towards the target, plus any other influences. A per-fish path strength sets how hard it holds to the route. Equation mode keeps exact placement.
 - **Alternatives considered:** Two separate simulations, one for equations and one for behaviour. Adding a temporary offset to the equation position that fades out, which is simpler but cannot do flocking.
@@ -159,7 +160,7 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 ## 12. Every input becomes an influence
 
 - **Date:** 13 October 2026
-- **Status:** Decided 13 October 2026, when Eleanor agreed the design
+- **Status:** Built 13 October 2026
 - **What prompted it:** The list of inputs wanted: mouse, webcam hands, a camera or depth sensor in front of a projection, touch on a phone. Plus 8, which needs everything to work without hardware.
 - **Decision:** The simulation knows one kind of input, an influence: a point in the tank with a velocity, a radius and a kind (attract or scatter). Each device has a small adapter that produces influences.
 - **Alternatives considered:** Handling each device separately in the simulation.
@@ -198,7 +199,7 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 ## 16. The fish decides how to respond, not the input
 
 - **Date:** 13 October 2026
-- **Status:** Decided 13 October 2026, when Eleanor agreed the design; refines 12
+- **Status:** Built 13 October 2026; refines 12
 - **What prompted it:** Eleanor suggested a curiosity factor: curious fish go towards a hand instead of scattering from it.
 - **Decision:** An influence no longer has a kind. It is a presence, and each fish responds according to its own temperament, from shy to curious, with the starting value set by its species. Two exceptions: an influence can carry an override for gestures and the operator, and a fast-moving influence startles every fish.
 - **Alternatives considered:** Keeping attract and scatter as two kinds of influence, as first written in 12, which makes every fish in the tank react identically.
@@ -221,3 +222,20 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 - **Decision:** Rules in [CLAUDE.md](../CLAUDE.md): do small things directly, match the model to the kind of work, move up a tier when a result is thin, and check a subagent's report before relying on it. Design decisions and changes to the simulation core are not delegated.
 - **Alternatives considered:** Running everything on the main model, which is simplest and costs most.
 - **What follows from it:** The briefs in [assets.md](assets.md) can be handed to cheaper agents. The rules are a first version and should change as we see what works.
+
+## 19. A fish's position is its route plus an offset
+
+- **Date:** 13 October 2026
+- **Status:** Built; refines 10
+- **What prompted it:** The risk recorded in 10, that a fish chasing its route target would cut corners. Before writing the first stage 1 test it was measured: a fish chasing its target with a spring soft enough to be pushed trailed the target by 0.04 to 0.11 of the tank's height across the built-in paths, which is one to three fish lengths. Even with a spring nearly seven times stiffer it trailed by 0.01 to 0.04. So plain chasing fails.
+- **Decision:** Keep the idea in 10 but change what is simulated. A fish's position is its route position plus an offset. The offset has its own velocity, is pulled back to zero by a spring whose stiffness is the fish's path strength, and is pushed by influences, drift and schooling. This is what chasing becomes once the fish is also told how its target is moving; simulating the offset directly gets the same result with no error.
+- **Alternatives considered:**
+  - *Plain chasing,* as measured above.
+  - *A much stiffer spring.* Less lag, but a fish too stiff to push.
+  - *An offset that simply fades,* with no velocity of its own. Rejected in 10 because it cannot school; the offset here responds to forces worked out from where the fish really are, so it can.
+- **What follows from it:**
+  - An unpushed fish is exactly on its route, so equation mode needs no special case and every earlier path test still passes unchanged. The first stage 1 test checks this exactly, on all ten built-in paths.
+  - Drag does not weaken with path strength. A fish that barely holds its route drifts back slowly, and a curious fish settles beside a pointer instead of wobbling around it. This came from a failing test, where a curious fish swam through the pointer.
+  - Path strength at zero means a fish never returns to its route, but it still moves with it. A fish with no route at all, swimming freely, is not built and would be a new kind of route.
+  - "Top speed" is a limit on speed relative to the route. A route can still be as fast as its equation makes it.
+  - Offsets wrap round where the route wraps and stop at the tank's edge otherwise.

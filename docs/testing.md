@@ -18,9 +18,10 @@ Two further rules:
 
 ## What exists today
 
-- 30 tests in two files, [tank.test.ts](../src/core/tank.test.ts) and [equations.test.ts](../src/core/equations.test.ts), run with Vitest by `npm test`. All pass.
-- All of them test the simulation in `src/core/`. Nothing tests the renderer or the panel.
-- Nothing runs the tests automatically when code is pushed.
+- 74 tests in six files, run with Vitest by `npm test`. All pass. There were 30 before stage 1.
+- They test the simulation in `src/core/` and the pointer input in `src/input/`. Nothing tests the renderer or the panel.
+- The tests and the type check run automatically on every push and pull request ([ci.yml](../.github/workflows/ci.yml)).
+- `npm run test:watch` reruns tests as files change, and [testing.ts](../src/core/testing.ts) builds and advances a test tank in one line.
 
 The core is easy to test because of three choices already made, which every later stage must keep:
 
@@ -89,22 +90,16 @@ Not automatic tests, but part of the plan. A scene is a named, repeatable tank (
 - Third-party libraries (lil-gui, math.js, Three.js, MediaPipe) are not tested. Our use of them is.
 - No coverage target. The measure is whether each behaviour in this doc has a test.
 
-## To set up before stage 1
-
-- Run the tests and the type check automatically on every push and pull request.
-- A watch mode for working test-first (`vitest` without `run`), added as `npm run test:watch`.
-- A helper for building test tanks in one line, since nearly every new test will need one.
-
 ## First tests for each stage
 
 These are the behaviours to write tests for first, not a complete list. Each is one or more failing tests before any code.
 
 ### Stage 1: fish that can be pushed
 
-The opening experiment in the roadmap, "how closely does a steering fish follow each path", is itself the first test.
+*Built. The tests are in [steering.test.ts](../src/core/steering.test.ts), [tank.test.ts](../src/core/tank.test.ts) and [pointer.test.ts](../src/input/pointer.test.ts). Still to do: fixed scenes, and judging the feel by eye.*
 
-- With path strength at full and nothing pushing, a fish stays within a stated distance of its route, on every built-in path. *The first test written. If it cannot pass for the sharp paths, the design changes before anything else is built.*
-- In equation mode a fish is exactly on its route, as today. All 30 existing tests keep passing.
+- An unpushed fish is exactly on its route, on every built-in path. *The first test written. A measurement beforehand showed a fish that merely chases its route cannot do this, which changed the design: see entry 19 in [decisions.md](decisions.md).*
+- All 30 earlier tests keep passing unchanged.
 - A fish pushed off its route is back within the stated distance inside a stated time.
 - A curious fish moves nearer to an influence; a shy one moves further away; one beyond the influence's radius does nothing.
 - An influence with a scatter override sends a curious fish away too, as does one moving faster than the stated startle speed.

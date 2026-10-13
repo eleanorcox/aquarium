@@ -23,6 +23,8 @@ As of 13 October 2026:
 
 ### Stage 1: fish that can be pushed
 
+*Status, 13 October 2026: built and tested on the `stage-1-pushable-fish` branch. Not yet judged by eye; the strengths of the forces are first guesses.*
+
 Fish steer towards their path instead of being placed on it; curious fish approach the mouse and shy ones scatter; drift; flocking.
 
 - **Shows:** the equation aquarium, but the fish react to the mouse and return to their routes.
@@ -116,4 +118,6 @@ flocking ──> schools ──────────────────�
 
 ## Suggested next step
 
-First the small test setup in [testing.md](testing.md#to-set-up-before-stage-1). Then stage 1, starting with its first test: a fish steering towards its path target stays within a stated distance of the route, on each of the ten built-in paths. That answers the main risk in [architecture.md](architecture.md) in a day or two, before anything else is committed.
+1. Eleanor tries stage 1 in the browser and says what feels wrong. The strengths are tuned to match, and the branch is merged.
+2. Fixed scenes for judging by eye, described in [testing.md](testing.md), so later tuning is compared like with like.
+3. Stage 1b: a tank bigger than the screen.

@@ -4,39 +4,43 @@ What the ideas in [ideas.md](ideas.md) mean for the code. Nothing here is built 
 
 ## What we have
 
-About 1,000 lines of TypeScript, built with Vite, tested with Vitest.
+About 2,000 lines of TypeScript, built with Vite, tested with Vitest.
 
 - [src/core/](../src/core/): the simulation. No DOM. A `Tank` holds `Fish`; each fish has a motion model and parameters.
 - [src/render/](../src/render/): a Canvas 2D renderer that only reads the tank.
 - [src/ui/](../src/ui/): a lil-gui panel that only changes the tank through its methods.
+- [src/input/](../src/input/): adapters that turn a device into influences. So far, the pointer.
 
 The rule that the simulation never knows how it is drawn is what makes "one project, several modes" possible. Keep it.
 
-## The main tension: paths against behaviour
+## Paths and behaviour in one simulation
 
-Today a fish's position is a pure function of time. [tank.ts](../src/core/tank.ts) asks "where is this fish at time t" and puts it there. The fish has no memory and no velocity of its own.
+*Built in stage 1. How it was arrived at is in [decisions.md](decisions.md), entries 10 and 19.*
 
-That is ideal for strand 1: paths are exact, repeatable and easy to test. It cannot do strand 3. A fish that scatters from a hand, or schools with its neighbours, depends on where it was a moment ago and what is around it.
+Before stage 1 a fish's position was a pure function of time: the tank asked "where is this fish at time t" and put it there. That is exact and repeatable, which suits the equation aquarium, but such a fish cannot be pushed by a hand or school with its neighbours.
 
-**Proposed approach: the path becomes where the fish wants to be, not where it is.**
+**A fish's position is now its route position plus an offset.**
 
-- Each fish keeps its equation. The equation gives a *target* that moves along the path.
-- Each fish also has a real position and velocity. Every step, it steers towards its target.
-- Other influences add to the steering: away from a hand, towards a hand, with the school.
-- So does drift: a small, slowly changing nudge of the fish's own, so it wanders a little either side of its route. It is generated from the tank's seeded randomness, never the real clock, so runs stay repeatable.
-- One number per fish, call it path strength, sets how hard it holds to the target.
+- Each fish keeps its equation. The equation gives its *route*: where it would be if left alone.
+- Each fish also has an *offset* from its route, with a velocity of its own.
+- A spring pulls the offset back to zero. Its stiffness is the fish's **path strength**.
+- Everything else pushes the offset: influences such as a pointer, the fish's own **drift**, and **schooling** with other fish.
 
-With path strength at full and no other influences, the fish sits on its target and the result is today's equation aquarium. With it lower, a hand can push the fish away and it swims back afterwards, which is the Animal Crossing fish with Swish Fish hands. With it at zero, fish flock freely.
+An unpushed fish has an offset of exactly zero, so it is exactly on its route, and the equation aquarium works as before with no special case. With lower path strength a pointer pushes a fish further and it returns more slowly. Fish sharing a route and set to school spread into a group around it.
 
-This is the first thing to build, because pointer, flocking, hand and body tracking all depend on it, and it decides whether strand 1 and strand 3 stay one codebase.
+The forces live in [steering.ts](../src/core/steering.ts), each as a small function, with their strengths as named constants at the top. Those strengths are first guesses and need tuning by eye.
 
-*Risk to check early:* a fish chasing a fast target may cut corners and blur a sharp path such as the heart. Equation mode can keep exact placement to avoid this.
+Limits of what is built:
+
+- A fish with path strength zero never returns to its route but still moves with it. A fish with no route, swimming freely, does not exist yet.
+- Schooling compares every pair of schooling fish. That is fine for tens of fish; hundreds need the grid described below.
+- Fish school with any other schooling fish. There are no species yet to keep schools apart.
 
 ## One kind of input for all interaction
 
 A mouse, a tracked hand, a person in front of a projection and a touch on a phone are all the same thing to the fish: a point in the tank, possibly moving, that attracts or repels.
 
-So the core gets one concept, an **influence**: a position in tank units, a velocity and a radius. An influence is a presence, not a command. How a fish responds depends on the fish: each has a temperament from shy to curious, taken from its species, so the same hand draws some fish in and sends others away. An influence may carry an override ("everything scatter") for gestures and for the operator, and a fast-moving one startles every fish. Each input source is a small adapter in `src/ui/` (or a new `src/input/`) that turns its device into a list of influences each frame.
+The core has one concept for this, an **influence**: a position in tank units, a velocity and a radius. An influence is a presence, not a command. How a fish responds depends on the fish: each has a temperament from shy to curious, taken from its species, so the same hand draws some fish in and sends others away. An influence may carry an override ("everything scatter") for gestures and for the operator, and a fast-moving one startles every fish. Each input source is a small adapter in `src/ui/` (or a new `src/input/`) that turns its device into a list of influences each frame.
 
 This means every behaviour is developed with a mouse first, and adding a new sensor never touches the fish.
 
@@ -78,7 +82,6 @@ So "a few fish on a phone, hundreds on a wall" comes from two choices that can b
 
 | Today | Problem | Change |
 | --- | --- | --- |
-| A fish's id is its position in the list, and fish are never removed | An exhibition tank must retire old fish | Stable ids, and a way to remove a fish |
 | A fish's look is one `hue` number | Illustrated, generated and visitor-coloured fish need more | An `appearance` on each fish, separate from its motion |
 | Positions are `{ x, y }` | 3D paths | Add z, defaulting to the middle of the tank, so 2D keeps working |
 | One fish, one equation | Formations | A group that shares an equation, with a per-fish index |

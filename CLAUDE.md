@@ -27,7 +27,7 @@ npm run build      # type check, then build into dist/
 ## Code rules
 
 - `src/core/` is the simulation. No DOM, no browser APIs, no real clock, no `Math.random` except through the function passed in.
-- `src/render/` only reads the tank. `src/ui/` and input code only change it through its methods.
+- `src/render/` only reads the tank. `src/ui/` and `src/input/` only change it through its methods. Input adapters take positions in tank units and times in seconds, and never touch the page, so they can be tested.
 - The simulation advances on a fixed 1/60 s timestep. The same starting tank and steps must always give the same result.
 - Catalogue code says "species", not "fish", where it reasonably can: rays, whales and seals are planned.
 - Match the surrounding code: one-line comments that say why, behaviour-sentence test names, tests beside the code as `name.test.ts`.
