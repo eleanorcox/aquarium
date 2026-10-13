@@ -4,6 +4,8 @@ A digital aquarium where every fish swims along a mathematical equation. Pick a 
 
 The project is a way to learn 3D and immersive technology step by step: 2D in the browser, then 3D, then an external monitor, then a projector, and later webcam or depth-camera control.
 
+Where the project is heading is written up in [docs/](docs/README.md).
+
 ## Run it
 
 Needs Node.js 22.12 or newer (`.nvmrc` pins 24; with nvm, run `nvm install` then `nvm use`).
