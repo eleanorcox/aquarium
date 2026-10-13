@@ -1,7 +1,7 @@
 // The simulation core. No DOM access: renderers read this state, inputs change it through the methods below.
 import { compileEquations, scopeFor, type PositionFn } from './equations';
 import { DEFAULT_CUSTOM, MODELS, defaultParams, type EquationSource, type ModelId, type Params, type Vec2 } from './motion';
-import { MAX_OFFSET_SPEED, influenceForce, limitSpeed, routeForce, type Influence } from './steering';
+import { DRIFT_FORCE, MAX_OFFSET_SPEED, influenceForce, limitSpeed, routeForce, stepWander, type Influence } from './steering';
 
 export interface Fish {
   id: number;
@@ -27,11 +27,15 @@ export interface Fish {
   pathStrength: number;
   /** How it responds to an influence: -1 shy (flees), 0 takes no notice, 1 curious (approaches). */
   curiosity: number;
+  /** How much it wanders either side of its route of its own accord: 0 not at all, 1 most. */
+  drift: number;
+  /** The direction the fish is currently wandering in; drift pushes it this way. */
+  wander: Vec2;
 }
 
-export type Behaviour = Pick<Fish, 'pathStrength' | 'curiosity'>;
+export type Behaviour = Pick<Fish, 'pathStrength' | 'curiosity' | 'drift'>;
 
-const BEHAVIOUR_RANGES: Record<keyof Behaviour, [number, number]> = { pathStrength: [0, 1], curiosity: [-1, 1] };
+const BEHAVIOUR_RANGES: Record<keyof Behaviour, [number, number]> = { pathStrength: [0, 1], curiosity: [-1, 1], drift: [0, 1] };
 
 const NAMES = ['Sina', 'Lissa', 'Orbit', 'Cosmo', 'Theta', 'Pi', 'Euler', 'Fourier', 'Gauss', 'Noether'];
 const HUES = [172, 28, 290, 52, 205, 340, 110, 12, 240, 80];
@@ -74,6 +78,8 @@ export class Tank {
       offsetVelocity: { x: 0, y: 0 },
       pathStrength: 1,
       curiosity: 0,
+      drift: 0,
+      wander: { x: 0, y: 0 },
     };
     this.fish.push(fish);
     if (model === 'custom') this.setEquations(id, DEFAULT_CUSTOM);
@@ -130,7 +136,7 @@ export class Tank {
 
   step(dt: number): void {
     // Work out every push from where the fish are now, then move them all, so the order of the fish never matters.
-    const forces = this.fish.map((fish) => this.forceOn(fish));
+    const forces = this.fish.map((fish) => this.forceOn(fish, dt));
     this.t += dt;
     this.fish.forEach((fish, i) => {
       const force = forces[i]!;
@@ -157,8 +163,13 @@ export class Tank {
     return fish.model === 'custom';
   }
 
-  private forceOn(fish: Fish): Vec2 {
+  private forceOn(fish: Fish, dt: number): Vec2 {
     const force = routeForce(fish.offset, fish.offsetVelocity, fish.pathStrength);
+    if (fish.drift > 0) {
+      stepWander(fish.wander, this.random, dt);
+      force.x += fish.drift * DRIFT_FORCE * fish.wander.x;
+      force.y += fish.drift * DRIFT_FORCE * fish.wander.y;
+    }
     for (const influence of this.influences) {
       // Where the tank wraps, an influence just across the edge is close, not a tank-width away.
       const dx = this.wrapsX(fish) ? unwrap(fish.x - influence.x, this.width) : fish.x - influence.x;

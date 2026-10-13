@@ -54,6 +54,24 @@ export function influenceForce(dx: number, dy: number, curiosity: number, influe
   return distance === 0 ? { x: away, y: 0 } : { x: (dx / distance) * away, y: (dy / distance) * away };
 }
 
+/** Push on a fully drifting fish when its wander is at its strongest along one axis. */
+export const DRIFT_FORCE = 2.5;
+/** Seconds over which a fish's wander forgets where it was heading. */
+const WANDER_MEMORY = 1.5;
+/** How hard the wander is jostled each second. */
+const WANDER_JITTER = 1.2;
+
+/**
+ * Moves a fish's wander on by one step. The wander is a direction that changes slowly and never
+ * repeats, each axis staying between -1 and 1. Drift pushes the fish along it.
+ */
+export function stepWander(wander: Vec2, random: () => number, dt: number): void {
+  for (const axis of ['x', 'y'] as const) {
+    const jostle = WANDER_JITTER * (random() * 2 - 1) * Math.sqrt(dt);
+    wander[axis] = Math.min(1, Math.max(-1, wander[axis] - (wander[axis] / WANDER_MEMORY) * dt + jostle));
+  }
+}
+
 /** Limits a velocity to a top speed, keeping its direction. */
 export function limitSpeed(velocity: Vec2, max: number): void {
   const speed = Math.hypot(velocity.x, velocity.y);

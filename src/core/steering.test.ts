@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MODELS, type BuiltinId } from './motion';
-import { MAX_OFFSET_SPEED, STARTLE_SPEED, type Influence } from './steering';
+import { DRIFT_FORCE, MAX_OFFSET_SPEED, ROUTE_STIFFNESS, STARTLE_SPEED, type Influence } from './steering';
 import type { Fish, Tank } from './tank';
 import { DT, makeTank, run } from './testing';
 
@@ -142,6 +142,64 @@ describe('how a fish responds to an influence', () => {
   });
 });
 
+describe('drift', () => {
+  /**
+   * The furthest drift can carry a fish at full path strength: the largest drift push, which is
+   * DRIFT_FORCE along both axes at once, divided by the pull back per unit of offset.
+   */
+  const FURTHEST = (DRIFT_FORCE * Math.SQRT2) / ROUTE_STIFFNESS;
+
+  function drifter(tank: Tank, drift = 1): Fish {
+    const fish = tank.addFish('circle');
+    tank.setBehaviour(fish.id, { drift });
+    return fish;
+  }
+
+  it('a drifting fish strays from its route, but never beyond the furthest drift can carry it', () => {
+    const tank = makeTank();
+    const fish = drifter(tank);
+    let furthest = 0;
+    for (let i = 0; i < 60 * 60; i++) {
+      tank.step(DT);
+      furthest = Math.max(furthest, strayed(fish));
+    }
+    expect(furthest).toBeGreaterThan(ON_ROUTE);
+    expect(furthest).toBeLessThanOrEqual(FURTHEST);
+  });
+
+  it('less drift means straying less', () => {
+    const furthest = (drift: number) => {
+      const tank = makeTank();
+      const fish = drifter(tank, drift);
+      let max = 0;
+      for (let i = 0; i < 20 * 60; i++) {
+        tank.step(DT);
+        max = Math.max(max, strayed(fish));
+      }
+      return max;
+    };
+    expect(furthest(0.2)).toBeLessThan(furthest(1) / 2);
+  });
+
+  it('two fish on the same route do not stray identically', () => {
+    const tank = makeTank();
+    const a = drifter(tank);
+    const b = drifter(tank);
+    run(tank, 5);
+    expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(ON_ROUTE);
+  });
+
+  it('the same tank replayed strays identically', () => {
+    const finish = () => {
+      const tank = makeTank({ seed: 9 });
+      const fish = drifter(tank);
+      run(tank, 10);
+      return [fish.x, fish.y];
+    };
+    expect(finish()).toEqual(finish());
+  });
+});
+
 describe('tank edges', () => {
   it('a push cannot carry a fish out through the top or bottom', () => {
     const tank = makeTank();
@@ -171,7 +229,7 @@ describe('always true', () => {
     const tank = makeTank({ seed });
     BUILTINS.forEach((id, i) => {
       const fish = tank.addFish(id);
-      tank.setBehaviour(fish.id, { curiosity: (i % 5) / 2 - 1, pathStrength: 0.1 + (i % 4) * 0.3 });
+      tank.setBehaviour(fish.id, { curiosity: (i % 5) / 2 - 1, pathStrength: 0.1 + (i % 4) * 0.3, drift: (i % 3) / 2 });
     });
     return tank;
   }
