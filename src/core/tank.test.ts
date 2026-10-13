@@ -75,3 +75,40 @@ describe('Tank', () => {
     expect(Object.keys(fish.params).sort()).toEqual(['R', 'cx', 'cy', 'w', 'x0'].sort());
   });
 });
+
+describe('adding and removing fish', () => {
+  it('removing a fish leaves the others with their ids', () => {
+    const tank = new Tank(1.6, fixedRandom);
+    const [a, b, c] = [tank.addFish('sine'), tank.addFish('circle'), tank.addFish('rose')];
+    tank.removeFish(b.id);
+    expect(tank.fish.map((fish) => fish.id)).toEqual([a.id, c.id]);
+    expect(tank.get(c.id)).toBe(c);
+  });
+
+  it('never gives a new fish the id of a removed one', () => {
+    const tank = new Tank(1.6, fixedRandom);
+    const first = tank.addFish('sine');
+    const second = tank.addFish('sine');
+    tank.removeFish(second.id);
+    const third = tank.addFish('sine');
+    expect(new Set([first.id, second.id, third.id]).size).toBe(3);
+  });
+
+  it('no longer knows a removed fish', () => {
+    const tank = new Tank(1.6, fixedRandom);
+    const fish = tank.addFish('sine');
+    tank.removeFish(fish.id);
+    expect(() => tank.get(fish.id)).toThrow();
+    expect(() => tank.removeFish(fish.id)).toThrow();
+  });
+
+  it('keeps the rest swimming after a removal, including fish with typed equations', () => {
+    const tank = new Tank(1.6, fixedRandom);
+    const gone = tank.addFish('custom');
+    const stays = tank.addFish('custom');
+    tank.setEquations(stays.id, { x: 'cx + 0.1 * t', y: 'cy' });
+    tank.removeFish(gone.id);
+    tank.step(1);
+    expect(stays.x).toBeCloseTo(0.9);
+  });
+});

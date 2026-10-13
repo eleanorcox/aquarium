@@ -73,6 +73,8 @@ export class Tank {
   flock: FlockRules = { separation: 1, alignment: 1, cohesion: 1 };
   /** Compiled typed equations by fish id. Kept out of Fish so fish stay plain data. */
   private compiled = new Map<number, PositionFn>();
+  /** Ids are never reused, so an id always means the same fish even after others are removed. */
+  private nextId = 0;
 
   constructor(
     public width = 1.6,
@@ -80,7 +82,7 @@ export class Tank {
   ) {}
 
   addFish(model: ModelId, overrides: Params = {}): Fish {
-    const id = this.fish.length;
+    const id = this.nextId++;
     const fish: Fish = {
       id,
       name: (NAMES[id % NAMES.length] ?? 'Fish') + (id >= NAMES.length ? ` ${id + 1}` : ''),
@@ -175,8 +177,14 @@ export class Tank {
     });
   }
 
+  removeFish(id: number): void {
+    const fish = this.get(id);
+    this.fish.splice(this.fish.indexOf(fish), 1);
+    this.compiled.delete(id);
+  }
+
   get(id: number): Fish {
-    const fish = this.fish[id];
+    const fish = this.fish.find((f) => f.id === id);
     if (!fish) throw new Error(`No fish with id ${id}`);
     return fish;
   }
