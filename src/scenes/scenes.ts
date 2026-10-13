@@ -7,6 +7,8 @@ export interface Scene {
   name: string;
   /** What to watch for when judging this scene by eye. */
   lookFor: string;
+  /** Whether trails start switched on. Off for tanks with many fish, where they are slow and cluttered. */
+  trails?: boolean;
   build(tank: Tank): void;
 }
 

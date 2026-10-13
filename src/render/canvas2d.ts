@@ -1,16 +1,19 @@
-// Canvas 2D renderer: reads the tank and draws it. It never changes simulation state.
+// Canvas 2D renderer: reads the tank and draws the part of it a view shows. It never changes simulation state.
 import type { Vec2 } from '../core/motion';
 import type { Influence } from '../core/steering';
 import type { Fish, Tank } from '../core/tank';
+import { fishInView } from './drawList';
+import type { Size, View } from './view';
 
-export interface ViewState {
+/** What the person looking has chosen to see. */
+export interface Display {
   selected: number;
   trails: boolean;
 }
 
 export class Canvas2DRenderer {
   private ctx: CanvasRenderingContext2D;
-  /** Pixels per tank unit (the tank is 1 unit tall). */
+  /** Pixels per tank unit, taken from the view at the start of each frame. */
   private scale = 1;
 
   constructor(private canvas: HTMLCanvasElement) {
@@ -19,40 +22,53 @@ export class Canvas2DRenderer {
     this.ctx = ctx;
   }
 
-  /** Matches the backing store to the element size. Returns the tank width (aspect ratio). */
-  resize(): number {
+  /** Matches the backing store to the element size. Returns the size of the screen area in pixels. */
+  resize(): Size {
     const { width, height } = this.canvas.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.canvas.width = Math.round(width * dpr);
     this.canvas.height = Math.round(height * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.scale = height;
-    return Math.max(0.6, width / height);
+    return { width, height };
   }
 
-  /** Converts a pointer position to the id of the nearest fish, if one is close enough. */
-  pick(clientX: number, clientY: number, tank: Tank): number | undefined {
-    const { x, y } = this.toTank(clientX, clientY);
+  /** Converts a pointer position on the page to pixels from the canvas's top left corner. */
+  toCanvas(clientX: number, clientY: number): Vec2 {
+    const rect = this.canvas.getBoundingClientRect();
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
+  /** The id of the fish nearest a tank position, if one is within `reach` tank units. */
+  pick(at: Vec2, tank: Tank, reach: number): number | undefined {
     let best: number | undefined;
-    let bestDistance = 0.08;
+    let bestDistance = reach;
     for (const fish of tank.fish) {
-      const d = Math.hypot(fish.x - x, fish.y - y);
+      const d = Math.hypot(fish.x - at.x, fish.y - at.y);
       if (d < bestDistance) [best, bestDistance] = [fish.id, d];
     }
     return best;
   }
 
-  /** Converts a pointer position on the page to a position in tank units. */
-  toTank(clientX: number, clientY: number): Vec2 {
-    const rect = this.canvas.getBoundingClientRect();
-    return { x: (clientX - rect.left) / this.scale, y: (clientY - rect.top) / this.scale };
-  }
-
-  render(tank: Tank, view: ViewState): void {
+  render(tank: Tank, view: View, display: Display): void {
     const { ctx } = this;
-    const w = this.canvas.clientWidth;
-    const h = this.canvas.clientHeight;
-    ctx.clearRect(0, 0, w, h);
+    const scale = (this.scale = view.zoom);
+    const origin = view.toScreen({ x: 0, y: 0 });
+    const w = tank.width * scale;
+    const h = tank.height * scale;
+    ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
+
+    // Everything is drawn in pixels measured from the tank's top left corner, and nothing outside the tank.
+    ctx.save();
+    ctx.translate(origin.x, origin.y);
+    ctx.beginPath();
+    ctx.rect(0, 0, w, h);
+    ctx.clip();
+
+    const water = ctx.createRadialGradient(w / 2, 0, 0, w / 2, 0, Math.max(w * 0.7, h));
+    water.addColorStop(0, '#0b2233');
+    water.addColorStop(1, '#061521');
+    ctx.fillStyle = water;
+    ctx.fillRect(0, 0, w, h);
 
     ctx.strokeStyle = 'rgba(138, 164, 177, 0.07)';
     ctx.lineWidth = 1;
@@ -63,9 +79,11 @@ export class Canvas2DRenderer {
       ctx.stroke();
     }
 
-    if (view.trails) for (const fish of tank.fish) this.drawTrail(fish, fish.id === view.selected);
-    for (const fish of tank.fish) this.drawFish(fish, fish.id === view.selected, tank.t);
+    const inView = fishInView(tank.fish, view);
+    if (display.trails) for (const fish of inView) this.drawTrail(fish, fish.id === display.selected);
+    for (const fish of inView) this.drawFish(fish, fish.id === display.selected, tank.t);
     for (const influence of tank.influences) this.drawInfluence(influence);
+    ctx.restore();
   }
 
   /** A faint ring showing how far an influence reaches. */

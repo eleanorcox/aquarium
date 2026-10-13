@@ -125,3 +125,25 @@ describe('a tank given no randomness of its own', () => {
     expect(drifted()).toEqual(drifted());
   });
 });
+
+describe('the size of a tank', () => {
+  it('is its own: one unit tall, and as wide as it was made', () => {
+    expect([new Tank(2.5).width, new Tank(2.5).height]).toEqual([2.5, 1]);
+    expect(new Tank().width).toBeCloseTo(16 / 9);
+  });
+
+  it('can be made wider, and paths then use the new width', () => {
+    const tank = new Tank(1.6, fixedRandom);
+    const fish = tank.addFish('circle', { cx: 0.5, R: 0 });
+    tank.setWidth(3);
+    tank.step(1 / 60);
+    expect(fish.x).toBeCloseTo(1.5);
+  });
+
+  it('knows the size of a typical fish in it', () => {
+    const tank = new Tank(1.6, fixedRandom);
+    expect(tank.typicalFishSize()).toBeGreaterThan(0);
+    for (const size of [0.01, 0.02, 0.09]) tank.setFishSize(tank.addFish('sine').id, size);
+    expect(tank.typicalFishSize()).toBe(0.02);
+  });
+});

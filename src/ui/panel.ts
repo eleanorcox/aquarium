@@ -4,11 +4,13 @@ import { MODELS, MODEL_NAMES, paramSpecs, type ModelId } from '../core/motion';
 import type { Tank } from '../core/tank';
 import type { PointerInput, PointerMode } from '../input/pointer';
 import { SCENES } from '../scenes/scenes';
-import type { ViewState } from '../render/canvas2d';
+import type { Display } from '../render/canvas2d';
 
 export interface Controls {
-  view: ViewState;
+  display: Display;
   paused: boolean;
+  /** Keep the selected fish on screen when the tank is bigger than the screen. */
+  follow: boolean;
   select(id: number): void;
 }
 
@@ -28,15 +30,26 @@ const POINTER_OPTIONS: Record<string, PointerMode> = {
   Off: 'off',
 };
 
-export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput, scene: string, onAddFish: () => number): Controls {
+export interface PanelOptions {
+  pointer: PointerInput;
+  /** How far the pointer reaches, in pixels, so it feels the same at any zoom. */
+  reach: { pixels: number };
+  scene: string;
+  trails: boolean;
+  onAddFish: () => number;
+}
+
+export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions): Controls {
+  const { pointer, reach, scene, onAddFish } = options;
   const gui = new GUI({ title: 'Equatium' });
   const first = tank.fish[0]?.id ?? 0;
   const state = { fish: first, model: 'sine' as ModelId };
   // The selected fish's behaviour, copied here for the sliders and written back through the tank.
   const behaviour = { pathStrength: 1, curiosity: 0, drift: 0, schools: false };
   const controls: Controls = {
-    view: { selected: first, trails: true },
+    display: { selected: first, trails: options.trails },
     paused: false,
+    follow: false,
     select,
   };
 
@@ -45,13 +58,13 @@ export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput
     .add(state, 'model', MODEL_OPTIONS)
     .name('Motion')
     .onChange((model: ModelId) => {
-      tank.setModel(controls.view.selected, model);
+      tank.setModel(controls.display.selected, model);
       buildParams();
     });
   const params = gui.addFolder('Parameters');
 
   const behaviourFolder = gui.addFolder('Behaviour');
-  const setBehaviour = () => tank.setBehaviour(controls.view.selected, behaviour);
+  const setBehaviour = () => tank.setBehaviour(controls.display.selected, behaviour);
   behaviourFolder.add(behaviour, 'pathStrength', 0, 1, 0.01).name('Holds its route').onChange(setBehaviour);
   behaviourFolder.add(behaviour, 'curiosity', -1, 1, 0.01).name('Shy ↔ curious').onChange(setBehaviour);
   behaviourFolder.add(behaviour, 'drift', 0, 1, 0.01).name('Drift').onChange(setBehaviour);
@@ -62,12 +75,12 @@ export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput
     removeFish: () => {
       // The panel always shows one fish, so the last one stays.
       if (tank.fish.length < 2) return;
-      tank.removeFish(controls.view.selected);
+      tank.removeFish(controls.display.selected);
       select(tank.fish[0]!.id);
     },
     editAsEquation: () => {
-      tank.setModel(controls.view.selected, 'custom');
-      select(controls.view.selected);
+      tank.setModel(controls.display.selected, 'custom');
+      select(controls.display.selected);
       el.xInput.focus();
     },
   };
@@ -85,16 +98,17 @@ export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput
       location.search = `?scene=${id}`;
     });
   tankFolder.add(pointer, 'mode', POINTER_OPTIONS).name('Pointer');
-  tankFolder.add(pointer, 'radius', 0.05, 0.6, 0.01).name('Pointer reach');
+  tankFolder.add(reach, 'pixels', 40, 400, 5).name('Pointer reach');
   tankFolder.add(tank.flock, 'separation', 0, 2, 0.05).name('School: keep apart');
   tankFolder.add(tank.flock, 'alignment', 0, 2, 0.05).name('School: swim the same way');
   tankFolder.add(tank.flock, 'cohesion', 0, 2, 0.05).name('School: stay together');
-  tankFolder.add(controls.view, 'trails').name('Trails');
+  tankFolder.add(controls, 'follow').name('Follow selected fish');
+  tankFolder.add(controls.display, 'trails').name('Trails');
   tankFolder.add(controls, 'paused').name('Pause');
 
   el.editor.addEventListener('submit', (e) => {
     e.preventDefault();
-    const error = tank.setEquations(controls.view.selected, { x: el.xInput.value, y: el.yInput.value });
+    const error = tank.setEquations(controls.display.selected, { x: el.xInput.value, y: el.yInput.value });
     el.error.textContent = error ?? '';
     el.error.hidden = error === null;
     if (error === null) showEquation();
@@ -107,7 +121,7 @@ export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput
   function buildParams(): void {
     // Empty the folder instead of replacing it, so it keeps its place in the panel.
     for (const controller of [...params.controllers]) controller.destroy();
-    const fish = tank.get(controls.view.selected);
+    const fish = tank.get(controls.display.selected);
     for (const [key, spec] of Object.entries(paramSpecs(fish.model))) {
       params
         .add(fish.params, key, spec.min, spec.max, spec.step)
@@ -130,12 +144,12 @@ export function createPanel(tank: Tank, el: PanelElements, pointer: PointerInput
   }
 
   function showEquation(): void {
-    const fish = tank.get(controls.view.selected);
+    const fish = tank.get(controls.display.selected);
     if (fish.model !== 'custom') el.equation.textContent = `${fish.name}\n${MODELS[fish.model].equation(fish.params)}`;
   }
 
   function select(id: number): void {
-    controls.view.selected = id;
+    controls.display.selected = id;
     state.fish = id;
     const fish = tank.get(id);
     state.model = fish.model;

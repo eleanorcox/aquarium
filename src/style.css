@@ -22,7 +22,8 @@ body {
   cursor: pointer;
   /* A finger dragged across the tank moves the fish, not the page. */
   touch-action: none;
-  background: radial-gradient(120% 90% at 50% 0%, var(--water-2), var(--water));
+  /* Shows where the screen is a different shape from the tank. The renderer paints the water. */
+  background: #02080d;
 }
 #equation {
   position: fixed;

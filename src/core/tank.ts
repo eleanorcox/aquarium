@@ -56,6 +56,7 @@ const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 const NAMES = ['Sina', 'Lissa', 'Orbit', 'Cosmo', 'Theta', 'Pi', 'Euler', 'Fourier', 'Gauss', 'Noether'];
 const HUES = [172, 28, 290, 52, 205, 340, 110, 12, 240, 80];
 const TRAIL_LENGTH = 240;
+const DEFAULT_FISH_SIZE = 0.04;
 const DERIVATIVE_STEP = 0.01;
 
 const wrap = (v: number, size: number) => ((v % size) + size) % size;
@@ -77,8 +78,11 @@ export class Tank {
   /** Ids are never reused, so an id always means the same fish even after others are removed. */
   private nextId = 0;
 
+  /** Tank units are tank heights, so every tank is 1 tall. A bigger tank is a wider one with smaller fish. */
+  readonly height = 1;
+
   constructor(
-    public width = 1.6,
+    public width = 16 / 9,
     private random: () => number = seededRandom(1),
   ) {}
 
@@ -158,9 +162,20 @@ export class Tank {
     this.influences = influences;
   }
 
-  resize(width: number): void {
+  /** The tank's size is its own: it is set when the tank is made up, never by the screen showing it. */
+  setWidth(width: number): void {
     this.width = width;
     for (const fish of this.fish) fish.trail = [];
+  }
+
+  setFishSize(id: number, size: number): void {
+    this.get(id).size = size;
+  }
+
+  /** The middle fish size, which a view uses to decide how far to zoom in. */
+  typicalFishSize(): number {
+    const sizes = this.fish.map((fish) => fish.size).sort((a, b) => a - b);
+    return sizes[Math.floor(sizes.length / 2)] ?? DEFAULT_FISH_SIZE;
   }
 
   step(dt: number): void {
