@@ -20,6 +20,14 @@ describe('frames sent to the display window', () => {
     expect(looks(drawn.fish)).toEqual(looks(tank.fish));
   });
 
+  it('carry each fish’s swimming style, so real species swim the same way on the projector', () => {
+    const tank = new Tank();
+    const fish = tank.addFish('sine');
+    tank.setSpecies(fish.id, 'european-eel', 'anguilliform');
+    tank.addFish('sine');
+    expect(unpackFrame(structuredClone(packFrame(tank, details))).fish.map((f) => f.swimStyle)).toEqual(['anguilliform', undefined]);
+  });
+
   it('carry how the operator wants it shown', () => {
     const tank = new Tank();
     tank.addFish('sine');
@@ -30,8 +38,8 @@ describe('frames sent to the display window', () => {
   it('stay small for a big tank', () => {
     const tank = new Tank();
     buildScene(tank, 'field');
-    // Seven numbers of eight bytes per fish.
-    expect(packFrame(tank, details).fish.byteLength).toBe(tank.fish.length * 7 * 8);
+    // Eight numbers of eight bytes per fish.
+    expect(packFrame(tank, details).fish.byteLength).toBe(tank.fish.length * 8 * 8);
   });
 });
 

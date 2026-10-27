@@ -49,6 +49,16 @@ export interface Fish {
   schools: boolean;
   /** The formation it belongs to, named by the id of the fish it was made from. Members share one equation. */
   formation?: number;
+  /** The real species it is, by its catalogue name, if it is one. */
+  species?: string;
+  /** How its body bends as it swims, by the biologists' name for the style, if known. Used only for drawing. */
+  swimStyle?: string;
+}
+
+/** Whether a tank holds real species only or anything, and which place's species it is limited to, if any. */
+export interface TankRules {
+  kind: 'real' | 'made-up';
+  biome: string | null;
 }
 
 export type Behaviour = Pick<Fish, 'pathStrength' | 'curiosity' | 'drift' | 'schools'>;
@@ -75,6 +85,8 @@ export class Tank {
   influences: Influence[] = [];
   /** How strongly schooling fish follow each of the three schooling rules. */
   flock: FlockRules = { separation: 1, alignment: 1, cohesion: 1 };
+  /** What may be added. Checked only when fish are added, never by the simulation itself. */
+  rules: TankRules = { kind: 'made-up', biome: null };
   /** Compiled typed equations by fish id. Kept out of Fish so fish stay plain data. */
   private compiled = new Map<number, PositionFn>();
   /** Ids are never reused, so an id always means the same fish even after others are removed. */
@@ -184,6 +196,14 @@ export class Tank {
     }
     this.places = null;
     return ids;
+  }
+
+  setRules(rules: TankRules): void {
+    this.rules = { ...rules };
+  }
+
+  setSpecies(id: number, species: string, swimStyle: string): void {
+    Object.assign(this.get(id), { species, swimStyle });
   }
 
   /** Puts a fish into a formation, as when a saved tank is loaded. */

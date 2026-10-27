@@ -2,10 +2,11 @@
 // which only draws it. Both are on the same machine, talking over a BroadcastChannel.
 import type { Influence } from '../core/steering';
 import type { DrawnFish, DrawnTank } from '../render/drawn';
+import { SWIMMING_STYLES } from '../species/catalogue';
 
 export const CHANNEL = 'equatium-display';
-/** Numbers per fish in a frame: id, x, y, heading, speed, size, hue. */
-const PER_FISH = 7;
+/** Numbers per fish in a frame: id, x, y, heading, speed, size, hue, and swimming style as its place in the list, or -1. */
+const PER_FISH = 8;
 
 /** One frame of the tank, from the operator window to the display window. */
 export interface FrameMessage {
@@ -28,7 +29,7 @@ export type DisplayMessage =
 
 export function packFrame(tank: DrawnTank, details: Pick<FrameMessage, 'visual' | 'fill' | 'selected' | 'trails'>): FrameMessage {
   const fish = new Float64Array(tank.fish.length * PER_FISH);
-  tank.fish.forEach((f, i) => fish.set([f.id, f.x, f.y, f.heading, f.speed, f.size, f.hue], i * PER_FISH));
+  tank.fish.forEach((f, i) => fish.set([f.id, f.x, f.y, f.heading, f.speed, f.size, f.hue, SWIMMING_STYLES.indexOf(f.swimStyle as never)], i * PER_FISH));
   return { type: 'frame', width: tank.width, t: tank.t, fish, influences: tank.influences, ...details };
 }
 
@@ -36,8 +37,9 @@ export function packFrame(tank: DrawnTank, details: Pick<FrameMessage, 'visual' 
 export function unpackFrame(frame: FrameMessage): DrawnTank {
   const fish: DrawnFish[] = [];
   for (let i = 0; i < frame.fish.length; i += PER_FISH) {
-    const [id, x, y, heading, speed, size, hue] = frame.fish.subarray(i, i + PER_FISH);
-    fish.push({ id: id!, x: x!, y: y!, heading: heading!, speed: speed!, size: size!, hue: hue!, trail: [] });
+    const [id, x, y, heading, speed, size, hue, style] = frame.fish.subarray(i, i + PER_FISH);
+    const swimStyle = SWIMMING_STYLES[style!];
+    fish.push({ id: id!, x: x!, y: y!, heading: heading!, speed: speed!, size: size!, hue: hue!, trail: [], ...(swimStyle ? { swimStyle } : {}) });
   }
   return { width: frame.width, height: 1, t: frame.t, fish, influences: frame.influences };
 }

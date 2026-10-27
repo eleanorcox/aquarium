@@ -1,0 +1,27 @@
+{
+  "commonName": "Moorish idol",
+  "scientificName": "Zanclus cornutus",
+  "lengthCm": {
+    "typical": 21,
+    "max": 23
+  },
+  "water": "salt",
+  "regions": [
+    "Pacific saltwater"
+  ],
+  "depth": "midwater",
+  "swimmingStyle": "labriform",
+  "swimmingStyleNote": "conventional classification, not from a specific source",
+  "behaviour": "FishBase: reef-associated, benthopelagic, 0-182 m; 'generally encountered in small groups of 2 or 3 individuals', also singly, in pairs, and occasionally in large schools. Feeds on small encrusting animals. Also in the Indian Ocean.",
+  "groupSize": {
+    "min": 1,
+    "max": 3
+  },
+  "temperament": 0.2,
+  "temperamentNote": "Judged from living openly in small groups on reefs; no direct curiosity data.",
+  "sources": [
+    "https://www.fishbase.se/summary/Zanclus-cornutus.html"
+  ],
+  "hue": 52,
+  "hueNote": "Drawing colour, chosen by eye for the main body colour (bold yellow, black and white bands); not a sourced fact."
+}

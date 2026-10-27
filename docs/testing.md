@@ -166,6 +166,8 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 
 ### Stage 3b: a small real tank
 
+*Built. The tests are in [species.test.ts](../src/species/species.test.ts).*
+
 - Every species file in the repo loads and passes its checks.
 - A fish takes its size, speed and swimming style from its species; a fish can override them.
 - Adding a schooling species adds a group within that species' usual numbers.

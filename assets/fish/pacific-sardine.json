@@ -1,0 +1,28 @@
+{
+  "commonName": "Pacific sardine",
+  "scientificName": "Sardinops sagax",
+  "lengthCm": {
+    "typical": 20,
+    "max": 39.5
+  },
+  "water": "salt",
+  "regions": [
+    "Pacific saltwater"
+  ],
+  "depth": "midwater",
+  "swimmingStyle": "carangiform",
+  "swimmingStyleNote": "conventional classification, not from a specific source",
+  "behaviour": "FishBase: 'A coastal species that forms large schools'; marine, pelagic-neritic, 0-200 m. Migrates north in summer and south in autumn off California.",
+  "groupSize": {
+    "min": 100,
+    "max": 1000
+  },
+  "groupSizeNote": "'large schools' per FishBase; the numbers are a rough game estimate, not sourced",
+  "temperament": -0.4,
+  "temperamentNote": "Judged from its being a tightly schooling small prey fish; no behaviour text on curiosity.",
+  "sources": [
+    "https://www.fishbase.se/summary/Sardinops-sagax.html"
+  ],
+  "hue": 205,
+  "hueNote": "Drawing colour, chosen by eye for the main body colour (blue-green back, silver sides); not a sourced fact."
+}

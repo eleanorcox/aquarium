@@ -8,6 +8,7 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
+- Real fish: six species from FishBase (Pacific sardine, yellowfin tuna, Moorish idol, northern pike, European perch, European eel), each sized, coloured, swimming and schooling from its facts. A Real fish section in the panel sets the tank to real species only or made-up, limits it to a biome, and adds species. Pacific and British river scenes.
 - Formations: Make a formation turns the selected fish into a group sharing one equation, in which each fish knows its place as `i` of `n`. Editing any member's equation changes them all. A Whirlpool scene is one formation of 48 fish.
 - A field of fish scene (`?scene=field`): 700 small fish in one school streaming past, filling the screen so you are in the middle of it.
 - Visual modes, chosen from Visuals in the panel or with `?visuals=name`: Classic (the original look), Natural (fish that bend as they swim, eel-like to tuna-like, in sunlit water) and Paper (ink fish on squared paper).
@@ -23,6 +24,10 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 - A tank can be bigger than the screen. Drag to move around it, zoom with the wheel or a pinch, or tick Follow selected fish.
 - A scene of 500 small fish in five schools.
 - A Speed section in the panel showing how many fish are on screen and the time spent stepping and drawing each frame.
+
+### Fixed
+
+- The page stayed blank in the built site after the display window was added, because of how the maths library loaded. Both windows' code now loads at start-up.
 
 ### Changed
 

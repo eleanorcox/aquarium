@@ -1,0 +1,26 @@
+{
+  "commonName": "European eel",
+  "scientificName": "Anguilla anguilla",
+  "lengthCm": {
+    "typical": 35,
+    "max": 133
+  },
+  "water": "fresh",
+  "regions": [
+    "British freshwater"
+  ],
+  "depth": "bottom",
+  "swimmingStyle": "anguilliform",
+  "behaviour": "Water is that of adult feeding life in rivers; the species is catadromous and migrates 5,000-6,000 km to spawn in the Sargasso Sea, then dies. FishBase: 'Territorial and solitary'; demersal, lives in benthic habitats from streams to large rivers and lakes; groups of young eels reflect conditions, not active schooling.",
+  "groupSize": {
+    "min": 1,
+    "max": 1
+  },
+  "temperament": -0.5,
+  "temperamentNote": "Judged from a solitary, territorial, bottom-dwelling fish that stays hidden; no direct fleeing data in the text.",
+  "sources": [
+    "https://www.fishbase.se/summary/Anguilla-anguilla.html"
+  ],
+  "hue": 30,
+  "hueNote": "Drawing colour, chosen by eye for the main body colour (brown to olive); not a sourced fact."
+}

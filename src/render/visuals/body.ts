@@ -13,7 +13,16 @@ const NOSE = 0.45;
 
 /** Until fish have species, each gets a swimming style from its id, so a tank shows a mix. Mostly ordinary swimmers. */
 const STYLE_ORDER: SwimStyleId[] = ['subcarangiform', 'carangiform', 'subcarangiform', 'thunniform', 'anguilliform'];
-export const styleFor = (fish: DrawnFish): SwimStyle => STYLES[STYLE_ORDER[fish.id % STYLE_ORDER.length]!];
+/**
+ * Styles the body wave cannot show directly are drawn as the nearest it can: fish that swim with their fins
+ * (wrasse, boxfish) keep their bodies stiff, so they are drawn with the stiffest body; rays as trout for now.
+ */
+const DRAWN_AS: Record<string, SwimStyleId> = { labriform: 'thunniform', ostraciiform: 'thunniform', rajiform: 'subcarangiform' };
+
+export const styleFor = (fish: DrawnFish): SwimStyle => {
+  const named = fish.swimStyle ? (DRAWN_AS[fish.swimStyle] ?? fish.swimStyle) : undefined;
+  return named && named in STYLES ? STYLES[named as SwimStyleId] : STYLES[STYLE_ORDER[fish.id % STYLE_ORDER.length]!];
+};
 
 export interface Body {
   style: SwimStyle;

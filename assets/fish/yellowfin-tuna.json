@@ -1,0 +1,27 @@
+{
+  "commonName": "Yellowfin tuna",
+  "scientificName": "Thunnus albacares",
+  "lengthCm": {
+    "typical": 150,
+    "max": 239
+  },
+  "water": "salt",
+  "regions": [
+    "Pacific saltwater"
+  ],
+  "depth": "midwater",
+  "swimmingStyle": "thunniform",
+  "behaviour": "FishBase: 'They school primarily by size, either in monospecific or multi-species groups'; larger fish often school with porpoises. Pelagic in open water, usually 1-250 m, rarely near reefs; highly migratory. Also occurs in other oceans.",
+  "groupSize": {
+    "min": 5,
+    "max": 100
+  },
+  "groupSizeNote": "'school' per FishBase; numbers are a rough game estimate, not sourced",
+  "temperament": 0.1,
+  "temperamentNote": "Judged from open-water schooling and association with porpoises and floating objects; no direct curiosity data.",
+  "sources": [
+    "https://www.fishbase.se/summary/Thunnus-albacares.html"
+  ],
+  "hue": 225,
+  "hueNote": "Drawing colour, chosen by eye for the main body colour (dark metallic blue back (the yellow is in the fins)); not a sourced fact."
+}

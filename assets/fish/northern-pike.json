@@ -1,0 +1,27 @@
+{
+  "commonName": "Northern pike",
+  "scientificName": "Esox lucius",
+  "lengthCm": {
+    "typical": 40,
+    "max": 150
+  },
+  "water": "fresh",
+  "regions": [
+    "British freshwater"
+  ],
+  "depth": "midwater",
+  "swimmingStyle": "subcarangiform",
+  "swimmingStyleNote": "conventional classification, not from a specific source",
+  "behaviour": "FishBase: 'Usually solitary and highly territorial'; lives in clear, vegetated lakes, quiet pools and river backwaters; pelagic, usually 1-5 m deep; cannibalism is common. Also tolerates brackish water.",
+  "groupSize": {
+    "min": 1,
+    "max": 1
+  },
+  "temperament": -0.2,
+  "temperamentNote": "Judged from a solitary, territorial predator; it holds its ground rather than flees, but does not approach.",
+  "sources": [
+    "https://www.fishbase.se/summary/Esox-lucius.html"
+  ],
+  "hue": 95,
+  "hueNote": "Drawing colour, chosen by eye for the main body colour (olive green with pale spots); not a sourced fact."
+}

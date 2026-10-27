@@ -64,6 +64,8 @@ Template:
 | [28](#28-a-tank-is-shared-as-a-link) | A tank is shared as a link | 27 Oct 2026 | Built |
 | [29](#29-hands-are-shown-not-only-felt) | Hands are shown, not only felt | 27 Oct 2026 | Built |
 | [30](#30-the-display-window-only-draws) | The display window only draws | 27 Oct 2026 | Built |
+| [31](#31-the-page-loads-both-windows-code-up-front) | The page loads both windows' code up front | 27 Oct 2026 | Built |
+| [32](#32-real-species-are-data-and-tank-rules-are-checked-on-adding) | Real species are data, and tank rules are checked on adding | 27 Oct 2026 | Built |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -376,3 +378,28 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - The operator window must stay visible, not minimised: browsers pause animation in hidden windows, which would freeze the projection.
   - The hand-tracking library is now loaded only when hands are switched on, which makes every page start faster.
   - Headless test browsers here barely run animation, so the two windows together have not been seen working; the message format is tested.
+
+## 31. The page loads both windows' code up front
+
+- **Date:** 27 October 2026
+- **Status:** Built
+- **What prompted it:** After the display window (30) was added, the operator window no longer appeared in a headless browser. Tracking it down: the page loaded the operator's code on demand, and in the built site loading the maths library on demand never finished, with no error, while everything else loaded on demand without trouble and the same library loaded fine at start-up. The exact cause inside the build tool was not found.
+- **Decision:** The page loads both the operator and the display code at start-up and picks which to run. Neither waits at the top level as it loads. Only the camera code, which does not include the maths library, is still loaded on demand.
+- **Alternatives considered:** Finding and fixing the build tool's behaviour, which could have taken a long time with no guarantee; keeping on-demand loading for everything but the maths library, which is fragile.
+- **What follows from it:** The display window loads a little more code than it needs. Commits f421824 to the one before this entry were broken in the built site and in the dev server under headless testing; Eleanor may have seen a blank page if she tried them.
+
+## 32. Real species are data, and tank rules are checked on adding
+
+- **Date:** 27 October 2026
+- **Status:** Built; carries out 9 and 17
+- **What prompted it:** Stage 3b. Six species files were gathered from FishBase by a research subagent to the brief in [assets.md](assets.md).
+- **Decision:**
+  - Every file in `assets/fish/` is checked and loaded into the catalogue at start-up. Adding a species is adding a file.
+  - A species arrives as a lone fish or a school. Its size squeezes real length (a fish four times as long is drawn twice the size); its swimming style, temperament and colour come from its file; its route is a gentle wave in its depth band at a cruising speed set by its swimming style.
+  - School size is about the middle of the species' usual numbers, limited so big fish come in small groups.
+  - A tank is real or made-up, and may be limited to a biome. A real tank refuses made-up fish and, if it has a biome, species from elsewhere, each with a reason. A made-up tank takes anything.
+  - Fish that swim with their fins (the Moorish idol) are drawn with the stiffest body the body wave allows, since fin swimming is not drawn yet.
+- **Alternatives considered:** Species written into the code, which would make adding one a programming job.
+- **What follows from it:**
+  - Cruising speed by style, school sizes and temperaments are game choices, not sourced; the species files say so field by field. Colours are chosen by eye and marked as such.
+  - Species are drawn as coloured versions of the generic bent body until pictures exist.

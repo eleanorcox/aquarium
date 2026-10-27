@@ -82,6 +82,7 @@ One small data file per species, so that adding a fish means adding a picture an
 - `depth` is one of `surface`, `midwater`, `bottom`.
 - `swimmingStyle` is one of `anguilliform`, `subcarangiform`, `carangiform`, `thunniform`, `ostraciiform`, `labriform`, `rajiform`.
 - `groupSize` is how many usually swim together: 1 for a loner, hundreds for a schooling fish.
+- `hue` (optional) is the drawing colour, 0 to 360, chosen by eye. `temperament` (optional) is from -1 shy to 1 curious, a judgement explained in `temperamentNote`.
 - The example's numbers are placeholders showing the shape of the file, not checked facts.
 - Leave out any value that cannot be sourced; do not guess.
 

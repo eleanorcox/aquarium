@@ -2,6 +2,8 @@
 // Open one with ?scene=name in the address, and add &visuals=name to see it in a particular look.
 import { MODELS, type BuiltinId } from '../core/motion';
 import type { Tank } from '../core/tank';
+import { SPECIES } from '../species/catalogue';
+import { addSpecies } from '../species/stock';
 
 export interface Scene {
   name: string;
@@ -108,6 +110,30 @@ export const SCENES: Record<string, Scene> = {
       });
       tank.makeFormation(leader.id, 48);
       for (const fish of tank.fish) tank.setBehaviour(fish.id, { drift: 0.3, curiosity: -0.6, pathStrength: 0.5 });
+    },
+  },
+  pacific: {
+    name: 'Pacific (real fish)',
+    lookFor: 'A real-fish tank of Pacific saltwater species: a sardine school, a group of yellowfin tuna and a pair of Moorish idols, each swimming and schooling in its own way.',
+    settle: 3,
+    build(tank) {
+      tank.setRules({ kind: 'real', biome: 'Pacific saltwater' });
+      for (const id of ['pacific-sardine', 'yellowfin-tuna', 'moorish-idol']) {
+        const species = SPECIES[id];
+        if (species) addSpecies(tank, species);
+      }
+    },
+  },
+  river: {
+    name: 'British river (real fish)',
+    lookFor: 'A real-fish tank of British freshwater species: a pike, a perch and an eel near the bottom. Try adding a sardine: it should be refused.',
+    settle: 1,
+    build(tank) {
+      tank.setRules({ kind: 'real', biome: 'British freshwater' });
+      for (const id of ['northern-pike', 'european-perch', 'european-eel', 'european-perch']) {
+        const species = SPECIES[id];
+        if (species) addSpecies(tank, species);
+      }
     },
   },
   field: {

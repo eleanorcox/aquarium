@@ -1,0 +1,23 @@
+{
+  "commonName": "European perch",
+  "scientificName": "Perca fluviatilis",
+  "lengthCm": {
+    "typical": 25,
+    "max": 60
+  },
+  "water": "fresh",
+  "regions": [
+    "British freshwater"
+  ],
+  "depth": "bottom",
+  "swimmingStyle": "subcarangiform",
+  "swimmingStyleNote": "conventional classification, not from a specific source",
+  "behaviour": "FishBase: freshwater and brackish, demersal, usually 3-4 m deep, in lakes, estuarine lagoons and medium streams; 'an opportunistic diurnal feeder which preys mainly during sunrise and sunset'. The page says nothing about schooling, so no group size is given.",
+  "temperament": 0.2,
+  "temperamentNote": "Judged from an opportunistic feeder of open habitats; weak basis, the page has no direct curiosity data.",
+  "sources": [
+    "https://www.fishbase.se/summary/Perca-fluviatilis.html"
+  ],
+  "hue": 70,
+  "hueNote": "Drawing colour, chosen by eye for the main body colour (greenish yellow with dark bars); not a sourced fact."
+}

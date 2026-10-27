@@ -63,6 +63,8 @@ One of Eleanor's drawings digitised and swimming, and one generated fish, side b
 
 ### Stage 3b: a small real tank
 
+*Status, 27 October 2026: built. Six species from FishBase, biomes, real and made-up tanks, and Pacific and British river scenes. Species are drawn as coloured generic bodies until pictures exist.*
+
 The first six or so species as data, schools for the species that school, and one biome with its switch.
 
 - **Shows:** a tank that looks like a place, with a sardine school, a couple of tuna and a loner.

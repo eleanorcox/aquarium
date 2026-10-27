@@ -87,13 +87,17 @@ Hand tracking uses Google's MediaPipe hand landmarker. Its model file is kept in
 
 Choose **Visuals** in the panel, or add `?visuals=name` to the address: `classic` (the default), `natural` or `paper`. Natural fish bend as they swim using the travelling body wave from studies of real fish (`src/render/swimming.ts`). Press **H** to hide the panel.
 
+### Real fish
+
+The **Real fish** section of the panel sets the tank to **Real species only** or **Made-up**, limits a real tank to a **Biome**, and adds a **Species**: a school or a lone fish, sized, coloured and swimming from the facts in its file. A real tank refuses made-up fish and species from other places, saying why. The species are in `assets/fish/`, one JSON file each, sourced from FishBase; adding a file adds a species. Try the `pacific` and `river` scenes.
+
 ### Formations
 
 **Make a formation** turns the selected fish into a group of copies that share one equation, sized by **Formation size**. Each fish knows its place as `i` and the group's size as `n`, so one equation can spread them out: `x = cx + 0.3 * cos(t + 2 * pi * i / n)`, `y = cy + 0.3 * sin(t + 2 * pi * i / n)` makes a turning ring. Editing the equation of any member changes it for all of them. The `whirlpool` scene is one formation of 48 fish.
 
 ### Scenes
 
-Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `whirlpool` (one formation of 48 fish), `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
+Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `pacific` and `river` (real species), `whirlpool` (one formation of 48 fish), `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
 
 ### Your own equations
 

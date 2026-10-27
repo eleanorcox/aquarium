@@ -5,6 +5,8 @@ import type { Tank } from '../core/tank';
 import type { PointerInput, PointerMode } from '../input/pointer';
 import { VISUALS } from '../render/visuals';
 import { SCENES } from '../scenes/scenes';
+import { BIOMES, SPECIES } from '../species/catalogue';
+import { addSpecies } from '../species/stock';
 import type { Display } from '../render/canvas2d';
 
 export interface Controls {
@@ -56,7 +58,8 @@ export interface PanelOptions {
   display: { status: string };
   onOpenDisplay: () => void;
   onCopyLink: () => void;
-  onAddFish: () => number;
+  /** Adds a fish and returns its id, or the reason it could not be added. */
+  onAddFish: () => number | string;
 }
 
 export interface Stats {
@@ -99,7 +102,11 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   behaviourFolder.add(behaviour, 'schools').name('Schools').onChange(setBehaviour);
 
   const actions = {
-    addFish: () => select(onAddFish()),
+    addFish: () => {
+      const added = onAddFish();
+      if (typeof added === 'string') stocking.message = added;
+      else select(added);
+    },
     removeFish: () => {
       // The panel always shows one fish, so the last one stays.
       if (tank.fish.length < 2) return;
@@ -113,6 +120,32 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
     },
   };
   const editButton = gui.add(actions, 'editAsEquation').name('Edit as equation');
+
+  // Real fish: what kind of tank this is, which place it keeps to, and adding species from the catalogue.
+  const speciesIds = Object.keys(SPECIES).sort();
+  const stocking = {
+    kind: tank.rules.kind,
+    biome: tank.rules.biome ?? '',
+    species: speciesIds[0] ?? '',
+    message: '',
+    add: () => {
+      const species = SPECIES[stocking.species];
+      if (!species) return;
+      const added = addSpecies(tank, species);
+      if (typeof added === 'string') stocking.message = added;
+      else {
+        stocking.message = `Added ${added.length === 1 ? 'a' : added.length} ${species.commonName}${added.length === 1 ? '' : ' school'}`;
+        select(added[0]!);
+      }
+    },
+  };
+  const setRules = () => tank.setRules({ kind: stocking.kind, biome: stocking.biome || null });
+  const real = gui.addFolder('Real fish');
+  real.add(stocking, 'kind', { 'Made-up: anything goes': 'made-up', 'Real species only': 'real' }).name('Tank').onChange(setRules);
+  real.add(stocking, 'biome', { 'Anywhere': '', ...Object.fromEntries(BIOMES.map((b) => [b, b])) }).name('Biome').onChange(setRules);
+  real.add(stocking, 'species', Object.fromEntries(speciesIds.map((id) => [SPECIES[id]!.commonName, id]))).name('Species');
+  real.add(stocking, 'add').name('Add species');
+  real.add(stocking, 'message').name('').listen().disable();
   // A formation: copies of the selected fish sharing its equation, each knowing its place as i of n.
   const formation = {
     size: 12,

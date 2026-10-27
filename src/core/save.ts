@@ -2,7 +2,7 @@
 // so loading checks everything and refuses what it cannot trust, saying why.
 import { MODEL_NAMES, type EquationSource, type ModelId, type Params } from './motion';
 import type { FlockRules } from './steering';
-import { Tank } from './tank';
+import { Tank, type TankRules } from './tank';
 
 export const SAVE_VERSION = 1;
 /** More fish than this in a saved tank is refused: it would be too slow to be anything but a mistake or an attack. */
@@ -23,6 +23,8 @@ export interface SavedFish {
   schools: boolean;
   /** Where in the list of fish its formation's first member is, if it is in one. */
   formation?: number;
+  species?: string;
+  swimStyle?: string;
 }
 
 /** A tank's setup: its size, its fish and their settings, and the time, so routes carry on from where they were. */
@@ -31,6 +33,7 @@ export interface SavedTank {
   width: number;
   t: number;
   flock: FlockRules;
+  rules?: TankRules;
   fish: SavedFish[];
 }
 
@@ -40,6 +43,7 @@ export function saveTank(tank: Tank): SavedTank {
     width: tank.width,
     t: tank.t,
     flock: { ...tank.flock },
+    rules: { ...tank.rules },
     fish: tank.fish.map((f) => ({
       name: f.name,
       hue: f.hue,
@@ -51,6 +55,7 @@ export function saveTank(tank: Tank): SavedTank {
       curiosity: f.curiosity,
       drift: f.drift,
       schools: f.schools,
+      ...(f.species && f.swimStyle ? { species: f.species, swimStyle: f.swimStyle } : {}),
       ...(f.formation !== undefined ? { formation: tank.fish.findIndex((g) => g.formation === f.formation) } : {}),
     })),
   };
@@ -77,6 +82,11 @@ export function loadTank(data: unknown): Tank | string {
       const value = flock[rule];
       if (isNumber(value)) tank.setFlock({ [rule]: Math.min(2, Math.max(0, value)) });
     }
+  }
+  const { rules } = data;
+  if (isObject(rules) && (rules.kind === 'real' || rules.kind === 'made-up')) {
+    const biome = typeof rules.biome === 'string' && rules.biome.length <= MAX_NAME ? rules.biome : null;
+    tank.setRules({ kind: rules.kind, biome });
   }
   for (const [i, saved] of fish.entries()) {
     const problem = addSavedFish(tank, saved);
@@ -105,6 +115,10 @@ function addSavedFish(tank: Tank, saved: unknown): string | null {
     if (error) return `its equations do not work: ${error}`;
   }
   tank.setLook(fish.id, { name, hue });
+  const { species, swimStyle } = saved;
+  if (typeof species === 'string' && typeof swimStyle === 'string' && species.length <= MAX_NAME && swimStyle.length <= MAX_NAME) {
+    tank.setSpecies(fish.id, species, swimStyle);
+  }
   tank.setFishSize(fish.id, size);
   // Settings out of range are brought back into range by the tank, so an extreme value is not a reason to refuse.
   const behaviour: Record<string, number | boolean> = {};
