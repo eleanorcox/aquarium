@@ -66,7 +66,8 @@ Template:
 | [30](#30-the-display-window-only-draws) | The display window only draws | 27 Oct 2026 | Built |
 | [31](#31-the-page-loads-both-windows-code-up-front) | The page loads both windows' code up front | 27 Oct 2026 | Built |
 | [32](#32-real-species-are-data-and-tank-rules-are-checked-on-adding) | Real species are data, and tank rules are checked on adding | 27 Oct 2026 | Built |
-| [33](#33-schools-can-keep-to-their-own-kind) | Schools can keep to their own kind | 27 Oct 2026 | Built |
+| [33](#33-schools-can-keep-to-their-own-kind) | Schools can keep to their own kind | 27 Oct 2026 | Built; Colour schools changed by 34 |
+| [34](#34-disturbed-fish-can-join-the-nearest-other-school) | Disturbed fish can join the nearest other school | 27 Oct 2026 | Built |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -413,3 +414,15 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 - **Decision:** A fish may belong to a named school and then schools only with fish in the same school; fish with no school set school with each other, as before. Each real species arrives as its own school. The Colour schools scene leaves all its fish in one shared school but puts each colour on its own small route, far enough apart that no fish ever sees another colour's school unless pushed there. A test checks that over 20 seconds left alone.
 - **Alternatives considered:** Separate schools per colour, which would stop the colours mixing even when stirred. Crossing routes, which would mix the colours without Eleanor doing anything.
 - **What follows from it:** Mixing comes from people, and the loose hold on each fish's route slowly sorts the colours out again afterwards.
+
+## 34. Disturbed fish can join the nearest other school
+
+- **Date:** 27 October 2026
+- **Status:** Built; changes the Colour schools scene described in 33
+- **What prompted it:** Eleanor tried the first Colour schools and wanted something else: when she disrupts the fish, they should go to the nearest group, so the schools gradually become rainbows. And loads of fish.
+- **Decision:** A tank setting, Pushed-out fish: swim home (as before, the default) or join the nearest school. With joining on, a fish that a pointer, hand or movement has pushed in the last second, and pushed at least six of its own lengths off its route, takes the route and schoolmates of the nearest other school. It keeps its colour, and is not sent on again until it has arrived. Colour schools is now eight single-colour schools of 40, each its own school, with joining switched on once the scene has settled.
+- **Alternatives considered:**
+  - *Join only if another school is nearer than its own.* Tried first. A hand pushes fish sideways out of its way, not towards the next school, so almost nothing changed school.
+  - *Any fish far enough off its route.* Tried second. A school of 40 is naturally wider than that distance, so fish at the edge changed school with nobody touching them.
+  - *All colours sharing one school.* Neighbouring schools pulled at each other's edges and swapped fish on their own.
+- **What follows from it:** Mixing is caused only by people, which tests check both ways: 30 seconds alone changes nothing, and a hand swept along one row sends more than ten fish to other schools.

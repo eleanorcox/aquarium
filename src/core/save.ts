@@ -36,6 +36,7 @@ export interface SavedTank {
   t: number;
   flock: FlockRules;
   rules?: TankRules;
+  strays?: 'home' | 'join';
   fish: SavedFish[];
 }
 
@@ -46,6 +47,7 @@ export function saveTank(tank: Tank): SavedTank {
     t: tank.t,
     flock: { ...tank.flock },
     rules: { ...tank.rules },
+    strays: tank.strays,
     fish: tank.fish.map((f) => ({
       name: f.name,
       hue: f.hue,
@@ -86,7 +88,8 @@ export function loadTank(data: unknown): Tank | string {
       if (isNumber(value)) tank.setFlock({ [rule]: Math.min(2, Math.max(0, value)) });
     }
   }
-  const { rules } = data;
+  const { rules, strays } = data;
+  if (strays === 'home' || strays === 'join') tank.setStrays(strays);
   if (isObject(rules) && (rules.kind === 'real' || rules.kind === 'made-up')) {
     const biome = typeof rules.biome === 'string' && rules.biome.length <= MAX_NAME ? rules.biome : null;
     tank.setRules({ kind: rules.kind, biome });

@@ -51,6 +51,10 @@ export interface Fish {
   formation?: number;
   /** Which school it schools with, if it schools: only fish with the same school, or with none set, school together. */
   school?: number;
+  /** True while a knocked-out fish is on its way to a new school's route, so it is not sent on again before it arrives. */
+  joining?: boolean;
+  /** When a pointer, hand or movement last pushed it, in tank time. Only fish someone has disturbed change school. */
+  disturbedAt?: number;
   /** The real species it is, by its catalogue name, if it is one. */
   species?: string;
   /** How its body bends as it swims, by the biologists' name for the style, if known. Used only for drawing. */
@@ -73,6 +77,8 @@ const NAMES = ['Sina', 'Lissa', 'Orbit', 'Cosmo', 'Theta', 'Pi', 'Euler', 'Fouri
 const HUES = [172, 28, 290, 52, 205, 340, 110, 12, 240, 80];
 const TRAIL_LENGTH = 240;
 const DEFAULT_FISH_SIZE = 0.04;
+/** A fish pushed this many of its own sizes off its route counts as knocked out of its school. */
+const STRAY_DISTANCE = 6;
 const DERIVATIVE_STEP = 0.01;
 
 const wrap = (v: number, size: number) => ((v % size) + size) % size;
@@ -89,6 +95,8 @@ export class Tank {
   flock: FlockRules = { separation: 1, alignment: 1, cohesion: 1 };
   /** What may be added. Checked only when fish are added, never by the simulation itself. */
   rules: TankRules = { kind: 'made-up', biome: null };
+  /** What a fish knocked out of its school does: swims home to its own route, or joins whichever school is nearest. */
+  strays: 'home' | 'join' = 'home';
   /** Compiled typed equations by fish id. Kept out of Fish so fish stay plain data. */
   private compiled = new Map<number, PositionFn>();
   /** Ids are never reused, so an id always means the same fish even after others are removed. */
@@ -200,6 +208,10 @@ export class Tank {
     return ids;
   }
 
+  setStrays(strays: 'home' | 'join'): void {
+    this.strays = strays;
+  }
+
   setRules(rules: TankRules): void {
     this.rules = { ...rules };
   }
@@ -289,6 +301,57 @@ export class Tank {
       fish.offset.y += fish.offsetVelocity.y * dt;
       this.place(fish);
     });
+    if (this.strays === 'join') this.rehome();
+  }
+
+  /**
+   * A fish someone has knocked well off its route heads for the nearest other school's route, keeping its colour, so each
+   * disturbance trades a few fish between neighbouring schools and the colours gradually mix. It is not sent
+   * on again until it has arrived. Fish in formations stay put.
+   */
+  private rehome(): void {
+    const routePoint = (f: Fish) => ({ x: f.x - f.offset.x, y: f.y - f.offset.y });
+    const routeKey = (f: Fish) => `${f.model} ${JSON.stringify({ ...f.params, x0: 0 })} ${f.equations?.x ?? ''} ${f.equations?.y ?? ''}`;
+    for (const fish of this.fish) {
+      if (fish.formation !== undefined) continue;
+      const strayed = Math.hypot(fish.offset.x, fish.offset.y);
+      if (fish.joining) {
+        if (strayed < (STRAY_DISTANCE / 2) * fish.size) fish.joining = false;
+        continue;
+      }
+      // Only a fish someone has pushed in the last second, and pushed well off its route, changes school.
+      const disturbed = fish.disturbedAt !== undefined && this.t - fish.disturbedAt < 1;
+      if (!disturbed || strayed < STRAY_DISTANCE * fish.size) continue;
+      const own = routeKey(fish);
+      let nearest: Fish | undefined;
+      let best = Infinity;
+      for (const other of this.fish) {
+        if (other === fish || other.formation !== undefined || routeKey(other) === own) continue;
+        const point = routePoint(other);
+        const d = Math.hypot(fish.x - point.x, fish.y - point.y);
+        if (d < best) [nearest, best] = [other, d];
+      }
+      if (nearest) {
+        this.adoptRoute(fish, nearest);
+        fish.joining = true;
+      }
+    }
+  }
+
+  /** Puts a fish on another fish's route without moving it: its offset becomes the gap to the new route. */
+  private adoptRoute(fish: Fish, from: Fish): void {
+    fish.model = from.model;
+    // It joins the school as well as the route, so it swims with its new schoolmates.
+    fish.school = from.school;
+    fish.params = { ...from.params };
+    if (from.model === 'custom') {
+      fish.equations = from.equations ? { ...from.equations } : undefined;
+      const position = this.compiled.get(from.id);
+      if (position) this.compiled.set(fish.id, position);
+    }
+    const route = this.positionAt(fish, this.t);
+    if (!Number.isFinite(route.x) || !Number.isFinite(route.y)) return;
+    fish.offset = { x: fish.x - route.x, y: fish.y - route.y };
   }
 
   removeFish(id: number): void {
@@ -326,6 +389,7 @@ export class Tank {
       const dx = this.wrapsX(fish) ? unwrap(fish.x - influence.x, this.width) : fish.x - influence.x;
       const dy = this.wrapsY(fish) ? unwrap(fish.y - influence.y, 1) : fish.y - influence.y;
       const push = influenceForce(dx, dy, fish.curiosity, influence);
+      if (push.x !== 0 || push.y !== 0) fish.disturbedAt = this.t;
       force.x += push.x;
       force.y += push.y;
     }

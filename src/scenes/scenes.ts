@@ -15,6 +15,8 @@ export interface Scene {
   settle?: number;
   /** Whether the tank fills the screen, with no margin, so you are in the water instead of looking in. */
   fill?: boolean;
+  /** Anything to set once the scene has settled, such as rules that would misfire while schools spread out. */
+  settled?(tank: Tank): void;
   build(tank: Tank): void;
 }
 
@@ -114,19 +116,27 @@ export const SCENES: Record<string, Scene> = {
   },
   colours: {
     name: 'Colour schools',
-    lookFor: 'Six schools, each its own colour, each circling in its own part of the tank and never meeting on their own. Herd them into each other with the pointer or a hand and watch the colours mix, then drift home.',
+    lookFor: 'Eight schools of forty fish, each its own colour, circling in their own patches. They never meet on their own. Push fish out of a school and they join whichever school is nearest, keeping their colour, so stirring turns the schools into rainbows.',
+    trails: false,
     settle: 3,
+    // Schools start on one point and burst apart while settling, which must not count as being knocked out.
+    settled: (tank) => tank.setStrays('join'),
     build(tank) {
-      // Six small circles in two rows, far enough apart that no fish sees another school unless pushed.
-      const hues = [0, 45, 120, 190, 265, 320];
+      // Eight small circles in two rows: far enough apart that no school sees another unless fish are pushed,
+      // near enough that a push can carry fish across to a neighbour.
+      const hues = [0, 30, 55, 110, 175, 210, 265, 315];
       hues.forEach((hue, g) => {
-        const params = { cx: 0.18 + 0.32 * (g % 3), cy: g < 3 ? 0.27 : 0.73, R: 0.09, w: (g % 2 ? -1 : 1) * (0.5 + 0.1 * g) };
-        for (let i = 0; i < 16; i++) {
+        let first: number | undefined;
+        const params = { cx: 0.14 + 0.24 * (g % 4), cy: g < 4 ? 0.27 : 0.73, R: 0.05, w: (g % 2 ? -1 : 1) * (0.5 + 0.05 * g) };
+        for (let i = 0; i < 40; i++) {
           const fish = tank.addFish('circle', params);
           tank.setLook(fish.id, { hue });
-          tank.setFishSize(fish.id, 0.026);
-          // A loose hold on the route, so a hand can herd one school into another before they drift home.
-          tank.setBehaviour(fish.id, { schools: true, pathStrength: 0.25, drift: 0.4, curiosity: -0.7 });
+          tank.setFishSize(fish.id, 0.012);
+          // Each colour schools only with itself, so schools never pull at each other when left alone.
+          first ??= fish.id;
+          tank.joinSchool(fish.id, first);
+          // A loose hold on the route, so a hand can push fish over to the next school.
+          tank.setBehaviour(fish.id, { schools: true, pathStrength: 0.2, drift: 0.3, curiosity: -0.8 });
         }
       });
     },
@@ -193,6 +203,7 @@ export function buildScene(tank: Tank, id: string | null): string {
   scene.build(tank);
   for (let step = 0; step < (scene.settle ?? 0) * 60; step++) tank.step(1 / 60);
   // Settling leaves long trails behind fish that have only just appeared.
+  scene.settled?.(tank);
   tank.clearTrails();
   return known;
 }

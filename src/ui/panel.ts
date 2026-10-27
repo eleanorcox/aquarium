@@ -185,6 +185,7 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   tankFolder.add(options.hands, 'status').name('Hands').listen().disable();
   tankFolder.add(options.motion, 'on').name('Movement (webcam)').listen().onChange(options.onMotion);
   tankFolder.add(options.motion, 'status').name('Movement').listen().disable();
+  tankFolder.add(tank, 'strays', { 'Swim home to their own school': 'home', 'Join the nearest school': 'join' }).name('Pushed-out fish');
   tankFolder.add(tank.flock, 'separation', 0, 2, 0.05).name('School: keep apart');
   tankFolder.add(tank.flock, 'alignment', 0, 2, 0.05).name('School: swim the same way');
   tankFolder.add(tank.flock, 'cohesion', 0, 2, 0.05).name('School: stay together');

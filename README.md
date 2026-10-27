@@ -50,6 +50,8 @@ Each fish faces the way it is moving. y points down, as on screen.
 
 ### Behaviour
 
+**Pushed-out fish** in the **Tank** section decides what a fish does after you knock it well off its route: swim home, or join the nearest other school, keeping its colour. Only fish you have disturbed change school.
+
 Choose **All fish** at the top of the **Fish** list to change Motion or a Behaviour setting for every fish at once.
 
 The equation gives each fish its route. Its position is the route plus an offset, which a spring pulls back to zero, so a fish left alone is exactly on its route. Four settings per fish decide what moves it off:
@@ -99,7 +101,7 @@ The **Real fish** section of the panel sets the tank to **Real species only** or
 
 ### Scenes
 
-Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `colours` (six coloured schools that mix only when you stir them), `pacific` and `river` (real species), `whirlpool` (one formation of 48 fish), `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
+Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `colours` (eight coloured schools that you stir into rainbows), `pacific` and `river` (real species), `whirlpool` (one formation of 48 fish), `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
 
 ### Your own equations
 

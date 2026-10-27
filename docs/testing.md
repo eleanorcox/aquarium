@@ -93,7 +93,7 @@ The scenes are in [scenes.ts](../src/scenes/scenes.ts), each with a note on what
 | `?scene=drift` | Drift | Drift from none to full |
 | `?scene=school` | One school | Schooling, and a school parting round the pointer |
 | `?scene=shoal` | Five hundred fish | Speed, and dragging and zooming around a tank bigger than the screen |
-| `?scene=colours` | Colour schools | Herding one school into another, and how they sort themselves out |
+| `?scene=colours` | Colour schools | Stirring schools into rainbows: knocked-out fish joining the nearest other school |
 | `?scene=field` | A field of fish | Being in the middle of one huge school, filling the screen; parting it with a hand |
 
 Tests check that every scene is the same tank each time and keeps its fish inside the tank. A new scene is covered by those tests as soon as it is added.

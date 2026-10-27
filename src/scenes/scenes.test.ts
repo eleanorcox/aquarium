@@ -11,7 +11,7 @@ const built = (id: string) => {
 };
 
 describe('scenes', () => {
-  it('every scene has a name, says what to look for, and puts fish in the tank', () => {
+  it('every scene has a name, says what to look for, and puts fish in the tank', { timeout: 30_000 }, () => {
     for (const [id, scene] of Object.entries(SCENES)) {
       expect(scene.name, id).not.toBe('');
       expect(scene.lookFor, id).not.toBe('');
@@ -24,23 +24,40 @@ describe('scenes', () => {
     expect(SCENES.field!.fill).toBe(true);
   });
 
-  it('the colour schools scene has six groups, each one colour on its own route, apart until stirred', () => {
+  it('the colour schools scene has loads of fish in many single-colour schools, apart until stirred', () => {
     const tank = built('colours');
+    expect(tank.fish.length).toBeGreaterThanOrEqual(300);
+    expect(tank.strays).toBe('join');
     const groups = new Map<number, typeof tank.fish>();
     for (const fish of tank.fish) groups.set(fish.hue, [...(groups.get(fish.hue) ?? []), fish]);
-    expect(groups.size).toBe(6);
+    expect(groups.size).toBeGreaterThanOrEqual(8);
     const routeOf = (fish: (typeof tank.fish)[number]) => JSON.stringify({ ...fish.params, x0: 0, model: fish.model });
     for (const members of groups.values()) expect(new Set(members.map(routeOf)).size).toBe(1);
-    // One school across the colours, so groups pushed into each other mingle.
-    expect(new Set(tank.fish.map((f) => f.school)).size).toBe(1);
-    // Left alone, no fish comes within sight of another colour's fish: any mixing is the visitor's doing.
-    run(tank, 20);
-    const sight = 6 * 0.026;
-    for (const [hue, members] of groups) {
-      for (const fish of members) {
-        for (const other of tank.fish) if (other.hue !== hue) expect(Math.hypot(fish.x - other.x, fish.y - other.y)).toBeGreaterThan(sight);
-      }
+    // Each colour starts as its own school; a fish pushed across joins the other school's route and schoolmates.
+    expect(new Set(tank.fish.map((f) => f.school)).size).toBe(groups.size);
+    // Left alone for a while, no fish changes school: any mixing is the visitor's doing.
+    const before = tank.fish.map(routeOf);
+    run(tank, 30);
+    expect(tank.fish.map(routeOf)).toEqual(before);
+  }, 60_000);
+
+  it('stirring the colour schools with a hand sends fish to other schools, so colours mix', () => {
+    const tank = built('colours');
+    const homeOf = new Map(tank.fish.map((f) => [f.id, f.params.cx]));
+    // A scattering hand sweeps slowly back and forth along the top row.
+    for (let i = 0; i < 6 * 60; i++) {
+      const x = tank.width * (0.1 + 0.8 * (0.5 - 0.5 * Math.cos((i / 360) * 2 * Math.PI)));
+      tank.setInfluences([{ x, y: 0.27, vx: 0.3, vy: 0, radius: 0.25, kind: 'hand', shape: 'fist', effect: 'scatter' }]);
+      tank.step(1 / 60);
     }
+    tank.setInfluences([]);
+    run(tank, 4);
+    const moved = tank.fish.filter((f) => f.params.cx !== homeOf.get(f.id)).length;
+    expect(moved).toBeGreaterThan(10);
+    // Every school now holds fish of more than one colour, or most of them do.
+    const coloursPerSchool = new Map<number, Set<number>>();
+    for (const f of tank.fish) coloursPerSchool.set(f.params.cx! * 10 + f.params.cy!, (coloursPerSchool.get(f.params.cx! * 10 + f.params.cy!) ?? new Set()).add(f.hue));
+    expect([...coloursPerSchool.values()].filter((c) => c.size > 1).length).toBeGreaterThanOrEqual(2);
   }, 30_000);
 
   it('every scene is the same tank every time', () => {

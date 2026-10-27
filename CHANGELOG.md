@@ -8,7 +8,8 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
-- A Colour schools scene (`?scene=colours`): six schools, each its own colour, circling apart. They only mix when you herd them into each other with the pointer or a hand, then drift home.
+- A Colour schools scene (`?scene=colours`): 320 fish in eight schools, each its own colour, circling apart. Knock fish out of a school with the pointer or a hand and they head for the nearest other school, keeping their colour, so the schools gradually become rainbows. Left alone, no fish changes school.
+- Pushed-out fish, in the Tank section: knocked-out fish either swim home to their own school or join the nearest other school.
 - Each real species schools only with its own kind, so a sardine school no longer merges with passing tuna.
 
 - All fish, at the top of the Fish list: Motion and the Behaviour settings then change every fish at once. Only the setting moved is changed, so each fish keeps its others.
