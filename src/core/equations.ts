@@ -22,6 +22,9 @@ export interface Scope {
   a: number;
   b: number;
   c: number;
+  /** A fish's place in its formation, counting from 0, and how many fish are in it. A lone fish is 0 of 1. */
+  i: number;
+  n: number;
 }
 
 export type PositionFn = (scope: Scope) => Vec2;
@@ -30,8 +33,8 @@ export type CompileResult = { ok: true; position: PositionFn } | { ok: false; er
 
 export const MAX_EQUATION_LENGTH = 300;
 
-export function scopeFor(t: number, width: number, params: Params): Scope {
-  return { t, W: width, cx: width / 2, cy: 0.5, a: params.a ?? 0, b: params.b ?? 0, c: params.c ?? 0 };
+export function scopeFor(t: number, width: number, params: Params, place = { i: 0, n: 1 }): Scope {
+  return { t, W: width, cx: width / 2, cy: 0.5, a: params.a ?? 0, b: params.b ?? 0, c: params.c ?? 0, ...place };
 }
 
 function compileOne(axis: 'x' | 'y', source: string): ((scope: Scope) => number) | string {

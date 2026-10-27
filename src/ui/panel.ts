@@ -113,6 +113,16 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
     },
   };
   const editButton = gui.add(actions, 'editAsEquation').name('Edit as equation');
+  // A formation: copies of the selected fish sharing its equation, each knowing its place as i of n.
+  const formation = {
+    size: 12,
+    make: () => {
+      tank.makeFormation(controls.display.selected, formation.size);
+      select(controls.display.selected);
+    },
+  };
+  gui.add(formation, 'size', 2, 60, 1).name('Formation size');
+  gui.add(formation, 'make').name('Make a formation');
   gui.add(actions, 'addFish').name('Add fish');
   gui.add(actions, 'removeFish').name('Remove fish');
 

@@ -96,6 +96,20 @@ export const SCENES: Record<string, Scene> = {
       }
     },
   },
+  whirlpool: {
+    name: 'Whirlpool',
+    lookFor: 'One formation of 48 fish sharing a single equation: each fish uses its place i of n to find its own ring and speed. Open the equation to see how.',
+    settle: 1,
+    build(tank) {
+      const leader = tank.addFish('custom', { a: 0.8, b: 0.9, c: 0.4 });
+      tank.setEquations(leader.id, {
+        x: 'cx + (0.04 + 0.4 * i / n) * cos(a * t * (1.4 - i / n) + 2 * pi * i * 0.618)',
+        y: 'cy + b * (0.04 + 0.4 * i / n) * sin(a * t * (1.4 - i / n) + 2 * pi * i * 0.618)',
+      });
+      tank.makeFormation(leader.id, 48);
+      for (const fish of tank.fish) tank.setBehaviour(fish.id, { drift: 0.3, curiosity: -0.6, pathStrength: 0.5 });
+    },
+  },
   field: {
     name: 'A field of fish',
     lookFor: 'You are in the middle of one enormous school streaming past, filling the screen. Drag to look around; put the pointer or a hand in it and watch it part.',

@@ -47,6 +47,8 @@ export interface Fish {
   wander: Vec2;
   /** Whether it schools with the other schooling fish in sight. */
   schools: boolean;
+  /** The formation it belongs to, named by the id of the fish it was made from. Members share one equation. */
+  formation?: number;
 }
 
 export type Behaviour = Pick<Fish, 'pathStrength' | 'curiosity' | 'drift' | 'schools'>;
@@ -82,6 +84,8 @@ export class Tank {
   private schoolGrid = new Grid(1);
   private schoolVelocity: Vec2[] = [];
   private flocking = new Flock();
+  /** Each formation member's place, worked out when first needed after fish are added or removed. */
+  private places: Map<number, { i: number; n: number }> | null = null;
 
   /** Tank units are tank heights, so every tank is 1 tall. A bigger tank is a wider one with smaller fish. */
   readonly height = 1;
@@ -114,6 +118,7 @@ export class Tank {
       schools: false,
     };
     this.fish.push(fish);
+    this.places = null;
     if (model === 'custom') this.setEquations(id, DEFAULT_CUSTOM);
     this.place(fish);
     return fish;
@@ -127,6 +132,11 @@ export class Tank {
 
   /** Switching to 'custom' starts from the current path written as equations, so you can edit it. */
   setModel(id: number, model: ModelId): void {
+    // A fish given a different path leaves its formation.
+    if (model !== 'custom') {
+      this.get(id).formation = undefined;
+      this.places = null;
+    }
     const fish = this.get(id);
     if (model === 'custom' && fish.model !== 'custom') {
       const start = MODELS[fish.model].source(fish.params);
@@ -137,15 +147,61 @@ export class Tank {
     fish.trail = [];
   }
 
-  /** Returns an error message and leaves the fish unchanged if the equations do not work. */
+  /**
+   * Returns an error message and leaves the fish unchanged if the equations do not work. In a formation,
+   * the equations change for every member.
+   */
   setEquations(id: number, equations: EquationSource): string | null {
     const fish = this.get(id);
     const result = compileEquations(equations);
     if (!result.ok) return result.error;
-    this.compiled.set(id, result.position);
-    fish.equations = { ...equations };
-    fish.trail = [];
+    const members = fish.formation === undefined ? [fish] : this.fish.filter((f) => f.formation === fish.formation);
+    for (const member of members) {
+      this.compiled.set(member.id, result.position);
+      member.equations = { ...equations };
+      member.trail = [];
+    }
     return null;
+  }
+
+  /**
+   * Makes a formation of `count` fish from this one: copies sharing its equation, settings and size, each
+   * told its place in the formation as `i` and how many there are as `n`. A fish on a built-in path is first
+   * switched to that path written as an equation. Returns the ids of every member, this fish first.
+   */
+  makeFormation(id: number, count: number): number[] {
+    const leader = this.get(id);
+    if (leader.model !== 'custom') this.setModel(id, 'custom');
+    leader.formation = id;
+    const ids = [id];
+    for (let k = 1; k < count; k++) {
+      const member = this.addFish('custom', { ...leader.params });
+      member.formation = id;
+      this.setEquations(member.id, leader.equations!);
+      this.setFishSize(member.id, leader.size);
+      this.setBehaviour(member.id, leader);
+      ids.push(member.id);
+    }
+    this.places = null;
+    return ids;
+  }
+
+  /** Puts a fish into a formation, as when a saved tank is loaded. */
+  joinFormation(id: number, formation: number): void {
+    this.get(id).formation = formation;
+    this.places = null;
+  }
+
+  /** A fish's place in its formation. A fish on its own is 0 of 1. */
+  private placeOf(fish: Fish): { i: number; n: number } {
+    if (fish.formation === undefined) return { i: 0, n: 1 };
+    if (!this.places) {
+      const groups = new Map<number, Fish[]>();
+      for (const f of this.fish) if (f.formation !== undefined) groups.set(f.formation, [...(groups.get(f.formation) ?? []), f]);
+      this.places = new Map();
+      for (const members of groups.values()) members.forEach((f, i) => this.places!.set(f.id, { i, n: members.length }));
+    }
+    return this.places.get(fish.id) ?? { i: 0, n: 1 };
   }
 
   /** Values outside a setting's range are brought to its nearest end. */
@@ -211,6 +267,7 @@ export class Tank {
   removeFish(id: number): void {
     const fish = this.get(id);
     this.fish.splice(this.fish.indexOf(fish), 1);
+    this.places = null;
     this.compiled.delete(id);
   }
 
@@ -314,7 +371,7 @@ export class Tank {
     if (fish.model !== 'custom') return MODELS[fish.model].position(fish.params, t, this.width);
     const position = this.compiled.get(fish.id);
     if (!position) return { x: fish.x, y: fish.y };
-    const p = position(scopeFor(t, this.width, fish.params));
+    const p = position(scopeFor(t, this.width, fish.params, this.placeOf(fish)));
     // Typed equations can go anywhere, so wrap both axes to keep the fish in the tank.
     return { x: wrap(p.x, this.width), y: wrap(p.y, 1) };
   }

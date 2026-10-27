@@ -87,9 +87,13 @@ Hand tracking uses Google's MediaPipe hand landmarker. Its model file is kept in
 
 Choose **Visuals** in the panel, or add `?visuals=name` to the address: `classic` (the default), `natural` or `paper`. Natural fish bend as they swim using the travelling body wave from studies of real fish (`src/render/swimming.ts`). Press **H** to hide the panel.
 
+### Formations
+
+**Make a formation** turns the selected fish into a group of copies that share one equation, sized by **Formation size**. Each fish knows its place as `i` and the group's size as `n`, so one equation can spread them out: `x = cx + 0.3 * cos(t + 2 * pi * i / n)`, `y = cy + 0.3 * sin(t + 2 * pi * i / n)` makes a turning ring. Editing the equation of any member changes it for all of them. The `whirlpool` scene is one formation of 48 fish.
+
 ### Scenes
 
-Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
+Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `whirlpool` (one formation of 48 fish), `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
 
 ### Your own equations
 
@@ -99,6 +103,7 @@ Choose **Your own equation** as the motion, or press **Edit as equation** to sta
 - `W`: tank width (the tank is 1 tall)
 - `cx`, `cy`: the tank centre
 - `a`, `b`, `c`: sliders you can change while the fish swims
+- `i`, `n`: in a formation, this fish's place counting from 0, and how many fish there are. A fish on its own is 0 of 1.
 - functions such as `sin`, `cos`, `abs`, `sqrt`, `exp`, `pi`
 
 For example, `x = cx + 0.4 * sin(a * t / 2)` and `y = cy + 0.2 * sin(b * t) * cos(c * t)`. A typed path that leaves the tank wraps around to the other side. Equations are checked before the fish uses them, and an error message says what is wrong. Functions that could change math.js itself (`import`, `evaluate` and similar) are switched off.

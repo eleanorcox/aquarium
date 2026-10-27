@@ -57,6 +57,8 @@ Type "a slow figure of eight that speeds up at the edges" and the fish does it.
 
 ### Formations
 
+*Built 27 October 2026.*
+
 "Like a tornado" describes a group, not one fish. One fish on a helix does not read as a tornado; thirty fish on the same helix at different heights and phases does.
 
 - **Smallest version:** one equation shared by a group, with each fish given its own index `i` and count `n` as variables, so `phase = 2 * pi * i / n` spreads them out. Useful by hand even without a language model.
