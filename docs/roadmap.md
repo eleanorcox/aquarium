@@ -43,6 +43,8 @@ The tank gets its own size; the screen becomes a movable, zoomable window onto i
 
 ### Stage 2: hands
 
+*Status, 27 October 2026: built and merged; off until switched on in the panel. The step from tracking points to influences is tested with made-up hands; the camera and the feel of the gestures need trying by Eleanor.*
+
 The laptop webcam tracks hands and they drive the same behaviour as the mouse.
 
 - **Shows:** Swish Fish on a laptop. The first real immersive demo, with no extra hardware.

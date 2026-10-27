@@ -6,6 +6,7 @@ Equatium is the working name (not final; it may stop fitting once not every mode
 
 ```sh
 nvm use            # Node 24, pinned in .nvmrc; older Node fails at startup
+npm install        # also copies the hand-tracking runtime into public/mediapipe/wasm
 npm run dev        # local dev server
 npm test           # all tests, once
 npm run speed      # time the simulation; run before and after changing how it steps

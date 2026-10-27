@@ -120,3 +120,20 @@ body.bare #equation,
 body.bare #editor {
   display: none;
 }
+
+/* A small preview of the webcam while hands are on, flipped like a mirror to match the tank. */
+#camera {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 160px;
+  border: 1px solid #1f3546;
+  border-radius: 6px;
+  transform: scaleX(-1);
+  opacity: 0.8;
+  pointer-events: none;
+}
+#camera[hidden],
+body.bare #camera {
+  display: none;
+}

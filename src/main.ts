@@ -1,6 +1,8 @@
 import './style.css';
 import { MODELS, type BuiltinId } from './core/motion';
 import { Tank } from './core/tank';
+import { HandCamera } from './input/camera';
+import { HandInput } from './input/hands';
 import { PointerInput } from './input/pointer';
 import { ViewGestures } from './input/viewGestures';
 import { Canvas2DRenderer } from './render/canvas2d';
@@ -19,8 +21,9 @@ const scene = buildScene(tank, address.get('scene'));
 
 // The tank has its own size. The view is this screen's window onto it.
 const renderer = new Canvas2DRenderer(canvas, createVisual(address.get('visuals')));
-const view = new View(tank, renderer.resize(), tank.typicalFishSize());
-new ResizeObserver(() => view.setScreen(renderer.resize())).observe(canvas);
+let screen = renderer.resize();
+const view = new View(tank, screen, tank.typicalFishSize());
+new ResizeObserver(() => view.setScreen((screen = renderer.resize()))).observe(canvas);
 
 const panelElements = {
   equation: $('#equation'),
@@ -34,6 +37,32 @@ const pointer = new PointerInput();
 const reach = { pixels: 180 };
 const gestures = new ViewGestures(view);
 const seconds = () => performance.now() / 1000;
+
+// The camera picture is spread across whatever part of the tank is on screen.
+const hands = new HandInput((across, down) => view.toTank({ x: across * screen.width, y: down * screen.height }));
+const camera = new HandCamera(hands, seconds);
+camera.video.id = 'camera';
+camera.video.hidden = true;
+document.body.append(camera.video);
+const handsState = { on: false, status: 'Off' };
+async function setHands(on: boolean): Promise<void> {
+  if (!on) {
+    camera.stop();
+    camera.video.hidden = true;
+    handsState.status = 'Off';
+    return;
+  }
+  handsState.status = 'Starting…';
+  try {
+    await camera.start();
+    camera.video.hidden = false;
+    handsState.status = 'On: open hand or fist';
+  } catch (error) {
+    handsState.on = false;
+    handsState.status = error instanceof DOMException && error.name === 'NotAllowedError' ? 'Camera not allowed' : 'Could not start';
+    console.error(error);
+  }
+}
 
 canvas.addEventListener('pointerdown', (e) => {
   canvas.setPointerCapture(e.pointerId);
@@ -69,6 +98,8 @@ const stats = { fish: 0, drawn: 0, stepMs: 0, drawMs: 0 };
 const controls = createPanel(tank, panelElements, {
   pointer,
   stats,
+  hands: handsState,
+  onHands: (on) => void setHands(on),
   reach,
   scene,
   visual: renderer.visual.id,
@@ -122,8 +153,8 @@ function frame(now: number): void {
   previous = now;
   if (controls.paused) accumulator = 0;
   // The pointer reaches the same distance on screen however far the view is zoomed.
-  pointer.radius = view.tankLength(reach.pixels);
-  tank.setInfluences(pointer.influences(seconds()));
+  pointer.radius = hands.radius = view.tankLength(reach.pixels);
+  tank.setInfluences([...pointer.influences(seconds()), ...hands.influences(seconds())]);
   const stepStart = performance.now();
   while (accumulator >= DT) {
     tank.step(DT);

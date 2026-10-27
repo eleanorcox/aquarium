@@ -61,6 +61,12 @@ The equation gives each fish its route. Its position is the route plus an offset
 
 The pointer can also attract or scatter every fish whatever its temperament, and a fast sweep startles them all. The strengths of these effects are in `src/core/steering.ts` and are first guesses.
 
+### Hands
+
+Tick **Hands (webcam)** in the panel and allow the camera. Your hand moves through the tank like the pointer: an open hand lets each fish react in its own way, and a fist scatters them. The camera picture is flipped like a mirror and spread across the part of the tank on screen.
+
+Hand tracking uses Google's MediaPipe hand landmarker. Its model file is kept in `public/mediapipe/`, and its runtime is copied there from the installed package by `npm install`, so it works without an internet connection.
+
 ### Visual modes
 
 Choose **Visuals** in the panel, or add `?visuals=name` to the address: `classic` (the default), `natural` or `paper`. Natural fish bend as they swim using the travelling body wave from studies of real fish (`src/render/swimming.ts`). Press **H** to hide the panel.

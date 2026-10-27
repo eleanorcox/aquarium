@@ -59,6 +59,7 @@ Template:
 | [23](#23-behaviour-is-measured-in-fish-sizes) | Behaviour is measured in fish sizes | 13 Oct 2026 | Built |
 | [24](#24-canvas-2d-stays-until-drawing-is-measured-on-a-real-screen) | Canvas 2D stays until drawing is measured on a real screen | 13 Oct 2026 | Decided; settles the timing left open in 14 for now |
 | [25](#25-visual-modes-are-swappable-painters) | Visual modes are swappable painters | 27 Oct 2026 | Built |
+| [26](#26-hand-tracking-runs-from-files-in-the-project) | Hand tracking runs from files in the project | 27 Oct 2026 | Built |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -306,3 +307,16 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - Stage 3's comparison of drawn and generated fish becomes a matter of adding visual modes.
   - A WebGL renderer can arrive as visual modes of its own, one at a time, beside the Canvas 2D ones.
   - Natural pulls part of stage 3 forward: the body-wave equation is built and tested, side-on swimming is drawn in the stylised way for now (the body visibly ripples), and until there are species each fish's swimming style comes from its id.
+
+## 26. Hand tracking runs from files in the project
+
+- **Date:** 27 October 2026
+- **Status:** Built
+- **What prompted it:** Stage 2 uses Google's MediaPipe hand-tracking model. It needs a trained model file (7.8 MB) and a compiled runtime (13 MB, in three versions for different browsers), which are normally downloaded from Google and a public package server each time the page opens. Eleanor often works without wifi, and an exhibition may have none; she chose to keep them in the project.
+- **Decision:** The model file is kept in the repository at `public/mediapipe/hand_landmarker.task`. The runtime comes from the installed `@mediapipe/tasks-vision` package, version 1.1.0 pinned exactly, and is copied into `public/mediapipe/wasm` after every `npm install`; that copy is not committed. Version 1.1.0 was chosen over the newer 1.1.1 because 1.1.1 was under two weeks old.
+- **Alternatives considered:** Downloading both at run time, which adds nothing to the project but stops hand tracking without internet. Committing the runtime as well, which adds 39 MB of files that `npm install` already provides.
+- **What follows from it:**
+  - Hand tracking works offline once `npm install` has run.
+  - A built site is about 46 MB, mostly the three runtime versions. One of them, the "module" version, is probably unused and could be left out of the build.
+  - The package is Apache-2.0. The model's licence has not been confirmed from a source; check the model card before publishing the repository or the site.
+  - Headless test browsers here cannot open a camera, so camera start-up is checked by hand. The step that turns tracking points into influences is tested.

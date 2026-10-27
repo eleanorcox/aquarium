@@ -42,6 +42,9 @@ export interface PanelOptions {
   trails: boolean;
   /** Timings the page keeps up to date, shown read-only for judging speed by eye. */
   stats: Stats;
+  /** Webcam hand tracking: whether it is on, and a line saying how it is going. */
+  hands: { on: boolean; status: string };
+  onHands: (on: boolean) => void;
   onAddFish: () => number;
 }
 
@@ -115,6 +118,8 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
     });
   tankFolder.add(pointer, 'mode', POINTER_OPTIONS).name('Pointer');
   tankFolder.add(reach, 'pixels', 40, 400, 5).name('Pointer reach');
+  tankFolder.add(options.hands, 'on').name('Hands (webcam)').listen().onChange(options.onHands);
+  tankFolder.add(options.hands, 'status').name('Hands').listen().disable();
   tankFolder.add(tank.flock, 'separation', 0, 2, 0.05).name('School: keep apart');
   tankFolder.add(tank.flock, 'alignment', 0, 2, 0.05).name('School: swim the same way');
   tankFolder.add(tank.flock, 'cohesion', 0, 2, 0.05).name('School: stay together');

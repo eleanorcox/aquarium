@@ -21,7 +21,8 @@ function hand(x: number, y: number, shape: 'open' | 'fist'): Landmark[] {
 }
 
 const TANK_WIDTH = 1.6;
-const setUp = () => new HandInput(TANK_WIDTH);
+/** Spreads the mirrored camera picture across a whole tank, as when the tank fits the screen. */
+const setUp = () => new HandInput((across, down) => ({ x: across * TANK_WIDTH, y: down }));
 /** Camera frames arrive about 30 times a second. */
 const FRAME = 1 / 30;
 
@@ -114,6 +115,14 @@ describe('HandInput', () => {
     expect(influences).toHaveLength(2);
     expect(influences[0]!.effect).toBe('scatter');
     expect(influences[1]!.effect).toBeUndefined();
+  });
+
+  it('places a hand wherever the caller maps the picture to, such as the part of the tank on screen', () => {
+    const input = new HandInput((across, down) => ({ x: 2 + across * 0.5, y: 0.25 + down * 0.5 }));
+    const time = hold(input, [hand(0.5, 0.5, 'open')], 10);
+    const [influence] = input.influences(time);
+    expect(influence!.x).toBeGreaterThan(2);
+    expect(influence!.x).toBeLessThan(2.5);
   });
 
   it('ignores a malformed hand with missing points', () => {

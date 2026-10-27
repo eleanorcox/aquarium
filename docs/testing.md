@@ -145,6 +145,8 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 
 ### Stage 2: hands
 
+*Built. The tests are in [hands.test.ts](../src/input/hands.test.ts). They use made-up hands built from the standard 21-point layout, not recordings, because there is no camera here. Recordings from Eleanor's webcam would make better tests.*
+
 - A recording of an open hand is read as "attract"; a recording of a fist as "scatter".
 - A hand flickering between the two for a frame or two does not flip the behaviour.
 - A hand's position on camera lands at the matching place in the tank, mirrored so moving right moves right.

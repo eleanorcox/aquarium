@@ -1,6 +1,7 @@
 // Hand input: turns hand-tracking points from a camera into influences the fish react to.
 // It knows nothing about the camera or the tracking library. The caller passes, for each camera frame,
 // the 21 points of every hand seen, in the camera picture's 0 to 1 coordinates, and the time in seconds.
+import type { Vec2 } from '../core/motion';
 import type { Influence } from '../core/steering';
 
 export interface Landmark {
@@ -66,8 +67,12 @@ export class HandInput {
   radius = 0.25;
   private hands: TrackedHand[] = [];
 
-  /** `tankWidth` maps the camera picture across the whole tank. */
-  constructor(private tankWidth: number) {}
+  /**
+   * `toTank` places a point of the camera picture in the tank. It is given the point already flipped like a
+   * mirror, as 0 to 1 across from the person's left and 0 to 1 down, so the caller only decides where
+   * the picture lands: usually across whatever part of the tank is on screen.
+   */
+  constructor(private toTank: (across: number, down: number) => Vec2) {}
 
   /** Takes the hands seen in one camera frame. */
   update(seen: Landmark[][], time: number): void {
@@ -100,12 +105,15 @@ export class HandInput {
       .map((hand) => {
         // A hand that has just gone fades out, so fish do not jolt when tracking drops for a moment.
         const fade = Math.min(1, Math.max(0, 1 - (time - hand.seenAt - 2 / 30) / FADE));
+        // Flipped like a mirror: the camera sees your right hand on its left.
+        const at = this.toTank(1 - hand.x, hand.y);
+        // The mapping is a straight scale and shift, so a velocity maps as the difference of two points.
+        const ahead = this.toTank(1 - (hand.x + hand.vx), hand.y + hand.vy);
         return {
-          // Flipped like a mirror: the camera sees your right hand on its left.
-          x: (1 - hand.x) * this.tankWidth,
-          y: hand.y,
-          vx: -hand.vx * this.tankWidth,
-          vy: hand.vy,
+          x: at.x,
+          y: at.y,
+          vx: ahead.x - at.x,
+          vy: ahead.y - at.y,
           radius: this.radius * fade,
           ...(hand.shape === 'fist' ? { effect: 'scatter' as const } : {}),
         };
