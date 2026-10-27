@@ -1,4 +1,4 @@
-// Marks for things that are not fish: a hand in the tank, drawn so it is clear what the camera is seeing.
+// Marks for things that are not fish: a hand or movement in the tank, drawn so it is clear what the camera is seeing.
 import type { Influence } from '../../core/steering';
 import type { Frame } from './types';
 
@@ -6,6 +6,8 @@ import type { Frame } from './types';
 export interface HandColours {
   open: (alpha: number) => string;
   fist: (alpha: number) => string;
+  /** For movement seen by the camera, which has no hand shape. */
+  motion?: (alpha: number) => string;
 }
 
 /**
@@ -13,7 +15,8 @@ export interface HandColours {
  * An open hand and a fist are different colours, so the change is visible the moment it counts.
  */
 export function drawHand({ ctx, scale }: Frame, influence: Influence, colours: HandColours): void {
-  const colour = influence.shape === 'fist' ? colours.fist : colours.open;
+  const motion = influence.kind === 'motion';
+  const colour = motion ? (colours.motion ?? colours.open) : influence.shape === 'fist' ? colours.fist : colours.open;
   const x = influence.x * scale;
   const y = influence.y * scale;
   const r = influence.radius * scale;
@@ -29,5 +32,5 @@ export function drawHand({ ctx, scale }: Frame, influence: Influence, colours: H
   ctx.font = '600 13px system-ui, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(influence.shape === 'fist' ? 'fist: scatter' : 'open hand', x, y);
+  ctx.fillText(motion ? 'movement' : influence.shape === 'fist' ? 'fist: scatter' : 'open hand', x, y);
 }

@@ -106,7 +106,7 @@ export class Natural implements Visual {
 
   /** A soft brightening of the water where an influence reaches. */
   influence(frame: Frame, influence: Influence): void {
-    if (influence.kind === 'hand') return drawHand(frame, influence, { open: (a) => `rgba(110, 231, 214, ${a})`, fist: (a) => `rgba(255, 140, 90, ${a})` });
+    if (influence.kind === 'hand' || influence.kind === 'motion') return drawHand(frame, influence, { open: (a) => `rgba(110, 231, 214, ${a})`, fist: (a) => `rgba(255, 140, 90, ${a})`, motion: (a) => `rgba(240, 220, 120, ${a})` });
     const { ctx, scale } = frame;
     const x = influence.x * scale;
     const y = influence.y * scale;

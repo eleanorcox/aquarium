@@ -61,6 +61,10 @@ The equation gives each fish its route. Its position is the route plus an offset
 
 The pointer can also attract or scatter every fish whatever its temperament, and a fast sweep startles them all. The strengths of these effects are in `src/core/steering.ts` and are first guesses.
 
+### Movement
+
+Tick **Movement (webcam)** to have the webcam watch the room instead of hands. Anything moving in the picture, such as someone walking past a projection, becomes a presence the fish react to, each by its own temperament. It compares each camera picture with the one before, so it needs no tracking model, and it ignores the whole picture getting lighter or darker, as when a projector flickers.
+
 ### Projecting
 
 **Open display window** in the panel's **Projector** section opens a second window showing only the tank. Drag it onto the projector's screen and click it for full screen. The window you opened it from keeps the controls and runs the tank; keep it visible, not minimised, or the projection freezes. Touching or pointing at the projection works like the pointer, and with hands switched on, the camera picture is spread across the projected tank.

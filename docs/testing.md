@@ -175,7 +175,7 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 
 ### Stage 4: on the wall
 
-*Corner correction and the display window are built; the tests are in [cornerPin.test.ts](../src/render/cornerPin.test.ts) and [frames.test.ts](../src/display/frames.test.ts). The two windows working together needs checking in a real browser.*
+*Corner correction and the display window are built; the tests are in [cornerPin.test.ts](../src/render/cornerPin.test.ts) and [frames.test.ts](../src/display/frames.test.ts). The two windows working together needs checking in a real browser. Movement detection is tested on made-up camera pictures in [motion.test.ts](../src/input/motion.test.ts).*
 
 - Corner correction: the four corners of the picture land on the four chosen points, and a point in the middle lands in the middle.
 - A camera position goes through the camera-to-projection mapping and back unchanged.

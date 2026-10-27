@@ -11,6 +11,7 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 - A field of fish scene (`?scene=field`): 700 small fish in one school streaming past, filling the screen so you are in the middle of it.
 - Visual modes, chosen from Visuals in the panel or with `?visuals=name`: Classic (the original look), Natural (fish that bend as they swim, eel-like to tuna-like, in sunlit water) and Paper (ink fish on squared paper).
 - Press H to hide the panel and equation, for watching or recording the tank on its own.
+- Movement (webcam), in the panel: the webcam watches the room and anything moving, such as people walking past a projection, disturbs the fish nearby. Each moving area shows in the tank as a yellow disc labelled movement. Ignores the whole picture getting lighter or darker, as from a flickering projector.
 - Display window for a projector: **Open display window** in the Projector section opens a window with only the tank, to drag onto the projector's screen. Click it for full screen, press C to adjust its corners and R to reset them. The laptop window keeps the controls and runs the tank.
 - Corner correction, in the panel's Projector section: drag the four corners of the picture to square it up on a surface a projector hits at an angle. Remembered in this browser.
 - Copy link to this tank, in the panel: the address then holds the whole tank, and opening it shows the same fish on the same routes. Broken or tampered links are refused with a reason.

@@ -2,6 +2,8 @@ import { MODELS, type BuiltinId } from './core/motion';
 import { decodeTank, encodeTank, loadTank, saveTank } from './core/save';
 import { Tank } from './core/tank';
 import type { HandCamera } from './input/camera';
+import { MotionInput } from './input/motion';
+import type { MotionCamera } from './input/motionCamera';
 import { HandInput } from './input/hands';
 import { PointerInput } from './input/pointer';
 import { ViewGestures } from './input/viewGestures';
@@ -90,6 +92,33 @@ async function getCamera(): Promise<HandCamera> {
   document.body.append(camera.preview);
   return camera;
 }
+// Movement seen by the webcam facing the room, mapped the same way as hands.
+const motion = new MotionInput((across, down) =>
+  displayOpen() && display.area
+    ? { x: display.area.x + across * display.area.width, y: display.area.y + down * display.area.height }
+    : view.toTank({ x: across * screen.width, y: down * screen.height }),
+);
+let motionCamera: MotionCamera | undefined;
+const motionState = { on: false, status: 'Off' };
+async function setMotion(on: boolean): Promise<void> {
+  if (!on) {
+    motionCamera?.stop();
+    motionState.status = 'Off';
+    return;
+  }
+  motionState.status = 'Starting…';
+  try {
+    const { MotionCamera } = await import('./input/motionCamera');
+    motionCamera ??= new MotionCamera(motion, seconds);
+    await motionCamera.start();
+    motionState.status = 'Nothing moving';
+  } catch (error) {
+    motionState.on = false;
+    motionState.status = error instanceof DOMException && error.name === 'NotAllowedError' ? 'Camera not allowed' : 'Could not start';
+    console.error(error);
+  }
+}
+
 const handsState = { on: false, status: 'Off' };
 async function setHands(on: boolean): Promise<void> {
   if (!on) {
@@ -146,6 +175,8 @@ const controls = createPanel(tank, panelElements, {
   pointer,
   stats,
   hands: handsState,
+  motion: motionState,
+  onMotion: (on) => void setMotion(on),
   corners: cornersState,
   display,
   onOpenDisplay: () => window.open('?display', 'equatium-display', 'popup,width=1280,height=720'),
@@ -218,11 +249,12 @@ function frame(now: number): void {
   previous = now;
   if (controls.paused) accumulator = 0;
   // The pointer reaches the same distance on screen however far the view is zoomed.
-  pointer.radius = hands.radius = view.tankLength(reach.pixels);
+  pointer.radius = hands.radius = motion.radius = view.tankLength(reach.pixels);
+  if (motionState.on && !motionState.status.startsWith('Starting')) motionState.status = motion.describe();
   // Say what the camera sees, or what went wrong, so it is clear whether hands are being found.
   if (handsState.on && !handsState.status.startsWith('Starting')) handsState.status = camera?.problem ? `Problem: ${camera.problem}` : hands.describe();
   const touch = displayOpen() && display.touch ? [display.touch] : [];
-  tank.setInfluences([...pointer.influences(seconds()), ...hands.influences(seconds()), ...touch]);
+  tank.setInfluences([...pointer.influences(seconds()), ...hands.influences(seconds()), ...motion.influences(seconds()), ...touch]);
   const stepStart = performance.now();
   while (accumulator >= DT) {
     tank.step(DT);

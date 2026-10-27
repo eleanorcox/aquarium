@@ -80,7 +80,7 @@ export class Paper implements Visual {
   }
 
   influence(frame: Frame, influence: Influence): void {
-    if (influence.kind === 'hand') return drawHand(frame, influence, { open: (a) => `rgba(30, 110, 140, ${a})`, fist: (a) => `rgba(190, 60, 30, ${a})` });
+    if (influence.kind === 'hand' || influence.kind === 'motion') return drawHand(frame, influence, { open: (a) => `rgba(30, 110, 140, ${a})`, fist: (a) => `rgba(190, 60, 30, ${a})`, motion: (a) => `rgba(150, 110, 20, ${a})` });
     const { ctx, scale } = frame;
     ctx.strokeStyle = 'rgba(29, 43, 79, 0.35)';
     ctx.lineWidth = 1;

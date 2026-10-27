@@ -15,7 +15,7 @@ export interface Influence {
   /** Overrides each fish's own temperament: every fish in reach is drawn in or driven off. */
   effect?: 'attract' | 'scatter';
   /** What it is, for drawing only: the fish do not care. */
-  kind?: 'pointer' | 'hand';
+  kind?: 'pointer' | 'hand' | 'motion';
   /** For a hand, the shape it is making. */
   shape?: 'open' | 'fist';
 }

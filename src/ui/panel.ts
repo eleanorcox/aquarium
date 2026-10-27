@@ -45,6 +45,9 @@ export interface PanelOptions {
   /** Webcam hand tracking: whether it is on, and a line saying how it is going. */
   hands: { on: boolean; status: string };
   onHands: (on: boolean) => void;
+  /** Movement seen by the webcam facing the room: whether it is on, and what it sees. */
+  motion: { on: boolean; status: string };
+  onMotion: (on: boolean) => void;
   /** Sharing this tank as a link, and a line saying how that went. */
   link: { status: string };
   /** Corner correction for a projector at an angle. */
@@ -130,6 +133,8 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   tankFolder.add(reach, 'pixels', 40, 400, 5).name('Pointer reach');
   tankFolder.add(options.hands, 'on').name('Hands (webcam)').listen().onChange(options.onHands);
   tankFolder.add(options.hands, 'status').name('Hands').listen().disable();
+  tankFolder.add(options.motion, 'on').name('Movement (webcam)').listen().onChange(options.onMotion);
+  tankFolder.add(options.motion, 'status').name('Movement').listen().disable();
   tankFolder.add(tank.flock, 'separation', 0, 2, 0.05).name('School: keep apart');
   tankFolder.add(tank.flock, 'alignment', 0, 2, 0.05).name('School: swim the same way');
   tankFolder.add(tank.flock, 'cohesion', 0, 2, 0.05).name('School: stay together');
