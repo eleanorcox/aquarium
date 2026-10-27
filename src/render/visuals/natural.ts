@@ -4,6 +4,7 @@ import type { Influence } from '../../core/steering';
 import type { Fish } from '../../core/tank';
 import { traceTrail } from '../paint';
 import { BODY_LENGTH, Swimmers, faceFish, scatter, tracePolygon } from './body';
+import { drawHand } from './marks';
 import type { Frame, Visual } from './types';
 
 export class Natural implements Visual {
@@ -104,7 +105,9 @@ export class Natural implements Visual {
   }
 
   /** A soft brightening of the water where an influence reaches. */
-  influence({ ctx, scale }: Frame, influence: Influence): void {
+  influence(frame: Frame, influence: Influence): void {
+    if (influence.kind === 'hand') return drawHand(frame, influence, { open: (a) => `rgba(110, 231, 214, ${a})`, fist: (a) => `rgba(255, 140, 90, ${a})` });
+    const { ctx, scale } = frame;
     const x = influence.x * scale;
     const y = influence.y * scale;
     const r = influence.radius * scale;

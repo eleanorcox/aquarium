@@ -36,6 +36,7 @@ export class PointerInput {
         vx: moving ? this.velocity.x : 0,
         vy: moving ? this.velocity.y : 0,
         radius: this.radius,
+        kind: 'pointer',
         ...(this.mode === 'fish-decide' ? {} : { effect: this.mode }),
       },
     ];

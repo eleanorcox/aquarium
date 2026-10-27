@@ -8,6 +8,12 @@ describe('PointerInput', () => {
     expect(pointer.influences(0)).toMatchObject([{ x: 0.4, y: 0.7, radius: pointer.radius }]);
   });
 
+  it('marks its influence as the pointer, so it can be drawn differently from a hand', () => {
+    const pointer = new PointerInput();
+    pointer.move(0.4, 0.7, 0);
+    expect(pointer.influences(0)[0]!.kind).toBe('pointer');
+  });
+
   it('a pointer that has not arrived, or has left, is no influence', () => {
     const pointer = new PointerInput();
     expect(pointer.influences(0)).toEqual([]);

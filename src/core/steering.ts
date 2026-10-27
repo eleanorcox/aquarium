@@ -14,6 +14,10 @@ export interface Influence {
   radius: number;
   /** Overrides each fish's own temperament: every fish in reach is drawn in or driven off. */
   effect?: 'attract' | 'scatter';
+  /** What it is, for drawing only: the fish do not care. */
+  kind?: 'pointer' | 'hand';
+  /** For a hand, the shape it is making. */
+  shape?: 'open' | 'fist';
 }
 
 /** Pull back to the route, per unit of offset, at full path strength. */

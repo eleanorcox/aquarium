@@ -62,6 +62,7 @@ Template:
 | [26](#26-hand-tracking-runs-from-files-in-the-project) | Hand tracking runs from files in the project | 27 Oct 2026 | Built |
 | [27](#27-swimming-and-schooling-follow-the-research) | Swimming and schooling follow the research | 27 Oct 2026 | Built |
 | [28](#28-a-tank-is-shared-as-a-link) | A tank is shared as a link | 27 Oct 2026 | Built |
+| [29](#29-hands-are-shown-not-only-felt) | Hands are shown, not only felt | 27 Oct 2026 | Built |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -349,3 +350,12 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - A five-fish tank is a link of about 500 characters; 500 fish fit in under 20,000.
   - Saved data has a version number, so a later format can still read old links.
   - Where fish are at the moment of saving is not saved, only their routes and the time. Fish on routes carry on exactly; pushed, drifting and schooling fish start again from their routes.
+
+## 29. Hands are shown, not only felt
+
+- **Date:** 27 October 2026
+- **Status:** Built
+- **What prompted it:** Eleanor tried the webcam: the camera came on, but she could not tell what her hands were doing and saw no ring in the tank. A check with MediaPipe's own test photos showed the model and the hand reader work (a fist photo was found, read as a fist and turned into a scatter). The most likely fault was the tracking loop stopping on its first error without any sign, because an error inside it ended the loop while the panel still said "On".
+- **Decision:** Tracking errors are caught, reported in the panel, and, if the graphics card was the cause, tracking carries on using the processor. The preview shows the tracked points over the camera picture. Each hand is drawn in the tank as a coloured disc, one colour for an open hand and another for a fist, labelled with its shape. The panel says what the camera sees: "No hands seen", "1 hand: open", or the problem.
+- **Alternatives considered:** Drawing hands like the pointer, as a faint ring. That was the original design, and it gave no way to tell a missing hand from a faint one.
+- **What follows from it:** Whatever goes wrong on Eleanor's machine should now say what it is. Influences carry a `kind` and, for hands, a `shape`, used only for drawing.

@@ -123,36 +123,30 @@ body.bare #editor {
   display: none;
 }
 
-/* A small preview of the webcam while hands are on, flipped like a mirror to match the tank. */
+/* A small preview of the webcam while hands are on, with the tracked hands drawn over it, flipped like a
+   mirror to match the tank. */
 #camera {
   position: fixed;
   right: 16px;
   bottom: 16px;
-  width: 160px;
+  width: 200px;
   border: 1px solid #1f3546;
   border-radius: 6px;
+  overflow: hidden;
   transform: scaleX(-1);
-  opacity: 0.8;
   pointer-events: none;
+}
+#camera video,
+#camera canvas {
+  display: block;
+  width: 100%;
+}
+#camera canvas {
+  position: absolute;
+  inset: 0;
+  height: 100%;
 }
 #camera[hidden],
 body.bare #camera {
-  display: none;
-}
-
-/* Draggable corners for corner correction, shown while adjusting. */
-.corner-handle {
-  position: fixed;
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px;
-  border: 2px solid #dce9ee;
-  border-radius: 50%;
-  background: rgb(220 233 238 / 0.2);
-  cursor: move;
-  touch-action: none;
-  z-index: 10;
-}
-.corner-handle[hidden] {
   display: none;
 }

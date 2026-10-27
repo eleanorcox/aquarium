@@ -117,22 +117,22 @@ const seconds = () => performance.now() / 1000;
 // The camera picture is spread across whatever part of the tank is on screen.
 const hands = new HandInput((across, down) => view.toTank({ x: across * screen.width, y: down * screen.height }));
 const camera = new HandCamera(hands, seconds);
-camera.video.id = 'camera';
-camera.video.hidden = true;
-document.body.append(camera.video);
+camera.preview.id = 'camera';
+camera.preview.hidden = true;
+document.body.append(camera.preview);
 const handsState = { on: false, status: 'Off' };
 async function setHands(on: boolean): Promise<void> {
   if (!on) {
     camera.stop();
-    camera.video.hidden = true;
+    camera.preview.hidden = true;
     handsState.status = 'Off';
     return;
   }
   handsState.status = 'Starting…';
   try {
     await camera.start();
-    camera.video.hidden = false;
-    handsState.status = 'On: open hand or fist';
+    camera.preview.hidden = false;
+    handsState.status = 'No hands seen';
   } catch (error) {
     handsState.on = false;
     handsState.status = error instanceof DOMException && error.name === 'NotAllowedError' ? 'Camera not allowed' : 'Could not start';
@@ -246,6 +246,8 @@ function frame(now: number): void {
   if (controls.paused) accumulator = 0;
   // The pointer reaches the same distance on screen however far the view is zoomed.
   pointer.radius = hands.radius = view.tankLength(reach.pixels);
+  // Say what the camera sees, or what went wrong, so it is clear whether hands are being found.
+  if (handsState.on && !handsState.status.startsWith('Starting')) handsState.status = camera.problem ? `Problem: ${camera.problem}` : hands.describe();
   tank.setInfluences([...pointer.influences(seconds()), ...hands.influences(seconds())]);
   const stepStart = performance.now();
   while (accumulator >= DT) {

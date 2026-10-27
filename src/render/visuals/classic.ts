@@ -2,6 +2,7 @@
 import type { Influence } from '../../core/steering';
 import type { Fish } from '../../core/tank';
 import { traceTrail } from '../paint';
+import { drawHand } from './marks';
 import type { Frame, Visual } from './types';
 
 export class Classic implements Visual {
@@ -76,7 +77,9 @@ export class Classic implements Visual {
   }
 
   /** A faint ring showing how far an influence reaches. */
-  influence({ ctx, scale }: Frame, influence: Influence): void {
+  influence(frame: Frame, influence: Influence): void {
+    if (influence.kind === 'hand') return drawHand(frame, influence, { open: (a) => `rgba(110, 231, 214, ${a})`, fist: (a) => `rgba(255, 140, 90, ${a})` });
+    const { ctx, scale } = frame;
     ctx.strokeStyle = 'rgba(220, 233, 238, 0.18)';
     ctx.lineWidth = 1;
     ctx.beginPath();

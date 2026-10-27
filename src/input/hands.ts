@@ -66,6 +66,8 @@ export class HandInput {
   /** How far a hand's effect reaches, in tank units. */
   radius = 0.25;
   private hands: TrackedHand[] = [];
+  /** When the latest camera picture arrived. */
+  private latest = -Infinity;
 
   /**
    * `toTank` places a point of the camera picture in the tank. It is given the point already flipped like a
@@ -76,6 +78,7 @@ export class HandInput {
 
   /** Takes the hands seen in one camera frame. */
   update(seen: Landmark[][], time: number): void {
+    this.latest = time;
     const unmatched = new Set(this.hands);
     for (const points of seen) {
       if (points.length !== POINTS) continue;
@@ -115,9 +118,18 @@ export class HandInput {
           vx: ahead.x - at.x,
           vy: ahead.y - at.y,
           radius: this.radius * fade,
+          kind: 'hand' as const,
+          shape: hand.shape,
           ...(hand.shape === 'fist' ? { effect: 'scatter' as const } : {}),
         };
       });
+  }
+
+  /** What the camera saw in its latest picture, in words, for the panel. Hands that are fading out are not counted. */
+  describe(): string {
+    const shapes = this.hands.filter((hand) => hand.seenAt === this.latest).map((hand) => hand.shape);
+    if (shapes.length === 0) return 'No hands seen';
+    return `${shapes.length} hand${shapes.length === 1 ? '' : 's'}: ${shapes.join(', ')}`;
   }
 
   private follow(hand: TrackedHand, at: { x: number; y: number }, shape: HandShape, time: number): void {

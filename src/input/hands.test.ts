@@ -125,6 +125,24 @@ describe('HandInput', () => {
     expect(influence!.x).toBeLessThan(2.5);
   });
 
+  it('marks its influences as hands, with the shape each hand is making', () => {
+    const input = setUp();
+    const time = hold(input, [hand(0.2, 0.5, 'open'), hand(0.8, 0.5, 'fist')], 10);
+    const kinds = input.influences(time).map((influence) => [influence.kind, influence.shape]);
+    expect(kinds).toContainEqual(['hand', 'open']);
+    expect(kinds).toContainEqual(['hand', 'fist']);
+  });
+
+  it('says in words what it can see right now, not counting a hand that has just gone', () => {
+    const input = setUp();
+    expect(input.describe()).toBe('No hands seen');
+    let time = hold(input, [hand(0.5, 0.5, 'open')], 10);
+    expect(input.describe()).toBe('1 hand: open');
+    // The hand in the middle is still fading out while two hands appear elsewhere.
+    time = hold(input, [hand(0.2, 0.5, 'open'), hand(0.8, 0.5, 'fist')], 3, time);
+    expect(input.describe()).toBe('2 hands: open, fist');
+  });
+
   it('ignores a malformed hand with missing points', () => {
     const input = setUp();
     const time = hold(input, [hand(0.5, 0.5, 'open').slice(0, 10)], 5);

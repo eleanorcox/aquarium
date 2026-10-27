@@ -12,6 +12,7 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 - Press H to hide the panel and equation, for watching or recording the tank on its own.
 - Corner correction, in the panel's Projector section: drag the four corners of the picture to square it up on a surface a projector hits at an angle. Remembered in this browser.
 - Copy link to this tank, in the panel: the address then holds the whole tank, and opening it shows the same fish on the same routes. Broken or tampered links are refused with a reason.
+- Hand feedback: the webcam preview shows the tracked points of each hand, each hand appears in the tank as a coloured disc labelled open hand or fist, and the panel says what the camera sees or what went wrong.
 - Hands (webcam) in the panel: an open hand moves through the fish like the pointer, letting each fish decide, and a fist scatters them. Two hands work at once. A small mirrored preview shows what the camera sees. Works offline.
 
 - Fixed scenes: six named tanks that are the same every time, chosen from a Scene list in the panel or with `?scene=name` in the address.

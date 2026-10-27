@@ -4,6 +4,7 @@ import type { Influence } from '../../core/steering';
 import type { Fish } from '../../core/tank';
 import { traceTrail } from '../paint';
 import { BODY_LENGTH, Swimmers, faceFish, tracePolygon } from './body';
+import { drawHand } from './marks';
 import type { Frame, Visual } from './types';
 
 const INK = '#1d2b4f';
@@ -78,7 +79,9 @@ export class Paper implements Visual {
     ctx.restore();
   }
 
-  influence({ ctx, scale }: Frame, influence: Influence): void {
+  influence(frame: Frame, influence: Influence): void {
+    if (influence.kind === 'hand') return drawHand(frame, influence, { open: (a) => `rgba(30, 110, 140, ${a})`, fist: (a) => `rgba(190, 60, 30, ${a})` });
+    const { ctx, scale } = frame;
     ctx.strokeStyle = 'rgba(29, 43, 79, 0.35)';
     ctx.lineWidth = 1;
     ctx.setLineDash([6, 5]);
