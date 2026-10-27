@@ -238,10 +238,22 @@ export async function startOperator(): Promise<void> {
     }
   }
 
-  // H hides the panel and equation, for watching or recording the tank on its own.
+  // H, or the small button in the corner, hides the panel and equation, for watching or recording the tank
+  // on its own. The button is for touch screens, which have no H. A phone, or a link with ?watch, starts hidden.
+  const toggle = document.createElement('button');
+  toggle.id = 'controls-toggle';
+  toggle.type = 'button';
+  const showBare = (bare: boolean) => {
+    document.body.classList.toggle('bare', bare);
+    toggle.textContent = bare ? 'Show controls' : 'Hide';
+    toggle.setAttribute('aria-label', bare ? 'Show controls' : 'Hide controls');
+  };
+  toggle.addEventListener('click', () => showBare(!document.body.classList.contains('bare')));
+  document.body.append(toggle);
+  showBare(address.has('watch') || window.matchMedia('(max-width: 640px)').matches);
   window.addEventListener('keydown', (e) => {
     const typing = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
-    if (e.key.toLowerCase() === 'h' && !typing && !e.metaKey && !e.ctrlKey) document.body.classList.toggle('bare');
+    if (e.key.toLowerCase() === 'h' && !typing && !e.metaKey && !e.ctrlKey) showBare(!document.body.classList.contains('bare'));
   });
 
   // Fixed timestep: the simulation advances in equal 1/60 s steps whatever the screen's refresh rate,

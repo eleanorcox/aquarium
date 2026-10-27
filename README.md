@@ -85,7 +85,7 @@ Hand tracking uses Google's MediaPipe hand landmarker. Its model file is kept in
 
 ### Visual modes
 
-Choose **Visuals** in the panel, or add `?visuals=name` to the address: `classic` (the default), `natural` or `paper`. Natural fish bend as they swim using the travelling body wave from studies of real fish (`src/render/swimming.ts`). Press **H** to hide the panel.
+Choose **Visuals** in the panel, or add `?visuals=name` to the address: `classic` (the default), `natural` or `paper`. Natural fish bend as they swim using the travelling body wave from studies of real fish (`src/render/swimming.ts`). Press **H**, or the button in the top corner, to hide the panel. On a phone, or with `?watch` in the address, the controls start hidden.
 
 ### Real fish
 

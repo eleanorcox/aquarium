@@ -4,11 +4,25 @@ A proposed order of work. It is a proposal: the order depends on answers in [ope
 
 ## Where things stand
 
-As of 13 October 2026:
+As of 27 October 2026:
 
-- No exhibition or date. This is a direction to build towards, so the order below is set by what is interesting and what teaches most, not by a deadline.
-- Hardware is one laptop with a built-in webcam. No projector, separate camera or depth sensor.
-- Build first, buy second. Each piece of hardware is bought only after the software has shown what it needs to do.
+| Stage | Status |
+| --- | --- |
+| 1, fish that can be pushed | Done; recorded as v2 |
+| 1b, a tank bigger than the screen | Done; not yet judged by eye |
+| 2, hands | Done; feedback added after a first try showed nothing; needs trying again |
+| 3, a first look | Visual modes and natural swimming done; real drawings still to come |
+| 3b, a small real tank | Done, with coloured generic bodies until there are pictures |
+| 4a, on the wall without new hardware | Software done: display window, corner correction, movement through the webcam. Still to do: trying it in a dark room and writing the list of what to buy |
+| 4b, with a projector | Needs a projector |
+| 5, visitors add fish | Sharing a tank as a link is done; the rest needs a hosted service |
+
+Side branches: formations, phone layout and the field-of-fish scene are done. Free swimming is put off by choice. 3D, describing a motion in words (which needs an AI service and a key), and discovering species (which needs decisions on what triggers a discovery) are not started.
+
+Other facts that shape the order:
+
+- No exhibition or date. The order is set by what is interesting and what teaches most.
+- Hardware is one laptop with a built-in webcam. Build first, buy second.
 - Details are loose on purpose. Where the docs pick something specific, it is a starting point to react to.
 
 ## The reasoning
@@ -131,6 +145,6 @@ flocking ──> schools ──────────────────�
 
 ## Suggested next step
 
-1. Eleanor tries stage 1b: dragging and zooming, the `shoal` scene, and the draw time in the panel's Speed section. The branch is merged once it feels right.
-2. That draw time decides whether WebGL comes before stage 2 or with stage 3.
-3. Stage 2: webcam hands.
+1. Eleanor tries what was built on 27 October: hands with the new feedback, the display window, movement, the real-fish scenes and the field of fish, and reads the draw time on `?scene=shoal`.
+2. A dark-room trial of the display window on a monitor or television, ending in the list of what to buy.
+3. Fish pictures, to the brief in [assets.md](assets.md), so real species stop being generic bodies.
