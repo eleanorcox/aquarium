@@ -1,7 +1,7 @@
 // Natural: fish that bend as they swim, in the style of real swimmers, in sunlit water with drifting specks.
 // The colours are muted and the water is lit from above, closer to a real tank than Classic's glow.
 import type { Influence } from '../../core/steering';
-import type { Fish } from '../../core/tank';
+import type { DrawnFish } from '../drawn';
 import { traceTrail } from '../paint';
 import { BODY_LENGTH, Swimmers, faceFish, scatter, tracePolygon } from './body';
 import { drawHand } from './marks';
@@ -13,7 +13,7 @@ export class Natural implements Visual {
   readonly reach = BODY_LENGTH;
   private swimmers = new Swimmers();
 
-  begin(frame: Frame, fish: Fish[]): void {
+  begin(frame: Frame, fish: DrawnFish[]): void {
     this.swimmers.update(fish, frame.dt);
   }
 
@@ -55,14 +55,14 @@ export class Natural implements Visual {
     }
   }
 
-  trail({ ctx, scale }: Frame, fish: Fish, selected: boolean): void {
+  trail({ ctx, scale }: Frame, fish: DrawnFish, selected: boolean): void {
     ctx.strokeStyle = `rgba(220, 240, 255, ${selected ? 0.3 : 0.08})`;
     ctx.lineWidth = 1;
     traceTrail(ctx, fish, scale);
     ctx.stroke();
   }
 
-  fish({ ctx, scale }: Frame, fish: Fish, selected: boolean): void {
+  fish({ ctx, scale }: Frame, fish: DrawnFish, selected: boolean): void {
     const body = this.swimmers.bodyOf(fish, scale);
     const depth = body.style.depth * body.length;
     ctx.save();

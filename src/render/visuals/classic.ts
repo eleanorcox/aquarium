@@ -1,6 +1,6 @@
 // Classic: the original look. Glowing fish shapes with trails, on dark water with faint depth lines.
 import type { Influence } from '../../core/steering';
-import type { Fish } from '../../core/tank';
+import type { DrawnFish } from '../drawn';
 import { traceTrail } from '../paint';
 import { drawHand } from './marks';
 import type { Frame, Visual } from './types';
@@ -27,14 +27,14 @@ export class Classic implements Visual {
     }
   }
 
-  trail({ ctx, scale }: Frame, fish: Fish, selected: boolean): void {
+  trail({ ctx, scale }: Frame, fish: DrawnFish, selected: boolean): void {
     ctx.strokeStyle = `hsla(${fish.hue} 85% 66% / ${selected ? 0.55 : 0.2})`;
     ctx.lineWidth = selected ? 2 : 1.25;
     traceTrail(ctx, fish, scale);
     ctx.stroke();
   }
 
-  fish({ ctx, scale, t }: Frame, fish: Fish, selected: boolean): void {
+  fish({ ctx, scale, t }: Frame, fish: DrawnFish, selected: boolean): void {
     const s = fish.size * scale;
     // Tail beats faster when the fish swims faster.
     const wiggle = Math.sin(t * (6 + fish.speed * 25)) * 0.35;

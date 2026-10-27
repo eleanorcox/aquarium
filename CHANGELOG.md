@@ -11,6 +11,7 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 - A field of fish scene (`?scene=field`): 700 small fish in one school streaming past, filling the screen so you are in the middle of it.
 - Visual modes, chosen from Visuals in the panel or with `?visuals=name`: Classic (the original look), Natural (fish that bend as they swim, eel-like to tuna-like, in sunlit water) and Paper (ink fish on squared paper).
 - Press H to hide the panel and equation, for watching or recording the tank on its own.
+- Display window for a projector: **Open display window** in the Projector section opens a window with only the tank, to drag onto the projector's screen. Click it for full screen, press C to adjust its corners and R to reset them. The laptop window keeps the controls and runs the tank.
 - Corner correction, in the panel's Projector section: drag the four corners of the picture to square it up on a surface a projector hits at an angle. Remembered in this browser.
 - Copy link to this tank, in the panel: the address then holds the whole tank, and opening it shows the same fish on the same routes. Broken or tampered links are refused with a reason.
 - Hand feedback: the webcam preview shows the tracked points of each hand, each hand appears in the tank as a coloured disc labelled open hand or fist, and the panel says what the camera sees or what went wrong.
@@ -23,6 +24,7 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Changed
 
+- The hand-tracking library loads only when hands are switched on, so the page starts faster.
 - Natural mode's swimming uses published measurements of real fish: the head moves a little, eels carry more than one wave along their bodies and tuna less than one.
 - Schooling fish follow their three nearest schoolmates, as real fish do, instead of everyone in sight.
 - The tank keeps its own shape, 16:9 by default, instead of taking the shape of the window. A window of another shape shows a dark margin.

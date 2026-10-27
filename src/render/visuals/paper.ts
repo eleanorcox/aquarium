@@ -1,7 +1,7 @@
 // Paper: ink drawings of fish on graph paper, like a page of working. Suits the equation side of the
 // project. Light backgrounds wash out on a projector, so this one is for screens.
 import type { Influence } from '../../core/steering';
-import type { Fish } from '../../core/tank';
+import type { DrawnFish } from '../drawn';
 import { traceTrail } from '../paint';
 import { BODY_LENGTH, Swimmers, faceFish, tracePolygon } from './body';
 import { drawHand } from './marks';
@@ -15,7 +15,7 @@ export class Paper implements Visual {
   readonly reach = BODY_LENGTH;
   private swimmers = new Swimmers();
 
-  begin(frame: Frame, fish: Fish[]): void {
+  begin(frame: Frame, fish: DrawnFish[]): void {
     this.swimmers.update(fish, frame.dt);
   }
 
@@ -39,7 +39,7 @@ export class Paper implements Visual {
     }
   }
 
-  trail({ ctx, scale }: Frame, fish: Fish, selected: boolean): void {
+  trail({ ctx, scale }: Frame, fish: DrawnFish, selected: boolean): void {
     ctx.strokeStyle = selected ? 'rgba(29, 43, 79, 0.6)' : 'rgba(29, 43, 79, 0.25)';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
@@ -48,7 +48,7 @@ export class Paper implements Visual {
     ctx.setLineDash([]);
   }
 
-  fish({ ctx, scale }: Frame, fish: Fish, selected: boolean): void {
+  fish({ ctx, scale }: Frame, fish: DrawnFish, selected: boolean): void {
     const body = this.swimmers.bodyOf(fish, scale);
     ctx.save();
     faceFish(ctx, fish, scale);

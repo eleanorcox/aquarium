@@ -1,7 +1,7 @@
 // The shape of a swimming fish's body, bent by the body wave, shared by the visual modes that bend fish.
 // Coordinates are in pixels around the fish, with x pointing the way it faces and y to its side.
 import type { Vec2 } from '../../core/motion';
-import type { Fish } from '../../core/tank';
+import type { DrawnFish } from '../drawn';
 import { STYLES, SwimPhases, amplitudeScale, bodyWave, tailBeatFrequency, type SwimStyle, type SwimStyleId } from '../swimming';
 
 /** A bent fish is drawn this many fish sizes long, nose to tail fin. */
@@ -13,7 +13,7 @@ const NOSE = 0.45;
 
 /** Until fish have species, each gets a swimming style from its id, so a tank shows a mix. Mostly ordinary swimmers. */
 const STYLE_ORDER: SwimStyleId[] = ['subcarangiform', 'carangiform', 'subcarangiform', 'thunniform', 'anguilliform'];
-export const styleFor = (fish: Fish): SwimStyle => STYLES[STYLE_ORDER[fish.id % STYLE_ORDER.length]!];
+export const styleFor = (fish: DrawnFish): SwimStyle => STYLES[STYLE_ORDER[fish.id % STYLE_ORDER.length]!];
 
 export interface Body {
   style: SwimStyle;
@@ -37,7 +37,7 @@ export class Swimmers {
   private state = new Map<number, { phase: number; amplitude: number }>();
 
   /** Moves every fish's tail beat on by `dt` seconds, at a rate set by how fast it is going. */
-  update(fish: Fish[], dt: number): void {
+  update(fish: DrawnFish[], dt: number): void {
     for (const f of fish) {
       const speed = f.speed / (BODY_LENGTH * f.size);
       const phase = this.phases.advance(f.id, tailBeatFrequency(speed), dt);
@@ -48,7 +48,7 @@ export class Swimmers {
     for (const id of this.state.keys()) if (!ids.has(id)) this.state.delete(id);
   }
 
-  bodyOf(fish: Fish, scale: number): Body {
+  bodyOf(fish: DrawnFish, scale: number): Body {
     const style = styleFor(fish);
     const length = BODY_LENGTH * fish.size * scale;
     const { phase, amplitude } = this.state.get(fish.id) ?? { phase: 0, amplitude: 0 };
@@ -96,7 +96,7 @@ export function tracePolygon(ctx: CanvasRenderingContext2D, points: Vec2[]): voi
  * Turns the drawing to face the way the fish swims, keeping its back uppermost. A fish swimming left is
  * turned over instead of drawn upside down.
  */
-export function faceFish(ctx: CanvasRenderingContext2D, fish: Fish, scale: number): void {
+export function faceFish(ctx: CanvasRenderingContext2D, fish: DrawnFish, scale: number): void {
   ctx.translate(fish.x * scale, fish.y * scale);
   ctx.rotate(fish.heading);
   if (Math.cos(fish.heading) < 0) ctx.scale(1, -1);

@@ -1,6 +1,6 @@
 // Paints one frame of the tank onto a 2D canvas context through a view, in a chosen visual mode.
 // No page access, so every visual mode can be exercised in tests with a stand-in context.
-import type { Fish, Tank } from '../core/tank';
+import type { DrawnFish, DrawnTank } from './drawn';
 import { fishInView } from './drawList';
 import type { Size, View } from './view';
 import type { Visual } from './visuals/types';
@@ -11,7 +11,7 @@ export interface Display {
   trails: boolean;
 }
 
-export function paintTank(ctx: CanvasRenderingContext2D, screen: Size, tank: Tank, view: View, display: Display, visual: Visual, dt: number): void {
+export function paintTank(ctx: CanvasRenderingContext2D, screen: Size, tank: DrawnTank, view: View, display: Display, visual: Visual, dt: number): void {
   ctx.fillStyle = visual.margin;
   ctx.fillRect(0, 0, screen.width, screen.height);
 
@@ -34,7 +34,7 @@ export function paintTank(ctx: CanvasRenderingContext2D, screen: Size, tank: Tan
 }
 
 /** Starts a path along a fish's trail, lifting the pen where it wrapped across the tank. The caller strokes it. */
-export function traceTrail(ctx: CanvasRenderingContext2D, fish: Fish, scale: number): void {
+export function traceTrail(ctx: CanvasRenderingContext2D, fish: DrawnFish, scale: number): void {
   ctx.beginPath();
   let penDown = false;
   for (const point of fish.trail) {

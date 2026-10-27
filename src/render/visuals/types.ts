@@ -1,6 +1,6 @@
 // What a visual mode is: everything about how the tank looks, swappable without touching the simulation.
 import type { Influence } from '../../core/steering';
-import type { Fish } from '../../core/tank';
+import type { DrawnFish } from '../drawn';
 
 /** One frame's drawing surface. Positions are in pixels from the tank's top left corner. */
 export interface Frame {
@@ -23,9 +23,9 @@ export interface Visual {
   /** How far a drawn fish extends from its position, in fish sizes, so fish just off screen are still drawn. */
   readonly reach: number;
   /** Called once a frame with every fish, before anything is drawn. */
-  begin?(frame: Frame, fish: Fish[]): void;
+  begin?(frame: Frame, fish: DrawnFish[]): void;
   water(frame: Frame): void;
-  trail(frame: Frame, fish: Fish, selected: boolean): void;
-  fish(frame: Frame, fish: Fish, selected: boolean): void;
+  trail(frame: Frame, fish: DrawnFish, selected: boolean): void;
+  fish(frame: Frame, fish: DrawnFish, selected: boolean): void;
   influence(frame: Frame, influence: Influence): void;
 }

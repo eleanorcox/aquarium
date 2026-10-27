@@ -63,6 +63,7 @@ Template:
 | [27](#27-swimming-and-schooling-follow-the-research) | Swimming and schooling follow the research | 27 Oct 2026 | Built |
 | [28](#28-a-tank-is-shared-as-a-link) | A tank is shared as a link | 27 Oct 2026 | Built |
 | [29](#29-hands-are-shown-not-only-felt) | Hands are shown, not only felt | 27 Oct 2026 | Built |
+| [30](#30-the-display-window-only-draws) | The display window only draws | 27 Oct 2026 | Built |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -359,3 +360,19 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 - **Decision:** Tracking errors are caught, reported in the panel, and, if the graphics card was the cause, tracking carries on using the processor. The preview shows the tracked points over the camera picture. Each hand is drawn in the tank as a coloured disc, one colour for an open hand and another for a fist, labelled with its shape. The panel says what the camera sees: "No hands seen", "1 hand: open", or the problem.
 - **Alternatives considered:** Drawing hands like the pointer, as a faint ring. That was the original design, and it gave no way to tell a missing hand from a faint one.
 - **What follows from it:** Whatever goes wrong on Eleanor's machine should now say what it is. Influences carry a `kind` and, for hands, a `shape`, used only for drawing.
+
+## 30. The display window only draws
+
+- **Date:** 27 October 2026
+- **Status:** Built
+- **What prompted it:** Stage 4a: when projecting, the projector should show only the tank while the controls stay on the laptop screen.
+- **Decision:** The page opens either as the operator window (the app as before, with the panel) or, with `?display`, as a display window. The operator window runs the one simulation and sends each frame's fish positions to the display window over a BroadcastChannel, the browser's built-in way for windows on one machine to talk. The display window draws them in its own view, filling its screen, with its own corner correction. It sends back touches on the projection and which part of the tank it shows, so hands seen by the camera land on the projected picture.
+- **Alternatives considered:**
+  - *Both windows running the simulation in step.* Fish pushed by hands or schooling would drift apart between the two, since every input would have to reach both at the same moment.
+  - *The display window running the simulation and the operator sending commands.* The panel is built directly on the tank's objects, so it would need rebuilding as a remote control.
+- **What follows from it:**
+  - Drawing code now works from a plain description of fish (`DrawnTank`, `DrawnFish`), not the simulation itself.
+  - Trails are not sent to the display window.
+  - The operator window must stay visible, not minimised: browsers pause animation in hidden windows, which would freeze the projection.
+  - The hand-tracking library is now loaded only when hands are switched on, which makes every page start faster.
+  - Headless test browsers here barely run animation, so the two windows together have not been seen working; the message format is tested.

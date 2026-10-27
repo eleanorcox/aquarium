@@ -2,6 +2,7 @@
 // It never changes simulation state. The painting itself is in paint.ts and the visual modes.
 import type { Vec2 } from '../core/motion';
 import type { Tank } from '../core/tank';
+import type { DrawnTank } from './drawn';
 import { paintTank, type Display } from './paint';
 import type { Size, View } from './view';
 import type { Visual } from './visuals/types';
@@ -45,7 +46,7 @@ export class Canvas2DRenderer {
     return best;
   }
 
-  render(tank: Tank, view: View, display: Display): void {
+  render(tank: DrawnTank, view: View, display: Display): void {
     const now = performance.now();
     // Animation that is only for show, such as a tail beat, uses real time; a long pause is not caught up.
     const dt = this.lastFrame ? Math.min(0.1, (now - this.lastFrame) / 1000) : 0;

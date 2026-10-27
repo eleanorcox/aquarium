@@ -49,6 +49,9 @@ export interface PanelOptions {
   link: { status: string };
   /** Corner correction for a projector at an angle. */
   corners: { adjusting: boolean; adjust: (on: boolean) => void; reset: () => void };
+  /** A separate display window for a projector, and whether it is open. */
+  display: { status: string };
+  onOpenDisplay: () => void;
   onCopyLink: () => void;
   onAddFish: () => number;
 }
@@ -135,6 +138,8 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   tankFolder.add(controls, 'paused').name('Pause');
 
   const projector = gui.addFolder('Projector').close();
+  projector.add({ open: options.onOpenDisplay }, 'open').name('Open display window');
+  projector.add(options.display, 'status').name('Display window').listen().disable();
   projector.add(options.corners, 'adjusting').name('Adjust corners').onChange(options.corners.adjust);
   projector.add(options.corners, 'reset').name('Reset corners');
 
