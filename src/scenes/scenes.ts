@@ -11,6 +11,8 @@ export interface Scene {
   trails?: boolean;
   /** Seconds to run before the scene is shown, so schools that start on one point have spread out. */
   settle?: number;
+  /** Whether the tank fills the screen, with no margin, so you are in the water instead of looking in. */
+  fill?: boolean;
   build(tank: Tank): void;
 }
 
@@ -94,7 +96,36 @@ export const SCENES: Record<string, Scene> = {
       }
     },
   },
+  field: {
+    name: 'A field of fish',
+    lookFor: 'You are in the middle of one enormous school streaming past, filling the screen. Drag to look around; put the pointer or a hand in it and watch it part.',
+    trails: false,
+    settle: 3,
+    fill: true,
+    build(tank) {
+      tank.setWidth(4);
+      for (let i = 0; i < 700; i++) {
+        // Spread evenly but irregularly through the whole tank, all streaming the same way at slightly different paces.
+        const fish = tank.addFish('sine', {
+          A: 0.02 + 0.04 * spread(i, 1),
+          w: 0.5 + 0.6 * spread(i, 2),
+          phi: 6.28 * spread(i, 3),
+          v: 0.06 + 0.02 * spread(i, 4),
+          y0: 0.07 + 0.86 * spread(i, 5),
+          x0: spread(i, 6),
+        });
+        tank.setFishSize(fish.id, 0.011 + 0.004 * spread(i, 7));
+        tank.setBehaviour(fish.id, { schools: true, curiosity: -0.7, drift: 0.6, pathStrength: 0.25 });
+      }
+    },
+  },
 };
+
+/** A repeatable number from 0 up to 1 for each fish, for spreading fish about without randomness. */
+function spread(i: number, salt: number): number {
+  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
 
 /** Fills the tank with the named scene, or the default one if the name is not known. Returns the name used. */
 export function buildScene(tank: Tank, id: string | null): string {

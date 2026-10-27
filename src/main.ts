@@ -36,7 +36,7 @@ const { tank, scene } = await startingTank();
 // The tank has its own size. The view is this screen's window onto it.
 const renderer = new Canvas2DRenderer(canvas, createVisual(address.get('visuals')));
 let screen = renderer.resize();
-const view = new View(tank, screen, tank.typicalFishSize());
+const view = new View(tank, screen, tank.typicalFishSize(), { fill: SCENES[scene]?.fill });
 new ResizeObserver(() => {
   view.setScreen((screen = renderer.resize()));
   // An uncorrected picture follows the screen's new size. Corrected corners stay where they were put.

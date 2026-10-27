@@ -20,11 +20,15 @@ export class View {
   /** The tank position shown at the centre of the screen. */
   private centre: Vec2 = { x: 0, y: 0 };
 
-  /** `fishSize` is the size of a typical fish in the tank, in tank units. */
+  /**
+   * `fishSize` is the size of a typical fish in the tank, in tank units. With `fill`, the tank always
+   * covers the whole screen, for being in the middle of the water instead of looking in at it.
+   */
   constructor(
     private tank: Size,
     private screen: Size,
     private fishSize: number,
+    private options: { fill?: boolean } = {},
   ) {
     this.zoom = this.minZoom;
     this.centre = { x: tank.width / 2, y: tank.height / 2 };
@@ -32,7 +36,9 @@ export class View {
 
   /** The most zoomed-out the view goes: the whole tank on screen, unless that makes fish too small to read. */
   get minZoom(): number {
-    const whole = Math.min(this.screen.width / this.tank.width, this.screen.height / this.tank.height);
+    const across = this.screen.width / this.tank.width;
+    const down = this.screen.height / this.tank.height;
+    const whole = this.options.fill ? Math.max(across, down) : Math.min(across, down);
     return Math.max(whole, MIN_FISH_PIXELS / this.fishSize);
   }
 

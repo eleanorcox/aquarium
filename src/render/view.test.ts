@@ -92,6 +92,22 @@ describe('a tank too big for the screen', () => {
   });
 });
 
+describe('a view set to fill the screen', () => {
+  it('leaves no margin, zooming in as far as it needs to, and cannot zoom out past that', () => {
+    const view = new View({ width: 4, height: 1 }, { width: 1440, height: 900 }, 0.04, { fill: true });
+    expect(view.zoom).toBe(900);
+    expect(view.toScreen({ x: 0, y: 0 }).y).toBeCloseTo(0);
+    expect(view.toScreen({ x: 0, y: 1 }).y).toBeCloseTo(900);
+    view.zoomAt(0.5, { x: 720, y: 450 });
+    expect(view.zoom).toBe(900);
+  });
+
+  it('still zooms in further when fish would otherwise be too small', () => {
+    const view = new View({ width: 4, height: 1 }, { width: 1440, height: 900 }, 0.001, { fill: true });
+    expect(view.pixels(0.001)).toBeCloseTo(MIN_FISH_PIXELS);
+  });
+});
+
 describe('converting between screen and tank', () => {
   it('there and back gives the starting position, at any pan and zoom', () => {
     const view = new View(TANK, { width: 400, height: 800 }, 0.01);

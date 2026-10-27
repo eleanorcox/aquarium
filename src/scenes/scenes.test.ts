@@ -19,6 +19,11 @@ describe('scenes', () => {
     }
   });
 
+  it('the field of fish surrounds you: hundreds of fish, filling the screen', () => {
+    expect(built('field').fish.length).toBeGreaterThanOrEqual(500);
+    expect(SCENES.field!.fill).toBe(true);
+  });
+
   it('every scene is the same tank every time', () => {
     for (const id of Object.keys(SCENES)) {
       const after = () => {
@@ -41,11 +46,11 @@ describe('scenes', () => {
         }
       }
     }
-    // Twenty seconds of every scene, including the one with 500 fish, takes a few seconds to run.
-  }, 30_000);
+    // Twenty seconds of every scene, including the ones with hundreds of fish, takes a while to run.
+  }, 120_000);
 
   it('starts schools already spread out, not bursting from one point', () => {
-    for (const id of ['mixed', 'school', 'shoal']) {
+    for (const id of ['mixed', 'school', 'shoal', 'field']) {
       const schooling = built(id).fish.filter((fish) => fish.schools);
       for (const [i, a] of schooling.entries()) {
         // No two closer than half a fish size.

@@ -81,7 +81,7 @@ Choose **Visuals** in the panel, or add `?visuals=name` to the address: `classic
 
 ### Scenes
 
-Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school` or `shoal` (500 fish in a tank wider than the screen). They are for judging by eye how a change looks and feels.
+Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
 
 ### Your own equations
 

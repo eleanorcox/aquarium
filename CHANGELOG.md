@@ -8,6 +8,7 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
+- A field of fish scene (`?scene=field`): 700 small fish in one school streaming past, filling the screen so you are in the middle of it.
 - Visual modes, chosen from Visuals in the panel or with `?visuals=name`: Classic (the original look), Natural (fish that bend as they swim, eel-like to tuna-like, in sunlit water) and Paper (ink fish on squared paper).
 - Press H to hide the panel and equation, for watching or recording the tank on its own.
 - Corner correction, in the panel's Projector section: drag the four corners of the picture to square it up on a surface a projector hits at an angle. Remembered in this browser.
