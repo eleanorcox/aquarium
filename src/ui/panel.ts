@@ -47,6 +47,8 @@ export interface PanelOptions {
   onHands: (on: boolean) => void;
   /** Sharing this tank as a link, and a line saying how that went. */
   link: { status: string };
+  /** Corner correction for a projector at an angle. */
+  corners: { adjusting: boolean; adjust: (on: boolean) => void; reset: () => void };
   onCopyLink: () => void;
   onAddFish: () => number;
 }
@@ -131,6 +133,10 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   tankFolder.add(controls, 'follow').name('Follow selected fish');
   tankFolder.add(controls.display, 'trails').name('Trails');
   tankFolder.add(controls, 'paused').name('Pause');
+
+  const projector = gui.addFolder('Projector').close();
+  projector.add(options.corners, 'adjusting').name('Adjust corners').onChange(options.corners.adjust);
+  projector.add(options.corners, 'reset').name('Reset corners');
 
   const speed = gui.addFolder('Speed').close();
   speed.add(options.stats, 'fish').name('Fish in tank').listen().disable();

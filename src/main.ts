@@ -9,6 +9,7 @@ import { ViewGestures } from './input/viewGestures';
 import { Canvas2DRenderer } from './render/canvas2d';
 import { fishInView } from './render/drawList';
 import { createVisual } from './render/visuals';
+import { CornerPin, type Corners } from './render/cornerPin';
 import { View } from './render/view';
 import { SCENES, buildScene } from './scenes/scenes';
 import { createPanel } from './ui/panel';
@@ -36,7 +37,69 @@ const { tank, scene } = await startingTank();
 const renderer = new Canvas2DRenderer(canvas, createVisual(address.get('visuals')));
 let screen = renderer.resize();
 const view = new View(tank, screen, tank.typicalFishSize());
-new ResizeObserver(() => view.setScreen((screen = renderer.resize()))).observe(canvas);
+new ResizeObserver(() => {
+  view.setScreen((screen = renderer.resize()));
+  // An uncorrected picture follows the screen's new size. Corrected corners stay where they were put.
+  if (!pin.adjusted) {
+    pin = new CornerPin(screen);
+    showCorners();
+  }
+}).observe(canvas);
+
+// Corner correction, for a projector at an angle. The canvas is stretched with a CSS transform, so pointer
+// positions on the page are turned back into positions on the unstretched picture.
+let pin = new CornerPin(screen);
+const toPicture = (e: { clientX: number; clientY: number }) => pin.toPicture({ x: e.clientX, y: e.clientY });
+const CORNERS_KEY = 'equatium.corners';
+const handles = [0, 1, 2, 3].map(() => {
+  const handle = document.createElement('div');
+  handle.className = 'corner-handle';
+  handle.hidden = true;
+  document.body.append(handle);
+  return handle;
+});
+function showCorners(): void {
+  canvas.style.transform = pin.adjusted ? pin.cssTransform() : '';
+  pin.current.forEach((corner, i) => {
+    handles[i]!.style.left = `${corner.x}px`;
+    handles[i]!.style.top = `${corner.y}px`;
+  });
+}
+function saveCorners(): void {
+  // Only this device's projector needs these, so they stay in this browser. Private windows may refuse.
+  try {
+    if (pin.adjusted) localStorage.setItem(CORNERS_KEY, JSON.stringify({ screen, corners: pin.current }));
+    else localStorage.removeItem(CORNERS_KEY);
+  } catch {
+    /* Corner correction still works, it is just not remembered. */
+  }
+}
+try {
+  const saved = JSON.parse(localStorage.getItem(CORNERS_KEY) ?? 'null') as { screen: typeof screen; corners: Corners } | null;
+  if (saved && saved.screen.width === screen.width && saved.screen.height === screen.height) pin.setCorners(saved.corners);
+} catch {
+  /* Nothing remembered, or unreadable: start square. */
+}
+handles.forEach((handle, i) => {
+  handle.addEventListener('pointerdown', (e) => handle.setPointerCapture(e.pointerId));
+  handle.addEventListener('pointermove', (e) => {
+    if (!handle.hasPointerCapture(e.pointerId)) return;
+    const corners = pin.current;
+    corners[i] = { x: e.clientX, y: e.clientY };
+    if (pin.setCorners(corners)) showCorners();
+  });
+  handle.addEventListener('pointerup', saveCorners);
+});
+const cornersState = {
+  adjusting: false,
+  adjust: (on: boolean) => handles.forEach((handle) => (handle.hidden = !on)),
+  reset: () => {
+    pin.reset();
+    showCorners();
+    saveCorners();
+  },
+};
+showCorners();
 
 const panelElements = {
   equation: $('#equation'),
@@ -79,11 +142,11 @@ async function setHands(on: boolean): Promise<void> {
 
 canvas.addEventListener('pointerdown', (e) => {
   canvas.setPointerCapture(e.pointerId);
-  const at = renderer.toCanvas(e.clientX, e.clientY);
+  const at = toPicture(e);
   gestures.down(e.pointerId, at.x, at.y, e.pointerType);
 });
 canvas.addEventListener('pointermove', (e) => {
-  const at = renderer.toCanvas(e.clientX, e.clientY);
+  const at = toPicture(e);
   gestures.move(e.pointerId, at.x, at.y);
   const inTank = view.toTank(at);
   pointer.move(inTank.x, inTank.y, seconds());
@@ -100,7 +163,7 @@ canvas.addEventListener(
   'wheel',
   (e) => {
     e.preventDefault();
-    const at = renderer.toCanvas(e.clientX, e.clientY);
+    const at = toPicture(e);
     gestures.wheel(at.x, at.y, e.deltaY);
   },
   { passive: false },
@@ -112,6 +175,7 @@ const controls = createPanel(tank, panelElements, {
   pointer,
   stats,
   hands: handsState,
+  corners: cornersState,
   link,
   onCopyLink: () => void copyLink(),
   onHands: (on) => void setHands(on),
@@ -136,7 +200,7 @@ const controls = createPanel(tank, panelElements, {
 
 canvas.addEventListener('click', (e) => {
   if (gestures.dragged) return;
-  const at = view.toTank(renderer.toCanvas(e.clientX, e.clientY));
+  const at = view.toTank(toPicture(e));
   // Within about 60 pixels, however far the view is zoomed.
   const id = renderer.pick(at, tank, view.tankLength(60));
   if (id !== undefined) controls.select(id);

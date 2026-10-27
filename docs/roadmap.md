@@ -73,6 +73,8 @@ The first six or so species as data, schools for the species that school, and on
 
 In two parts, with a purchase between them.
 
+*Status, 27 October 2026: corner correction is built and tested. Still to do in 4a: a separate operator window, and motion detection through the webcam facing the room.*
+
 **4a, no new hardware.** Full-screen display with a separate operator window, tried on a monitor or television in a dark room. Motion detection through the laptop webcam facing the room. Corner correction built and tested on screen.
 
 - **Shows:** the aquarium filling a screen and reacting to someone moving in front of the laptop.

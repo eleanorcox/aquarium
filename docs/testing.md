@@ -174,6 +174,8 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 
 ### Stage 4: on the wall
 
+*Corner correction is built; its tests are in [cornerPin.test.ts](../src/render/cornerPin.test.ts).*
+
 - Corner correction: the four corners of the picture land on the four chosen points, and a point in the middle lands in the middle.
 - A camera position goes through the camera-to-projection mapping and back unchanged.
 - Motion detection on made-up frames: no change gives no influences; a block moving across gives one influence that follows it.

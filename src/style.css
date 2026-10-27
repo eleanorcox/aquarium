@@ -17,6 +17,8 @@ body {
 }
 #tank {
   display: block;
+  /* Corner correction stretches the canvas from its top left corner. */
+  transform-origin: 0 0;
   width: 100%;
   height: 100%;
   cursor: pointer;
@@ -135,5 +137,22 @@ body.bare #editor {
 }
 #camera[hidden],
 body.bare #camera {
+  display: none;
+}
+
+/* Draggable corners for corner correction, shown while adjusting. */
+.corner-handle {
+  position: fixed;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 2px solid #dce9ee;
+  border-radius: 50%;
+  background: rgb(220 233 238 / 0.2);
+  cursor: move;
+  touch-action: none;
+  z-index: 10;
+}
+.corner-handle[hidden] {
   display: none;
 }

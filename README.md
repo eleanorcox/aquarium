@@ -61,6 +61,10 @@ The equation gives each fish its route. Its position is the route plus an offset
 
 The pointer can also attract or scatter every fish whatever its temperament, and a fast sweep startles them all. The strengths of these effects are in `src/core/steering.ts` and are first guesses.
 
+### Projector corner correction
+
+A projector that is not square-on to its surface throws a lopsided picture. In the panel's **Projector** section, tick **Adjust corners** and drag the four handles to where the picture's corners should be; the whole picture stretches to fit, keeping straight lines straight. The pointer and hands still land where the fish are drawn. The corners are remembered in this browser; **Reset corners** undoes them.
+
 ### Sharing a tank
 
 **Copy link to this tank** in the panel puts the tank's fish and settings into the address, compressed, and copies it. Opening the link shows the same tank in any browser, with no account or server. Links that are damaged or tampered with are refused with a reason.

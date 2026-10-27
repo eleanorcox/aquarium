@@ -24,19 +24,14 @@ export class Canvas2DRenderer {
 
   /** Matches the backing store to the element size. Returns the size of the screen area in pixels. */
   resize(): Size {
-    const { width, height } = this.canvas.getBoundingClientRect();
+    // The size as laid out, before any corner correction stretches it.
+    const [width, height] = [this.canvas.clientWidth, this.canvas.clientHeight];
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.canvas.width = Math.round(width * dpr);
     this.canvas.height = Math.round(height * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.screen = { width, height };
     return this.screen;
-  }
-
-  /** Converts a pointer position on the page to pixels from the canvas's top left corner. */
-  toCanvas(clientX: number, clientY: number): Vec2 {
-    const rect = this.canvas.getBoundingClientRect();
-    return { x: clientX - rect.left, y: clientY - rect.top };
   }
 
   /** The id of the fish nearest a tank position, if one is within `reach` tank units. */
