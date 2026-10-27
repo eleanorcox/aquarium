@@ -25,6 +25,8 @@ export interface SavedFish {
   formation?: number;
   species?: string;
   swimStyle?: string;
+  /** Where in the list of fish the first member of its school is, if it keeps to one. */
+  school?: number;
 }
 
 /** A tank's setup: its size, its fish and their settings, and the time, so routes carry on from where they were. */
@@ -55,6 +57,7 @@ export function saveTank(tank: Tank): SavedTank {
       curiosity: f.curiosity,
       drift: f.drift,
       schools: f.schools,
+      ...(f.school !== undefined ? { school: tank.fish.findIndex((g) => g.school === f.school) } : {}),
       ...(f.species && f.swimStyle ? { species: f.species, swimStyle: f.swimStyle } : {}),
       ...(f.formation !== undefined ? { formation: tank.fish.findIndex((g) => g.formation === f.formation) } : {}),
     })),
@@ -96,6 +99,8 @@ export function loadTank(data: unknown): Tank | string {
   fish.forEach((saved, i) => {
     const first = isObject(saved) ? saved.formation : undefined;
     if (isNumber(first) && Number.isInteger(first) && first >= 0 && first < fish.length) tank.joinFormation(tank.fish[i]!.id, tank.fish[first]!.id);
+    const school = isObject(saved) ? saved.school : undefined;
+    if (isNumber(school) && Number.isInteger(school) && school >= 0 && school < fish.length) tank.joinSchool(tank.fish[i]!.id, tank.fish[school]!.id);
   });
   return tank;
 }

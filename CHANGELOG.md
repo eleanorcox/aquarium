@@ -8,6 +8,9 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
+- A Colour schools scene (`?scene=colours`): six schools, each its own colour, circling apart. They only mix when you herd them into each other with the pointer or a hand, then drift home.
+- Each real species schools only with its own kind, so a sardine school no longer merges with passing tuna.
+
 - All fish, at the top of the Fish list: Motion and the Behaviour settings then change every fish at once. Only the setting moved is changed, so each fish keeps its others.
 
 - Phone layout: on a narrow screen the controls start hidden behind a Show controls button, and take the full width when shown. Any link with `?watch` also opens with the controls hidden, for just watching.

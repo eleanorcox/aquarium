@@ -49,6 +49,8 @@ export interface Fish {
   schools: boolean;
   /** The formation it belongs to, named by the id of the fish it was made from. Members share one equation. */
   formation?: number;
+  /** Which school it schools with, if it schools: only fish with the same school, or with none set, school together. */
+  school?: number;
   /** The real species it is, by its catalogue name, if it is one. */
   species?: string;
   /** How its body bends as it swims, by the biologists' name for the style, if known. Used only for drawing. */
@@ -206,6 +208,11 @@ export class Tank {
     Object.assign(this.get(id), { species, swimStyle });
   }
 
+  /** Puts a fish into a school, so it schools only with fish in the same school. */
+  joinSchool(id: number, school: number): void {
+    this.get(id).school = school;
+  }
+
   /** Puts a fish into a formation, as when a saved tank is loaded. */
   joinFormation(id: number, formation: number): void {
     this.get(id).formation = formation;
@@ -357,6 +364,7 @@ export class Tank {
           own = velocity;
           continue;
         }
+        if (other.school !== fish.school) continue;
         const dx = other.x - fish.x;
         const dy = other.y - fish.y;
         this.flocking.add(wrapsX ? unwrap(dx, this.width) : dx, wrapsY ? unwrap(dy, 1) : dy, velocity.x, velocity.y);

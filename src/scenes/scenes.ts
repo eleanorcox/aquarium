@@ -112,6 +112,25 @@ export const SCENES: Record<string, Scene> = {
       for (const fish of tank.fish) tank.setBehaviour(fish.id, { drift: 0.3, curiosity: -0.6, pathStrength: 0.5 });
     },
   },
+  colours: {
+    name: 'Colour schools',
+    lookFor: 'Six schools, each its own colour, each circling in its own part of the tank and never meeting on their own. Herd them into each other with the pointer or a hand and watch the colours mix, then drift home.',
+    settle: 3,
+    build(tank) {
+      // Six small circles in two rows, far enough apart that no fish sees another school unless pushed.
+      const hues = [0, 45, 120, 190, 265, 320];
+      hues.forEach((hue, g) => {
+        const params = { cx: 0.18 + 0.32 * (g % 3), cy: g < 3 ? 0.27 : 0.73, R: 0.09, w: (g % 2 ? -1 : 1) * (0.5 + 0.1 * g) };
+        for (let i = 0; i < 16; i++) {
+          const fish = tank.addFish('circle', params);
+          tank.setLook(fish.id, { hue });
+          tank.setFishSize(fish.id, 0.026);
+          // A loose hold on the route, so a hand can herd one school into another before they drift home.
+          tank.setBehaviour(fish.id, { schools: true, pathStrength: 0.25, drift: 0.4, curiosity: -0.7 });
+        }
+      });
+    },
+  },
   pacific: {
     name: 'Pacific (real fish)',
     lookFor: 'A real-fish tank of Pacific saltwater species: a sardine school, a group of yellowfin tuna and a pair of Moorish idols, each swimming and schooling in its own way.',

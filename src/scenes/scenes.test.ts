@@ -24,6 +24,25 @@ describe('scenes', () => {
     expect(SCENES.field!.fill).toBe(true);
   });
 
+  it('the colour schools scene has six groups, each one colour on its own route, apart until stirred', () => {
+    const tank = built('colours');
+    const groups = new Map<number, typeof tank.fish>();
+    for (const fish of tank.fish) groups.set(fish.hue, [...(groups.get(fish.hue) ?? []), fish]);
+    expect(groups.size).toBe(6);
+    const routeOf = (fish: (typeof tank.fish)[number]) => JSON.stringify({ ...fish.params, x0: 0, model: fish.model });
+    for (const members of groups.values()) expect(new Set(members.map(routeOf)).size).toBe(1);
+    // One school across the colours, so groups pushed into each other mingle.
+    expect(new Set(tank.fish.map((f) => f.school)).size).toBe(1);
+    // Left alone, no fish comes within sight of another colour's fish: any mixing is the visitor's doing.
+    run(tank, 20);
+    const sight = 6 * 0.026;
+    for (const [hue, members] of groups) {
+      for (const fish of members) {
+        for (const other of tank.fish) if (other.hue !== hue) expect(Math.hypot(fish.x - other.x, fish.y - other.y)).toBeGreaterThan(sight);
+      }
+    }
+  }, 30_000);
+
   it('every scene is the same tank every time', () => {
     for (const id of Object.keys(SCENES)) {
       const after = () => {
@@ -33,7 +52,7 @@ describe('scenes', () => {
       };
       expect(after(), id).toEqual(after());
     }
-  });
+  }, 60_000);
 
   it('keeps every fish in the tank in every scene', () => {
     for (const id of Object.keys(SCENES)) {

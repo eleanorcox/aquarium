@@ -76,6 +76,8 @@ export function addSpecies(tank: Tank, species: Species): number[] | string {
     tank.setFishSize(fish.id, sizeFor(species));
     tank.setLook(fish.id, { name: school ? `${species.commonName} ${k + 1}` : species.commonName, hue: species.hue });
     tank.setSpecies(fish.id, species.id, species.swimmingStyle);
+    // Each school keeps to its own kind and its own group, numbered by the first fish in it.
+    if (school) tank.joinSchool(fish.id, ids[0] ?? fish.id);
     tank.setBehaviour(fish.id, { curiosity: species.temperament, schools: school, drift: 0.4, pathStrength: school ? 0.3 : 0.5 });
     ids.push(fish.id);
   }

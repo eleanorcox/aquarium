@@ -66,6 +66,7 @@ Template:
 | [30](#30-the-display-window-only-draws) | The display window only draws | 27 Oct 2026 | Built |
 | [31](#31-the-page-loads-both-windows-code-up-front) | The page loads both windows' code up front | 27 Oct 2026 | Built |
 | [32](#32-real-species-are-data-and-tank-rules-are-checked-on-adding) | Real species are data, and tank rules are checked on adding | 27 Oct 2026 | Built |
+| [33](#33-schools-can-keep-to-their-own-kind) | Schools can keep to their own kind | 27 Oct 2026 | Built |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -403,3 +404,12 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 - **What follows from it:**
   - Cruising speed by style, school sizes and temperaments are game choices, not sourced; the species files say so field by field. Colours are chosen by eye and marked as such.
   - Species are drawn as coloured versions of the generic bent body until pictures exist.
+
+## 33. Schools can keep to their own kind
+
+- **Date:** 27 October 2026
+- **Status:** Built
+- **What prompted it:** Eleanor asked for a scene where each group of fish is a different colour, and then made clear that the colours should mix only because of her: when she stirs them, not on their own. Separately, real species had been schooling with any other schooling fish, so sardines could join passing tuna.
+- **Decision:** A fish may belong to a named school and then schools only with fish in the same school; fish with no school set school with each other, as before. Each real species arrives as its own school. The Colour schools scene leaves all its fish in one shared school but puts each colour on its own small route, far enough apart that no fish ever sees another colour's school unless pushed there. A test checks that over 20 seconds left alone.
+- **Alternatives considered:** Separate schools per colour, which would stop the colours mixing even when stirred. Crossing routes, which would mix the colours without Eleanor doing anything.
+- **What follows from it:** Mixing comes from people, and the loose hold on each fish's route slowly sorts the colours out again afterwards.

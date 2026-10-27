@@ -99,7 +99,7 @@ The **Real fish** section of the panel sets the tank to **Real species only** or
 
 ### Scenes
 
-Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `pacific` and `river` (real species), `whirlpool` (one formation of 48 fish), `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
+Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `colours` (six coloured schools that mix only when you stir them), `pacific` and `river` (real species), `whirlpool` (one formation of 48 fish), `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
 
 ### Your own equations
 

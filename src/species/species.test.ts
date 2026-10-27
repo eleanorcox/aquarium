@@ -77,6 +77,15 @@ describe('fish from species', () => {
     expect(new Set(Object.values(SPECIES).map((s) => s.hue)).size).toBe(Object.keys(SPECIES).length);
   });
 
+  it('each species schools with its own kind only', () => {
+    const tank = makeTank();
+    const sardines = addSpecies(tank, sardine) as number[];
+    const tunas = addSpecies(tank, tuna) as number[];
+    const school = (id: number) => tank.get(id).school;
+    expect(new Set(sardines.map(school)).size).toBe(1);
+    expect(school(sardines[0]!)).not.toBe(school(tunas[0]!));
+  });
+
   it('a school swims together and stays in the tank', () => {
     const tank = makeTank();
     addSpecies(tank, sardine);

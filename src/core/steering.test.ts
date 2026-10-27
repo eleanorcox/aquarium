@@ -339,6 +339,19 @@ describe('schooling', () => {
     expect(nearRight.x).toBeGreaterThan(WIDTH - 0.02);
   });
 
+  it('fish in different schools take no notice of each other; fish in the same school do', () => {
+    const tank = makeTank();
+    tank.setFlock(ONLY.cohesion);
+    const loner = at(tank, 0.8, 0.5);
+    for (const y of [0.45, 0.5, 0.55]) tank.joinSchool(at(tank, 1, y).id, 1);
+    tank.joinSchool(loner.id, 2);
+    run(tank, 1);
+    expect(strayed(loner)).toBe(0);
+    tank.joinSchool(loner.id, 1);
+    run(tank, 1);
+    expect(loner.x).toBeGreaterThan(0.8 + ON_ROUTE);
+  });
+
   it('a rule turned down to nothing has no effect', () => {
     const tank = makeTank();
     tank.setFlock({ separation: 0, alignment: 0, cohesion: 0 });
