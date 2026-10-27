@@ -25,6 +25,9 @@ export interface PanelElements {
   error: HTMLElement;
 }
 
+/** Stands for every fish at once in the Fish list. No fish has this id. */
+export const ALL_FISH = -1;
+
 const MODEL_OPTIONS = Object.fromEntries(Object.entries(MODEL_NAMES).map(([id, name]) => [name, id]));
 const POINTER_OPTIONS: Record<string, PointerMode> = {
   'Each fish decides': 'fish-decide',
@@ -89,17 +92,20 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
     .add(state, 'model', MODEL_OPTIONS)
     .name('Motion')
     .onChange((model: ModelId) => {
-      tank.setModel(controls.display.selected, model);
+      for (const id of chosen()) tank.setModel(id, model);
       buildParams();
     });
   const params = gui.addFolder('Parameters');
 
   const behaviourFolder = gui.addFolder('Behaviour');
-  const setBehaviour = () => tank.setBehaviour(controls.display.selected, behaviour);
-  behaviourFolder.add(behaviour, 'pathStrength', 0, 1, 0.01).name('Holds its route').onChange(setBehaviour);
-  behaviourFolder.add(behaviour, 'curiosity', -1, 1, 0.01).name('Shy ↔ curious').onChange(setBehaviour);
-  behaviourFolder.add(behaviour, 'drift', 0, 1, 0.01).name('Drift').onChange(setBehaviour);
-  behaviourFolder.add(behaviour, 'schools').name('Schools').onChange(setBehaviour);
+  // Only the setting moved is changed, so with All fish chosen every fish keeps its other settings.
+  const setBehaviour = (key: keyof typeof behaviour) => (value: number | boolean) => {
+    for (const id of chosen()) tank.setBehaviour(id, { [key]: value });
+  };
+  behaviourFolder.add(behaviour, 'pathStrength', 0, 1, 0.01).name('Holds its route').onChange(setBehaviour('pathStrength'));
+  behaviourFolder.add(behaviour, 'curiosity', -1, 1, 0.01).name('Shy ↔ curious').onChange(setBehaviour('curiosity'));
+  behaviourFolder.add(behaviour, 'drift', 0, 1, 0.01).name('Drift').onChange(setBehaviour('drift'));
+  behaviourFolder.add(behaviour, 'schools').name('Schools').onChange(setBehaviour('schools'));
 
   const actions = {
     addFish: () => {
@@ -108,8 +114,8 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
       else select(added);
     },
     removeFish: () => {
-      // The panel always shows one fish, so the last one stays.
-      if (tank.fish.length < 2) return;
+      // The panel always shows one fish, so the last one stays. With All fish chosen, nothing is removed.
+      if (tank.fish.length < 2 || allChosen()) return;
       tank.removeFish(controls.display.selected);
       select(tank.fish[0]!.id);
     },
@@ -150,6 +156,7 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   const formation = {
     size: 12,
     make: () => {
+      if (allChosen()) return;
       tank.makeFormation(controls.display.selected, formation.size);
       select(controls.display.selected);
     },
@@ -205,13 +212,31 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
     if (error === null) showEquation();
   });
 
+  function allChosen(): boolean {
+    return controls.display.selected === ALL_FISH;
+  }
+
+  /** The ids of the fish the panel is changing: the selected one, or every fish. */
+  function chosen(): number[] {
+    return allChosen() ? tank.fish.map((f) => f.id) : [controls.display.selected];
+  }
+
   function fishOptions(): Record<string, number> {
-    return Object.fromEntries(tank.fish.map((f) => [f.name, f.id]));
+    return { 'All fish': ALL_FISH, ...Object.fromEntries(tank.fish.map((f) => [f.name, f.id])) };
   }
 
   function buildParams(): void {
     // Empty the folder instead of replacing it, so it keeps its place in the panel.
     for (const controller of [...params.controllers]) controller.destroy();
+    if (allChosen()) {
+      // Fish on different paths have different settings, so path settings are only shown for one fish.
+      editButton.show(false);
+      el.editor.hidden = true;
+      el.error.hidden = true;
+      el.equation.hidden = false;
+      el.equation.textContent = `All ${tank.fish.length} fish\nMotion and Behaviour changes apply to every fish.`;
+      return;
+    }
     const fish = tank.get(controls.display.selected);
     for (const [key, spec] of Object.entries(paramSpecs(fish.model))) {
       params
@@ -235,6 +260,7 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   }
 
   function showEquation(): void {
+    if (allChosen()) return;
     const fish = tank.get(controls.display.selected);
     if (fish.model !== 'custom') el.equation.textContent = `${fish.name}\n${MODELS[fish.model].equation(fish.params)}`;
   }
@@ -242,7 +268,8 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   function select(id: number): void {
     controls.display.selected = id;
     state.fish = id;
-    const fish = tank.get(id);
+    // With All fish chosen, the controls start from the first fish's settings.
+    const fish = id === ALL_FISH ? tank.fish[0]! : tank.get(id);
     state.model = fish.model;
     Object.assign(behaviour, { pathStrength: fish.pathStrength, curiosity: fish.curiosity, drift: fish.drift, schools: fish.schools });
     fishController.options(fishOptions());

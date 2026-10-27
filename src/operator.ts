@@ -279,7 +279,8 @@ export async function startOperator(): Promise<void> {
       accumulator -= DT;
     }
     const drawStart = performance.now();
-    if (controls.follow) view.follow(tank.get(controls.display.selected));
+    const followed = tank.fish.find((f) => f.id === controls.display.selected);
+    if (controls.follow && followed) view.follow(followed);
     renderer.render(tank, view, controls.display);
     display.status = displayOpen() ? 'Open' : 'Not open';
     if (displayOpen()) {

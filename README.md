@@ -50,6 +50,8 @@ Each fish faces the way it is moving. y points down, as on screen.
 
 ### Behaviour
 
+Choose **All fish** at the top of the **Fish** list to change Motion or a Behaviour setting for every fish at once.
+
 The equation gives each fish its route. Its position is the route plus an offset, which a spring pulls back to zero, so a fish left alone is exactly on its route. Four settings per fish decide what moves it off:
 
 | Setting | Range | What it does |
