@@ -1,5 +1,6 @@
 import './style.css';
 import { MODELS, type BuiltinId } from './core/motion';
+import { decodeTank, encodeTank, loadTank, saveTank } from './core/save';
 import { Tank } from './core/tank';
 import { HandCamera } from './input/camera';
 import { HandInput } from './input/hands';
@@ -16,8 +17,20 @@ const canvas = document.querySelector<HTMLCanvasElement>('#tank')!;
 const $ = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector)!;
 
 const address = new URLSearchParams(location.search);
-const tank = new Tank();
-const scene = buildScene(tank, address.get('scene'));
+const link = { status: '' };
+
+/** The tank in the address if there is a good one, otherwise the scene named there, or the default scene. */
+async function startingTank(): Promise<{ tank: Tank; scene: string }> {
+  const shared = address.get('tank');
+  if (shared) {
+    const loaded = loadTank(await decodeTank(shared));
+    if (typeof loaded !== 'string') return { tank: loaded, scene: '' };
+    link.status = `Could not open the linked tank. ${loaded}`;
+  }
+  const tank = new Tank();
+  return { tank, scene: buildScene(tank, address.get('scene')) };
+}
+const { tank, scene } = await startingTank();
 
 // The tank has its own size. The view is this screen's window onto it.
 const renderer = new Canvas2DRenderer(canvas, createVisual(address.get('visuals')));
@@ -99,6 +112,8 @@ const controls = createPanel(tank, panelElements, {
   pointer,
   stats,
   hands: handsState,
+  link,
+  onCopyLink: () => void copyLink(),
   onHands: (on) => void setHands(on),
   reach,
   scene,
@@ -134,6 +149,19 @@ function showSpeed(stepMs: number, drawMs: number): void {
   stats.drawMs = smooth(stats.drawMs, drawMs);
   stats.fish = tank.fish.length;
   stats.drawn = fishInView(tank.fish, view, renderer.visual.reach).length;
+}
+
+/** Puts this tank, as it is now, into the address and copies the address to share. */
+async function copyLink(): Promise<void> {
+  address.delete('scene');
+  address.set('tank', await encodeTank(saveTank(tank)));
+  history.replaceState(null, '', `?${address}`);
+  try {
+    await navigator.clipboard.writeText(location.href);
+    link.status = 'Link copied';
+  } catch {
+    link.status = 'Link is in the address bar';
+  }
 }
 
 // H hides the panel and equation, for watching or recording the tank on its own.

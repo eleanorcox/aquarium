@@ -61,6 +61,7 @@ Template:
 | [25](#25-visual-modes-are-swappable-painters) | Visual modes are swappable painters | 27 Oct 2026 | Built |
 | [26](#26-hand-tracking-runs-from-files-in-the-project) | Hand tracking runs from files in the project | 27 Oct 2026 | Built |
 | [27](#27-swimming-and-schooling-follow-the-research) | Swimming and schooling follow the research | 27 Oct 2026 | Built |
+| [28](#28-a-tank-is-shared-as-a-link) | A tank is shared as a link | 27 Oct 2026 | Built |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -336,3 +337,15 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - Two tests had encoded the remembered values: that the swing grows steadily from the nose, and that a tuna is nearly still to halfway. Both now encode the measurements.
   - Schools pack a little more tightly, and a step of 500 schooling fish takes about 4.2 ms instead of 3.4 ms.
   - Still unsourced: trout and tuna envelopes, and cruising speeds by style. The survey lists open datasets, including the 44-species kinematics, from which per-species values could be read.
+
+## 28. A tank is shared as a link
+
+- **Date:** 27 October 2026
+- **Status:** Built
+- **What prompted it:** The first, server-free step of stage 5 in the [roadmap](roadmap.md), picked up while Eleanor was away because it needed no decisions from her.
+- **Decision:** A tank's setup (its width, the time, schooling strengths, and each fish's path, settings, name, colour and size) is saved as plain data, compressed, and written into the address as `?tank=...`. Loading checks every value: anything that is not a saved tank, an unknown path, a broken number, an equation that fails or tries to reach outside the maths, more than 2,000 fish, an empty tank or an impossible size is refused with a reason, and the page falls back to the default scene. Settings out of range are brought into range instead of refused.
+- **Alternatives considered:** Saving in the browser only, which cannot be shared. A server, which stage 5 will need for visitors' fish but which is not needed to share a tank.
+- **What follows from it:**
+  - A five-fish tank is a link of about 500 characters; 500 fish fit in under 20,000.
+  - Saved data has a version number, so a later format can still read old links.
+  - Where fish are at the moment of saving is not saved, only their routes and the time. Fish on routes carry on exactly; pushed, drifting and schooling fish start again from their routes.

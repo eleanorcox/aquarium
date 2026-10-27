@@ -10,6 +10,7 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 - Visual modes, chosen from Visuals in the panel or with `?visuals=name`: Classic (the original look), Natural (fish that bend as they swim, eel-like to tuna-like, in sunlit water) and Paper (ink fish on squared paper).
 - Press H to hide the panel and equation, for watching or recording the tank on its own.
+- Copy link to this tank, in the panel: the address then holds the whole tank, and opening it shows the same fish on the same routes. Broken or tampered links are refused with a reason.
 - Hands (webcam) in the panel: an open hand moves through the fish like the pointer, letting each fish decide, and a fist scatters them. Two hands work at once. A small mirrored preview shows what the camera sees. Works offline.
 
 - Fixed scenes: six named tanks that are the same every time, chosen from a Scene list in the panel or with `?scene=name` in the address.

@@ -45,6 +45,9 @@ export interface PanelOptions {
   /** Webcam hand tracking: whether it is on, and a line saying how it is going. */
   hands: { on: boolean; status: string };
   onHands: (on: boolean) => void;
+  /** Sharing this tank as a link, and a line saying how that went. */
+  link: { status: string };
+  onCopyLink: () => void;
   onAddFish: () => number;
 }
 
@@ -106,6 +109,8 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   gui.add(actions, 'removeFish').name('Remove fish');
 
   const tankFolder = gui.addFolder('Tank');
+  tankFolder.add({ copy: options.onCopyLink }, 'copy').name('Copy link to this tank');
+  tankFolder.add(options.link, 'status').name('Link').listen().disable();
   const visualOptions = Object.fromEntries(Object.entries(VISUALS).map(([id, v]) => [v.name, id]));
   tankFolder.add({ visual: options.visual }, 'visual', visualOptions).name('Visuals').onChange(options.onVisual);
   const sceneOptions = Object.fromEntries(Object.entries(SCENES).map(([id, s]) => [s.name, id]));

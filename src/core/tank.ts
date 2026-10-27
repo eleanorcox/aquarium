@@ -177,6 +177,11 @@ export class Tank {
     for (const fish of this.fish) fish.trail = [];
   }
 
+  /** Sets what a fish is called and its colour, as when a saved tank is loaded. */
+  setLook(id: number, look: { name?: string; hue?: number }): void {
+    Object.assign(this.get(id), look);
+  }
+
   setFishSize(id: number, size: number): void {
     this.get(id).size = size;
   }

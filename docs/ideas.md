@@ -250,6 +250,8 @@ In a personal aquarium, on a phone or saved, you make your own fish, and now and
 
 ### Save and share an aquarium
 
+*Link sharing built 27 October 2026.*
+
 - **Smallest version:** the whole tank written into the page's web address, so a link *is* the aquarium. No accounts, no server. Also remembered in the browser between visits.
 - **Later:** accounts and aquariums stored on a server, if links turn out not to be enough.
 

@@ -85,6 +85,8 @@ In two parts, with a purchase between them.
 
 ### Stage 5: visitors add fish
 
+*Status, 27 October 2026: saving a tank to a link is built (entry 28 in the decision log). The rest needs a hosted service.*
+
 Save and load tanks; a phone page for choosing a fish; the real-time service; then colouring on the phone; then paper scanning.
 
 - **Shows:** scan a code, make a fish, watch it swim in.

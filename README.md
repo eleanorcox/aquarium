@@ -61,6 +61,10 @@ The equation gives each fish its route. Its position is the route plus an offset
 
 The pointer can also attract or scatter every fish whatever its temperament, and a fast sweep startles them all. The strengths of these effects are in `src/core/steering.ts` and are first guesses.
 
+### Sharing a tank
+
+**Copy link to this tank** in the panel puts the tank's fish and settings into the address, compressed, and copies it. Opening the link shows the same tank in any browser, with no account or server. Links that are damaged or tampered with are refused with a reason.
+
 ### Hands
 
 Tick **Hands (webcam)** in the panel and allow the camera. Your hand moves through the tank like the pointer: an open hand lets each fish react in its own way, and a fist scatters them. The camera picture is flipped like a mirror and spread across the part of the tank on screen.

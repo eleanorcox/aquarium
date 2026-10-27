@@ -182,6 +182,8 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 
 ### Stage 5: visitors add fish
 
+*Saving is built; its tests are in [save.test.ts](../src/core/save.test.ts). "A tank saved by an older version still loads" waits for a second version of the format.*
+
 - A tank saved and loaded again produces identical fish positions after the same number of steps.
 - A tank survives the round trip through a web address.
 - A tank saved by an older version still loads.
