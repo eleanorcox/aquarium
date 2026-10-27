@@ -8,6 +8,9 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
+- Visual modes, chosen from Visuals in the panel or with `?visuals=name`: Classic (the original look), Natural (fish that bend as they swim, eel-like to tuna-like, in sunlit water) and Paper (ink fish on squared paper).
+- Press H to hide the panel and equation, for watching or recording the tank on its own.
+
 - Fixed scenes: six named tanks that are the same every time, chosen from a Scene list in the panel or with `?scene=name` in the address.
 - A tank can be bigger than the screen. Drag to move around it, zoom with the wheel or a pinch, or tick Follow selected fish.
 - A scene of 500 small fish in five schools.

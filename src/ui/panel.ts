@@ -3,6 +3,7 @@ import GUI from 'lil-gui';
 import { MODELS, MODEL_NAMES, paramSpecs, type ModelId } from '../core/motion';
 import type { Tank } from '../core/tank';
 import type { PointerInput, PointerMode } from '../input/pointer';
+import { VISUALS } from '../render/visuals';
 import { SCENES } from '../scenes/scenes';
 import type { Display } from '../render/canvas2d';
 
@@ -35,6 +36,9 @@ export interface PanelOptions {
   /** How far the pointer reaches, in pixels, so it feels the same at any zoom. */
   reach: { pixels: number };
   scene: string;
+  /** The visual mode in use, and what to do when another is chosen. */
+  visual: string;
+  onVisual: (id: string) => void;
   trails: boolean;
   /** Timings the page keeps up to date, shown read-only for judging speed by eye. */
   stats: Stats;
@@ -99,6 +103,8 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   gui.add(actions, 'removeFish').name('Remove fish');
 
   const tankFolder = gui.addFolder('Tank');
+  const visualOptions = Object.fromEntries(Object.entries(VISUALS).map(([id, v]) => [v.name, id]));
+  tankFolder.add({ visual: options.visual }, 'visual', visualOptions).name('Visuals').onChange(options.onVisual);
   const sceneOptions = Object.fromEntries(Object.entries(SCENES).map(([id, s]) => [s.name, id]));
   // Choosing a scene reloads the page with it in the address, so the address always names what is on screen.
   tankFolder

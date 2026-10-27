@@ -34,7 +34,7 @@ Decisions that shape the plan. Roughly in order of how much they change it.
 16. **In a real-fish tank, how fixed are the routes?** Real and made-up fish are now separate tank settings (see [ideas.md](ideas.md#real-fish-and-made-up-fish)), so a tuna on a rose curve belongs to made-up. Still open: whether a real tank lets you edit a species' route at all.
 17. **Do predators chase prey?** It makes a tank livelier and gives schools a reason to move, but visitors may not enjoy watching their fish be hunted.
 
-18. **Side-on swimming: honest or stylised?** A real fish's bend barely shows from the side. Either the tail narrows and widens as it swings, or the body visibly ripples as in most 2D games. To be judged by eye in stage 3.
+18. **Side-on swimming: honest or stylised?** A real fish's bend barely shows from the side. Natural mode does the stylised version for now, with the body visibly rippling. The honest version, where the tail narrows and widens as it swings, could be a second visual mode to compare.
 19. **Does curiosity wear off?** A fish that has come to look at a hand could lose interest after a while, or stay as long as the hand does.
 
 ## Visitors and their fish

@@ -1,5 +1,5 @@
 // Fixed scenes: named tanks that are the same every time, for judging by eye how a change looks and feels.
-// Open one with ?scene=name in the address.
+// Open one with ?scene=name in the address, and add &visuals=name to see it in a particular look.
 import { MODELS, type BuiltinId } from '../core/motion';
 import type { Tank } from '../core/tank';
 

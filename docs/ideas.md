@@ -268,6 +268,10 @@ Open your aquarium on your phone and just watch.
 - **Smallest version:** a layout with no panel that works in portrait, opened from a saved link. A small tank fits whole; a large one is watched by following a fish or dragging around.
 - **Needs:** any screen size, above.
 
+### Visual modes
+
+*Built 27 October 2026: Classic, Natural and Paper.* A visual mode is a complete look for the tank, chosen per screen and switchable while the fish swim. Further candidates: a deep-sea look with glowing creatures (suits projection), an illustrated look from Eleanor's drawings, a WebGL look with light rippling through the water.
+
 ### Illustrated fish
 
 Eleanor draws fish on paper; they are digitised and swim.

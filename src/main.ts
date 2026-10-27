@@ -5,6 +5,7 @@ import { PointerInput } from './input/pointer';
 import { ViewGestures } from './input/viewGestures';
 import { Canvas2DRenderer } from './render/canvas2d';
 import { fishInView } from './render/drawList';
+import { createVisual } from './render/visuals';
 import { View } from './render/view';
 import { SCENES, buildScene } from './scenes/scenes';
 import { createPanel } from './ui/panel';
@@ -12,11 +13,12 @@ import { createPanel } from './ui/panel';
 const canvas = document.querySelector<HTMLCanvasElement>('#tank')!;
 const $ = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector)!;
 
+const address = new URLSearchParams(location.search);
 const tank = new Tank();
-const scene = buildScene(tank, new URLSearchParams(location.search).get('scene'));
+const scene = buildScene(tank, address.get('scene'));
 
 // The tank has its own size. The view is this screen's window onto it.
-const renderer = new Canvas2DRenderer(canvas);
+const renderer = new Canvas2DRenderer(canvas, createVisual(address.get('visuals')));
 const view = new View(tank, renderer.resize(), tank.typicalFishSize());
 new ResizeObserver(() => view.setScreen(renderer.resize())).observe(canvas);
 
@@ -69,6 +71,13 @@ const controls = createPanel(tank, panelElements, {
   stats,
   reach,
   scene,
+  visual: renderer.visual.id,
+  onVisual: (id) => {
+    renderer.visual = createVisual(id);
+    // The address names what is on screen, so a link opens the same scene in the same look.
+    address.set('visuals', id);
+    history.replaceState(null, '', `?${address}`);
+  },
   trails: SCENES[scene]?.trails ?? true,
   onAddFish: () => {
     const ids = Object.keys(MODELS) as BuiltinId[];
@@ -93,8 +102,14 @@ function showSpeed(stepMs: number, drawMs: number): void {
   stats.stepMs = smooth(stats.stepMs, stepMs);
   stats.drawMs = smooth(stats.drawMs, drawMs);
   stats.fish = tank.fish.length;
-  stats.drawn = fishInView(tank.fish, view).length;
+  stats.drawn = fishInView(tank.fish, view, renderer.visual.reach).length;
 }
+
+// H hides the panel and equation, for watching or recording the tank on its own.
+window.addEventListener('keydown', (e) => {
+  const typing = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
+  if (e.key.toLowerCase() === 'h' && !typing && !e.metaKey && !e.ctrlKey) document.body.classList.toggle('bare');
+});
 
 // Fixed timestep: the simulation advances in equal 1/60 s steps whatever the screen's refresh rate,
 // so a fish follows exactly the same path on a laptop, a 144 Hz monitor or a projector.

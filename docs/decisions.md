@@ -58,6 +58,7 @@ Template:
 | [22](#22-tank-units-stay-tank-heights) | Tank units stay tank heights | 13 Oct 2026 | Built; refines 11 |
 | [23](#23-behaviour-is-measured-in-fish-sizes) | Behaviour is measured in fish sizes | 13 Oct 2026 | Built |
 | [24](#24-canvas-2d-stays-until-drawing-is-measured-on-a-real-screen) | Canvas 2D stays until drawing is measured on a real screen | 13 Oct 2026 | Decided; settles the timing left open in 14 for now |
+| [25](#25-visual-modes-are-swappable-painters) | Visual modes are swappable painters | 27 Oct 2026 | Built |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -291,3 +292,17 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
 - **What follows from it:**
   - 2,000 schooling fish is out of reach for the simulation as it stands. Fish in a dense school all see each other, so the work still grows with the square of the school's size. The usual cure is for each fish to attend only to its nearest few schoolmates. Not needed for hundreds.
   - `npm run speed` reports these timings, to compare before and after changes to the simulation.
+
+## 25. Visual modes are swappable painters
+
+- **Date:** 27 October 2026
+- **Status:** Built
+- **What prompted it:** Eleanor wanted to test different visuals side by side, calling the existing look Classic mode.
+- **Decision:** A visual mode decides everything about how the tank looks: the water, the fish, their trails and the ring around the pointer. It is chosen per screen, from the panel or with `?visuals=name`, and can be switched while the fish swim. The renderer keeps everything that is not about looks: the view, zoom, and which fish are on screen. Three modes to start: Classic (unchanged), Natural (fish that bend as they swim) and Paper (ink fish on squared paper).
+- **Alternatives considered:**
+  - *One renderer with settings for colours and shapes.* Fine for small changes, but a new look such as illustrated fish or WebGL needs different code, not different settings.
+  - *Calling them themes.* Kept "visual modes" as Eleanor named them, always with "visual" in front, because "mode" already means equation, interactive and phone mode in these docs.
+- **What follows from it:**
+  - Stage 3's comparison of drawn and generated fish becomes a matter of adding visual modes.
+  - A WebGL renderer can arrive as visual modes of its own, one at a time, beside the Canvas 2D ones.
+  - Natural pulls part of stage 3 forward: the body-wave equation is built and tested, side-on swimming is drawn in the stylised way for now (the body visibly ripples), and until there are species each fish's swimming style comes from its id.

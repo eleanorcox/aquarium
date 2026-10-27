@@ -33,7 +33,7 @@ Fish steer towards their path instead of being placed on it; curious fish approa
 
 ### Stage 1b: a tank bigger than the screen
 
-*Status, 13 October 2026: built and tested on the `stage-1b-tank-and-view` branch. Not yet judged by eye. The simulation handles 500 fish comfortably; drawing speed still needs reading off a real screen.*
+*Status, 27 October 2026: built, tested and merged. Not yet judged by eye. The simulation handles 500 fish comfortably; drawing speed still needs reading off a real screen.*
 
 The tank gets its own size; the screen becomes a movable, zoomable window onto it. Then a 500-fish test tank.
 
@@ -49,6 +49,8 @@ The laptop webcam tracks hands and they drive the same behaviour as the mouse.
 - **Decides:** which gestures feel natural, and whether camera lag is acceptable.
 
 ### Stage 3: a first look (alongside stages 1 and 2)
+
+*Status, 27 October 2026: begun early. Visual modes exist (Classic, Natural, Paper), and Natural bends fish with the body-wave equation. Still to come: real drawings, and the research survey's corrections to the swimming values.*
 
 One of Eleanor's drawings digitised and swimming, and one generated fish, side by side. Both are real species and bend with the body-wave equation, so this stage is also the first test of natural swimming.
 

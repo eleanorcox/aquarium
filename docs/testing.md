@@ -96,6 +96,8 @@ The scenes are in [scenes.ts](../src/scenes/scenes.ts), each with a note on what
 
 Tests check that every scene is the same tank each time and keeps its fish inside the tank. A new scene is covered by those tests as soon as it is added.
 
+Visual modes are checked the same way from the other side: a test draws every scene in every visual mode onto a stand-in canvas and fails if any drawing call receives a number that is not a real number, which is how broken bending geometry shows up. It cannot tell whether a look is good; that is by eye, with `?scene=name&visuals=name`.
+
 ## Test rules
 
 - Tests sit beside the code they test, as `name.test.ts`.
@@ -150,6 +152,8 @@ These are the behaviours to write tests for first, not a complete list. Each is 
 - Two hands give two influences.
 
 ### Stage 3: a first look
+
+*Partly built: the body-wave tests are in [swimming.test.ts](../src/render/swimming.test.ts).*
 
 - The body wave is smallest at the head and largest at the tail.
 - The eel preset bends along its whole length; the tuna preset stays nearly straight until the tail.

@@ -139,6 +139,6 @@ None of these is needed for pointer, flocking, webcam hands, projection, graphic
 
 ## Rendering
 
-- Canvas 2D is enough for now and for simple illustrated fish.
-- Bending an illustration as it swims, water effects and 3D all point to WebGL. Three.js is already the plan in the [README](../README.md) and can draw flat illustrated fish as well as 3D ones, so one WebGL renderer could serve both.
-- Decide after the first graphics experiment, not before.
+- [paint.ts](../src/render/paint.ts) paints a frame through the view: margin, clip to the tank, then hands the drawing to the visual mode. It has no access to the page, so tests can drive it.
+- **Visual modes** ([src/render/visuals/](../src/render/visuals/)) each draw the water, fish, trails and pointer ring their own way. Classic is the original look; Natural and Paper bend fish using [swimming.ts](../src/render/swimming.ts) and the shared body shape in [body.ts](../src/render/visuals/body.ts). See [decisions.md](decisions.md), entry 25.
+- Canvas 2D is still the only renderer. WebGL is expected to arrive as visual modes of its own; when depends on the draw times in the panel's Speed section (entry 24).
