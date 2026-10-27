@@ -19,6 +19,8 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Changed
 
+- Natural mode's swimming uses published measurements of real fish: the head moves a little, eels carry more than one wave along their bodies and tuna less than one.
+- Schooling fish follow their three nearest schoolmates, as real fish do, instead of everyone in sight.
 - The tank keeps its own shape, 16:9 by default, instead of taking the shape of the window. A window of another shape shows a dark margin.
 - Small fish school more tightly and drift less, in proportion to their size.
 - The pointer's reach is set in pixels and feels the same at any zoom.

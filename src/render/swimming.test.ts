@@ -5,12 +5,18 @@ const IDS = Object.keys(STYLES) as SwimStyleId[];
 const along = (steps: number) => Array.from({ length: steps + 1 }, (_, i) => i / steps);
 
 describe('the body wave', () => {
-  it('is smallest at the head and grows all the way to the tail, in every style', () => {
+  it('swings most at the tail and least in the front part of the body, in every style', () => {
+    // Measured fish turn about a pivot near the front, so the head moves a little more than the point behind it.
     for (const id of IDS) {
       const sizes = along(20).map((s) => envelope(STYLES[id], s));
-      for (let i = 1; i < sizes.length; i++) expect(sizes[i]!, id).toBeGreaterThanOrEqual(sizes[i - 1]!);
-      expect(sizes[0]!, id).toBeLessThan(sizes[20]!);
+      expect(Math.max(...sizes), id).toBe(sizes[20]);
+      expect(sizes.indexOf(Math.min(...sizes)), id).toBeLessThanOrEqual(8);
+      for (const size of sizes) expect(size, id).toBeGreaterThan(0);
     }
+  });
+
+  it('swings about a tenth of a body length either way at the tail, as measured across many species', () => {
+    for (const id of IDS) expect(envelope(STYLES[id], 1), id).toBeCloseTo(0.1, 2);
   });
 
   it('never swings further than the style allows', () => {
@@ -24,9 +30,14 @@ describe('the body wave', () => {
   it('an eel bends along its whole length; a tuna stays nearly straight until the tail', () => {
     const halfway = (id: SwimStyleId) => envelope(STYLES[id], 0.5) / envelope(STYLES[id], 1);
     expect(halfway('anguilliform')).toBeGreaterThan(0.5);
-    expect(halfway('thunniform')).toBeLessThan(0.1);
+    expect(halfway('thunniform')).toBeLessThan(0.2);
     expect(halfway('subcarangiform')).toBeGreaterThan(halfway('carangiform'));
     expect(halfway('carangiform')).toBeGreaterThan(halfway('thunniform'));
+  });
+
+  it('has more than one wave along an eel and less than one along a tuna', () => {
+    expect(STYLES.anguilliform.wavelength).toBeLessThan(1);
+    expect(STYLES.thunniform.wavelength).toBeGreaterThan(1);
   });
 
   it('travels from head to tail', () => {

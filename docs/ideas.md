@@ -186,6 +186,7 @@ Find out what equations and data exist before designing anything.
   - Schooling has its own models: Reynolds's boids, and Couzin's zones model, where a fish avoids neighbours that are very close, lines up with those at middle distance and moves towards those further away.
 - **Not yet known:** whether there are open motion-capture or tracking datasets of real fish paths that could be replayed or learned from. Needs a proper search.
 - **Smallest version:** a short written survey in this folder, with sources, ending in a list of what is usable.
+- **Done 27 October 2026:** [research/fish-motion.md](research/fish-motion.md). Applied to the code as described in entry 27 of the decision log.
 
 ### Natural swimming (body motion)
 

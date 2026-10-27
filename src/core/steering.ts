@@ -93,8 +93,14 @@ const ALIGNMENT_FORCE = 2;
 const COHESION_FORCE = 4;
 
 /**
- * The three schooling rules for one fish: keep clear of schoolmates that are too close, match the
- * average heading of those in sight, and move towards their middle.
+ * How many of its nearest schoolmates a fish lines up with and moves towards. Studies of real fish find
+ * they react to one to three neighbours, not to everyone in sight (docs/research/fish-motion.md).
+ */
+export const NEIGHBOURS = 3;
+
+/**
+ * The three schooling rules for one fish: keep clear of any schoolmate that is too close, match the
+ * heading of its nearest few in sight, and move towards their middle.
  * Distances scale with the fish's `size`, so small fish school more tightly than large ones.
  *
  * A fish in a large school has hundreds of schoolmates in sight, so this is the busiest loop in the
@@ -104,47 +110,61 @@ export class Flock {
   private sight = 0;
   private personalSpace = 0;
   private tiebreak = 0;
-  private inSight = 0;
   private pushX = 0;
   private pushY = 0;
-  private sumDx = 0;
-  private sumDy = 0;
-  private sumVx = 0;
-  private sumVy = 0;
+  /** The nearest schoolmates so far, nearest first: squared distance, offset and velocity, five numbers each. */
+  private count = 0;
+  private near = new Float64Array(NEIGHBOURS * 5);
 
   /** Starts again for a fish of this size. `tiebreak` is an angle unique to the fish, used to part fish in exactly the same place. */
   start(size: number, tiebreak: number): void {
     this.sight = SIGHT * size;
     this.personalSpace = PERSONAL_SPACE * size;
     this.tiebreak = tiebreak;
-    this.inSight = this.pushX = this.pushY = this.sumDx = this.sumDy = this.sumVx = this.sumVy = 0;
+    this.count = this.pushX = this.pushY = 0;
   }
 
   /** Takes account of one schoolmate: `dx`, `dy` point from the fish to it, and `vx`, `vy` is its velocity. */
   add(dx: number, dy: number, vx: number, vy: number): void {
-    const distanceSquared = dx * dx + dy * dy;
-    if (distanceSquared >= this.sight * this.sight) return;
-    this.inSight++;
-    this.sumDx += dx;
-    this.sumDy += dy;
-    this.sumVx += vx;
-    this.sumVy += vy;
-    if (distanceSquared < this.personalSpace * this.personalSpace) {
-      const distance = Math.sqrt(distanceSquared);
+    const d2 = dx * dx + dy * dy;
+    if (d2 >= this.sight * this.sight) return;
+    // Anything too close is pushed away from, whether or not it is one of the nearest few.
+    if (d2 < this.personalSpace * this.personalSpace) {
+      const distance = Math.sqrt(d2);
       const push = SEPARATION_FORCE * (1 - distance / this.personalSpace);
       this.pushX -= (distance === 0 ? Math.cos(this.tiebreak) : dx / distance) * push;
       this.pushY -= (distance === 0 ? Math.sin(this.tiebreak) : dy / distance) * push;
     }
+    // Keep the nearest few, nearest first, by sliding further ones down the list.
+    const near = this.near;
+    if (this.count === NEIGHBOURS && d2 >= near[(NEIGHBOURS - 1) * 5]!) return;
+    let slot = Math.min(this.count, NEIGHBOURS - 1);
+    while (slot > 0 && near[(slot - 1) * 5]! > d2) {
+      near.copyWithin(slot * 5, (slot - 1) * 5, slot * 5);
+      slot--;
+    }
+    near.set([d2, dx, dy, vx, vy], slot * 5);
+    this.count = Math.min(this.count + 1, NEIGHBOURS);
   }
 
   /** The resulting push on the fish, given its own velocity and how strongly each rule applies. */
   force(velocityX: number, velocityY: number, rules: FlockRules): Vec2 {
     const force = { x: rules.separation * this.pushX, y: rules.separation * this.pushY };
-    if (this.inSight === 0) return force;
-    force.x += rules.alignment * ALIGNMENT_FORCE * (this.sumVx / this.inSight - velocityX);
-    force.y += rules.alignment * ALIGNMENT_FORCE * (this.sumVy / this.inSight - velocityY);
-    force.x += (rules.cohesion * COHESION_FORCE * this.sumDx) / this.inSight;
-    force.y += (rules.cohesion * COHESION_FORCE * this.sumDy) / this.inSight;
+    if (this.count === 0) return force;
+    let dx = 0;
+    let dy = 0;
+    let vx = 0;
+    let vy = 0;
+    for (let i = 0; i < this.count; i++) {
+      dx += this.near[i * 5 + 1]!;
+      dy += this.near[i * 5 + 2]!;
+      vx += this.near[i * 5 + 3]!;
+      vy += this.near[i * 5 + 4]!;
+    }
+    force.x += rules.alignment * ALIGNMENT_FORCE * (vx / this.count - velocityX);
+    force.y += rules.alignment * ALIGNMENT_FORCE * (vy / this.count - velocityY);
+    force.x += (rules.cohesion * COHESION_FORCE * dx) / this.count;
+    force.y += (rules.cohesion * COHESION_FORCE * dy) / this.count;
     return force;
   }
 }

@@ -60,6 +60,7 @@ Template:
 | [24](#24-canvas-2d-stays-until-drawing-is-measured-on-a-real-screen) | Canvas 2D stays until drawing is measured on a real screen | 13 Oct 2026 | Decided; settles the timing left open in 14 for now |
 | [25](#25-visual-modes-are-swappable-painters) | Visual modes are swappable painters | 27 Oct 2026 | Built |
 | [26](#26-hand-tracking-runs-from-files-in-the-project) | Hand tracking runs from files in the project | 27 Oct 2026 | Built |
+| [27](#27-swimming-and-schooling-follow-the-research) | Swimming and schooling follow the research | 27 Oct 2026 | Built |
 
 Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come from the commit history and their reasons from the commit messages and the [README](../README.md) as they stood; they were not recorded at the time.
 
@@ -320,3 +321,18 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - A built site is about 46 MB, mostly the three runtime versions. One of them, the "module" version, is probably unused and could be left out of the build.
   - The package is Apache-2.0. The model's licence has not been confirmed from a source; check the model card before publishing the repository or the site.
   - Headless test browsers here cannot open a camera, so camera start-up is checked by hand. The step that turns tracking points into influences is tested.
+
+## 27. Swimming and schooling follow the research
+
+- **Date:** 27 October 2026
+- **Status:** Built
+- **What prompted it:** The sourced survey in [research/fish-motion.md](research/fish-motion.md), written by a research subagent and checked here against its main sources (Di Santo et al. 2021, 44 species; Seo et al. 2025; Couzin et al. 2002). Several values in the code had been written from memory.
+- **Decision:**
+  - *Body wave.* Envelopes are now polynomials with a constant term, so the head moves a little and the least movement is about a quarter of the way back, as in measured fish. Eel and mackerel envelopes come from published fits; trout and tuna remain unsourced and are marked so. Wavelengths are the 44-species medians: eel-like 0.75, trout-like 0.93, mackerel-like 1.0, tuna-like 1.14 body lengths. The tail swings 0.1 body lengths either way in every style.
+  - *Tail beat.* Unchanged: it already matched Bainbridge's measured line at 3 body lengths a second, and the survey confirms the Strouhal number it uses. Below about 2.75 body lengths a second the measured line is not valid, so the slow beat of a still fish stays a choice.
+  - *Schooling.* A fish lines up with and moves towards its three nearest schoolmates, not everyone in sight. Studies of fish find they react to one to three neighbours; the "seven nearest" figure often quoted comes from starlings. Fish still keep clear of anyone too close.
+- **Alternatives considered:** Keeping the remembered values, which were close but wrong in the details the survey corrected. Following one or two neighbours, which is closer to some studies but risks schools splitting in a small tank.
+- **What follows from it:**
+  - Two tests had encoded the remembered values: that the swing grows steadily from the nose, and that a tuna is nearly still to halfway. Both now encode the measurements.
+  - Schools pack a little more tightly, and a step of 500 schooling fish takes about 4.2 ms instead of 3.4 ms.
+  - Still unsourced: trout and tuna envelopes, and cruising speeds by style. The survey lists open datasets, including the 44-species kinematics, from which per-species values could be read.

@@ -272,6 +272,22 @@ describe('schooling', () => {
     expect(Math.cos(fish.heading)).toBeGreaterThan(0.9);
   });
 
+  it('a schooling fish follows its nearest few neighbours, not everyone in sight', () => {
+    // Real fish react to their one to three nearest neighbours. Three close by swim right; five further off, still in sight, swim left.
+    const tank = makeTank();
+    tank.setFlock(ONLY.alignment);
+    const fish = at(tank, 0.8, 0.5);
+    for (const y of [0.42, 0.58]) swimmer(tank, 0.78, y);
+    swimmer(tank, 0.88, 0.5);
+    for (const [dx, dy] of [[-0.2, 0], [0.2, 0.05], [0, 0.2], [0.05, -0.2], [-0.14, -0.14]] as const) {
+      const away = tank.addFish('sine', { A: 0, v: -0.2, y0: 0.5 + dy, x0: (0.8 + dx) / WIDTH });
+      tank.setBehaviour(away.id, { schools: true });
+      tank.setFishSize(away.id, REFERENCE_SIZE);
+    }
+    run(tank, 0.3);
+    expect(Math.cos(fish.heading)).toBeGreaterThan(0.5);
+  });
+
   it('a schooling fish apart from its group moves towards it', () => {
     const tank = makeTank();
     tank.setFlock(ONLY.cohesion);
