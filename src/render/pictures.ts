@@ -16,6 +16,11 @@ export class PictureStore {
     this.images.set(id, image);
   }
 
+  /** The coloured-in picture kept under this id, as the data address it arrived as, to pass on to a display window. */
+  dataUrl(id: string): string | undefined {
+    return this.images.get(id)?.src;
+  }
+
   remove(id: string): void {
     this.images.delete(id);
   }

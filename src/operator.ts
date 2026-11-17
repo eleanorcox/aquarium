@@ -10,7 +10,8 @@ import { Canvas2DRenderer } from './render/canvas2d';
 import { fishInView } from './render/drawList';
 import { createVisual } from './render/visuals';
 import { View } from './render/view';
-import { CHANNEL, isDisplayMessage, packFrame } from './display/frames';
+import { CHANNEL, isDisplayMessage, packFrame, packLooks } from './display/frames';
+import { PICTURES } from './render/pictures';
 import type { Influence } from './core/steering';
 import { SCENES, buildScene } from './scenes/scenes';
 import { addMadeUpGroup } from './species/stock';
@@ -69,8 +70,16 @@ export async function startOperator(): Promise<void> {
   // A display window on a projector, if one is open. It reports which part of the tank it shows and any touches.
   const displayChannel = new BroadcastChannel(CHANNEL);
   const display = { status: 'Not open', area: null as { x: number; y: number; width: number; height: number } | null, heard: -Infinity, touch: null as Influence | null };
+  // What the display window has been sent of visitor fish's looks and pictures, so each is sent only once.
+  let sentLooks = '';
+  const sentPictures = new Set<string>();
   displayChannel.addEventListener('message', (e: MessageEvent<unknown>) => {
     if (!isDisplayMessage(e.data)) return;
+    // A window saying hello has just opened, or reopened, and has none of them.
+    if (e.data.type === 'hello') {
+      sentLooks = '';
+      sentPictures.clear();
+    }
     display.heard = seconds();
     if (e.data.type === 'shown') display.area = e.data.area;
     if (e.data.type === 'pointer') display.touch = e.data.influence;
@@ -290,6 +299,18 @@ export async function startOperator(): Promise<void> {
     renderer.render(tank, view, controls.display);
     display.status = displayOpen() ? 'Open' : 'Not open';
     if (displayOpen()) {
+      const looks = packLooks(tank);
+      const signature = JSON.stringify(looks.looks);
+      if (signature !== sentLooks) {
+        sentLooks = signature;
+        displayChannel.postMessage(looks);
+        for (const { picture } of looks.looks) {
+          const dataUrl = picture === undefined || sentPictures.has(picture) ? undefined : PICTURES.dataUrl(picture);
+          if (picture === undefined || dataUrl === undefined) continue;
+          sentPictures.add(picture);
+          displayChannel.postMessage({ type: 'picture', id: picture, dataUrl });
+        }
+      }
       displayChannel.postMessage(packFrame(tank, { visual: renderer.visual.id, fill: SCENES[scene]?.fill ?? false, selected: controls.display.selected, trails: false }));
     }
     showSpeed(drawStart - stepStart, performance.now() - drawStart);

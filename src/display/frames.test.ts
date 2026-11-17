@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { buildScene } from '../scenes/scenes';
 import { Tank } from '../core/tank';
 import { run } from '../core/testing';
-import { isDisplayMessage, isFrameMessage, packFrame, unpackFrame } from './frames';
+import { isDisplayMessage, isFrameMessage, isLooksMessage, isPictureMessage, lookMap, packFrame, packLooks, unpackFrame } from './frames';
+import { addVisitorFish } from '../visitors/arrive';
 
 const details = { visual: 'natural', fill: true, selected: 3, trails: false };
 
@@ -54,5 +55,30 @@ describe('recognising messages between the windows', () => {
     for (const junk of [null, 'frame', { type: 'frame' }, { type: 'shown' }, { type: 'pointer' }, { type: 'nope' }]) {
       expect(isFrameMessage(junk) || isDisplayMessage(junk)).toBe(false);
     }
+  });
+});
+
+describe('visitor fish looks for the display window', () => {
+  it('are sent for visitor fish only, with their outline, colours, pattern and picture id', () => {
+    const tank = new Tank();
+    tank.addFish('sine');
+    const id = addVisitorFish(tank, { version: 1, name: 'Dot', outline: 'tall', hues: [10, 250], pattern: 'coloured', temperament: 0 }, 'picture-3');
+    expect(packLooks(tank)).toEqual({ type: 'looks', looks: [{ id, outline: 'tall', secondHue: 250, pattern: 'coloured', picture: 'picture-3', swimStyle: 'carangiform' }] });
+  });
+
+  it('are put back on the fish as the display window unpacks each frame', () => {
+    const tank = new Tank();
+    tank.addFish('sine');
+    const id = addVisitorFish(tank, { version: 1, name: 'Dot', outline: 'round', hues: [10, 250], pattern: 'spots', temperament: 0 });
+    const drawn = unpackFrame(packFrame(tank, { visual: 'classic', fill: false, selected: 0, trails: false }), lookMap(packLooks(tank)));
+    expect(drawn.fish.find((f) => f.id === id)).toMatchObject({ outline: 'round', secondHue: 250, pattern: 'spots', hue: 10 });
+    expect(drawn.fish.find((f) => f.id !== id)!.outline).toBeUndefined();
+  });
+
+  it('are only accepted in the shape they are sent in, as are pictures', () => {
+    expect(isLooksMessage({ type: 'looks', looks: [] })).toBe(true);
+    expect(isLooksMessage({ type: 'looks', looks: 'x' })).toBe(false);
+    expect(isPictureMessage({ type: 'picture', id: 'p', dataUrl: 'data:image/png;base64,AA' })).toBe(true);
+    expect(isPictureMessage({ type: 'picture', id: 'p', dataUrl: 'javascript:alert(1)' })).toBe(false);
   });
 });
