@@ -2,6 +2,8 @@
 import type { Tank } from '../core/tank';
 import type { VisitorFish } from './visitorFish';
 
+/** How each outline swims: slim fish ripple more of their body, deep ones mostly their tails. */
+const SWIM_STYLES = { slim: 'subcarangiform', round: 'carangiform', tall: 'carangiform' } as const;
 /** A visitor's fish is drawn at least this big, so they can find it. */
 const SMALLEST = 0.035;
 /** How far in from the side a visitor's fish starts, as a fraction of the tank's width. */
@@ -25,6 +27,7 @@ export function addVisitorFish(tank: Tank, visitor: VisitorFish, pictureId?: str
     outline: visitor.outline,
     pattern: visitor.pattern,
     visitor: true,
+    swimStyle: SWIM_STYLES[visitor.outline],
     ...(pictureId !== undefined ? { picture: pictureId } : {}),
   });
   tank.setFishSize(fish.id, Math.max(SMALLEST, tank.typicalFishSize()));

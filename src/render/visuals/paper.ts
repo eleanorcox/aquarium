@@ -6,6 +6,7 @@ import { traceTrail } from '../paint';
 import { BODY_LENGTH, Swimmers, faceFish, tracePolygon } from './body';
 import { drawHand } from './marks';
 import type { Frame, Visual } from './types';
+import { drawVisitorFish } from './visitor';
 
 const INK = '#1d2b4f';
 
@@ -48,7 +49,9 @@ export class Paper implements Visual {
     ctx.setLineDash([]);
   }
 
-  fish({ ctx, scale }: Frame, fish: DrawnFish, selected: boolean): void {
+  fish(frame: Frame, fish: DrawnFish, selected: boolean): void {
+    if (drawVisitorFish(frame, fish, this.swimmers, { selected, ring: INK })) return;
+    const { ctx, scale } = frame;
     const body = this.swimmers.bodyOf(fish, scale);
     ctx.save();
     faceFish(ctx, fish, scale);

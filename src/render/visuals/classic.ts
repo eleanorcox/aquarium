@@ -2,13 +2,22 @@
 import type { Influence } from '../../core/steering';
 import type { DrawnFish } from '../drawn';
 import { traceTrail } from '../paint';
+import { BODY_LENGTH, Swimmers } from './body';
 import { drawHand } from './marks';
+import { drawVisitorFish } from './visitor';
 import type { Frame, Visual } from './types';
 
 export class Classic implements Visual {
   readonly id = 'classic';
   readonly margin = '#02080d';
-  readonly reach = 2.2;
+  // As far as a visitor fish's picture reaches; Classic's own fish are shorter.
+  readonly reach = BODY_LENGTH;
+  // Only visitor fish bend in Classic: they are drawn from pictures that need a spine.
+  private swimmers = new Swimmers();
+
+  begin(frame: Frame, fish: DrawnFish[]): void {
+    this.swimmers.update(fish.filter((f) => f.outline !== undefined), frame.dt);
+  }
 
   water({ ctx, width: w, height: h }: Frame): void {
     const water = ctx.createRadialGradient(w / 2, 0, 0, w / 2, 0, Math.max(w * 0.7, h));
@@ -34,7 +43,9 @@ export class Classic implements Visual {
     ctx.stroke();
   }
 
-  fish({ ctx, scale, t }: Frame, fish: DrawnFish, selected: boolean): void {
+  fish(frame: Frame, fish: DrawnFish, selected: boolean): void {
+    if (drawVisitorFish(frame, fish, this.swimmers, { selected, ring: 'rgba(220, 233, 238, 0.7)', glow: `hsl(${fish.hue} 85% 66% / 0.6)` })) return;
+    const { ctx, scale, t } = frame;
     const s = fish.size * scale;
     // Tail beats faster when the fish swims faster.
     const wiggle = Math.sin(t * (6 + fish.speed * 25)) * 0.35;

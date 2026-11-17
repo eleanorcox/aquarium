@@ -5,6 +5,7 @@ import type { DrawnFish } from '../drawn';
 import { traceTrail } from '../paint';
 import { BODY_LENGTH, Swimmers, faceFish, scatter, tracePolygon } from './body';
 import { drawHand } from './marks';
+import { drawVisitorFish } from './visitor';
 import type { Frame, Visual } from './types';
 
 export class Natural implements Visual {
@@ -62,7 +63,9 @@ export class Natural implements Visual {
     ctx.stroke();
   }
 
-  fish({ ctx, scale }: Frame, fish: DrawnFish, selected: boolean): void {
+  fish(frame: Frame, fish: DrawnFish, selected: boolean): void {
+    if (drawVisitorFish(frame, fish, this.swimmers, { selected, ring: 'rgba(232, 238, 240, 0.6)' })) return;
+    const { ctx, scale } = frame;
     const body = this.swimmers.bodyOf(fish, scale);
     const depth = body.style.depth * body.length;
     ctx.save();

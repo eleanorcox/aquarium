@@ -4,6 +4,8 @@ import { MODELS, type BuiltinId } from '../core/motion';
 import type { Tank } from '../core/tank';
 import { SPECIES } from '../species/catalogue';
 import { addSpecies } from '../species/stock';
+import { addVisitorFish } from '../visitors/arrive';
+import { OUTLINES } from '../visitors/visitorFish';
 
 export interface Scene {
   name: string;
@@ -227,6 +229,23 @@ export const SCENES: Record<string, Scene> = {
         tank.setFishSize(fish.id, size);
         tank.setBehaviour(fish.id, { curiosity, drift: 0.6 });
       });
+    },
+  },
+  visitors: {
+    name: "Visitors' fish",
+    lookFor: 'Fish as visitors make them on their phones: every outline with every pattern, swimming in from the sides. Do the pictures bend naturally? Are they easy to tell apart?',
+    trails: false,
+    settle: 6,
+    build(tank) {
+      const names = ['Bubbles', 'Finn', 'Nemo', 'Coral', 'Splash', 'Pebble', 'Squiggle', 'Dot', 'Ziggy'];
+      const colours: [number, number][] = [[20, 200], [200, 45], [320, 160], [50, 280], [140, 10], [270, 55], [0, 0], [180, 330], [100, 230]];
+      let i = 0;
+      for (const outline of OUTLINES) {
+        for (const pattern of ['plain', 'stripes', 'spots'] as const) {
+          addVisitorFish(tank, { version: 1, name: names[i]!, outline, hues: colours[i]!, pattern, temperament: (i % 3) - 1 });
+          i++;
+        }
+      }
     },
   },
 };

@@ -3,7 +3,7 @@
 import type { Influence } from '../core/steering';
 import type { Fish } from '../core/tank';
 
-export type DrawnFish = Pick<Fish, 'id' | 'x' | 'y' | 'heading' | 'speed' | 'size' | 'hue' | 'trail' | 'swimStyle'>;
+export type DrawnFish = Pick<Fish, 'id' | 'x' | 'y' | 'heading' | 'speed' | 'size' | 'hue' | 'trail' | 'swimStyle' | 'outline' | 'secondHue' | 'pattern' | 'picture'>;
 
 export interface DrawnTank {
   width: number;

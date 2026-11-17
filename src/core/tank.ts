@@ -72,7 +72,7 @@ export interface Fish {
 }
 
 /** What a fish looks like, apart from its size. */
-export type Look = Partial<Pick<Fish, 'name' | 'hue' | 'outline' | 'secondHue' | 'pattern' | 'picture' | 'visitor'>>;
+export type Look = Partial<Pick<Fish, 'name' | 'hue' | 'outline' | 'secondHue' | 'pattern' | 'picture' | 'visitor' | 'swimStyle'>>;
 
 /** Whether a tank holds real species only or anything, and which place's species it is limited to, if any. */
 export interface TankRules {
