@@ -143,3 +143,9 @@ For example, `x = cx + 0.4 * sin(a * t / 2)` and `y = cy + 0.2 * sin(b * t) * co
 Every push to `main` is published to GitHub Pages at https://aquarium.eleanorcox.rocks by `.github/workflows/pages.yml`, once the tests pass. The site has no server: shared tanks travel inside their links.
 
 The hand-tracking model is Google's, under the Apache License 2.0; see `public/mediapipe/README.md`.
+
+## Licence
+
+The code is under the [PolyForm Noncommercial License 1.0.0](LICENSE.md): free to use, change and share for any non-commercial purpose. The docs, pictures and videos are under [CC BY-NC 4.0](LICENSE-CONTENT.txt): share and adapt them for non-commercial purposes, crediting Eleanor Cox. For commercial use, ask.
+
+Third-party material keeps its own terms: the hand-tracking model and runtime in `public/mediapipe/` are Google's, under the Apache License 2.0, and species facts in `assets/fish/` come from FishBase, whose terms apply to that data.
