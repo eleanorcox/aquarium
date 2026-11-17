@@ -122,3 +122,7 @@ For example, `x = cx + 0.4 * sin(a * t / 2)` and `y = cy + 0.2 * sin(b * t) * co
 ## Deploying
 
 `npm run build` produces static files with relative paths, so `dist/` can be hosted at a subdomain root or under a subpath of a larger site.
+
+Every push to `main` is published to GitHub Pages at https://aquarium.eleanorcox.rocks by `.github/workflows/pages.yml`, once the tests pass. The site has no server: shared tanks travel inside their links.
+
+The hand-tracking model is Google's, under the Apache License 2.0; see `public/mediapipe/README.md`.

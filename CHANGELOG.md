@@ -8,6 +8,7 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
+- The aquarium is published at https://aquarium.eleanorcox.rocks on every push, once the tests pass.
 - Add many fish at once: set How many (up to 300) and Add as separate fish, a school on one route, or a free-swimming school. A big school gets smaller fish so it fits. The new fish are chosen together as Just added, ready to change.
 - Change many fish at once: the Fish list offers groups as well as All fish: Just added, each school (named by its colour or species), each formation and all free-swimming fish. Motion, Behaviour and Look changes apply to the whole group, and when the whole group is on the same kind of path its path settings can be changed for all of them together. Remove fish removes the whole group.
 - A Look section in the panel: Colour and Size, for one fish or a whole group.

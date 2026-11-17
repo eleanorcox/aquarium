@@ -456,3 +456,15 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - Adding takes a number and a way of arriving: separate fish on a mix of routes, a school sharing a route, or a free-swimming school. More than 20 in a school makes the fish smaller, so a school of 300 still fits the tank.
 - **Alternatives considered:** Selecting fish by dragging a box round them on screen. It would be good on a big tank but clashes with dragging to look around, and groups by school cover the common case.
 - **What follows from it:** A group chosen in the list is not highlighted on screen yet.
+
+## 37. Published on GitHub Pages at a subdomain
+
+- **Date:** 17 November 2026
+- **Status:** Built; settles the open licence check in 29
+- **What prompted it:** Eleanor asked to start hosting. She has a domain, eleanorcox.rocks, kept for a personal website still to be made.
+- **Decision:**
+  - The site is published to GitHub Pages by a workflow that runs the tests, builds, and publishes on every push to main. A failing test stops the publish.
+  - It lives at a subdomain, aquarium.eleanorcox.rocks, so the main domain stays free for the website. The domain is pointed at GitHub with one DNS record at the domain's host. GitHub provides HTTPS, which browsers require before they allow the webcam.
+  - The hand-tracking model's licence is confirmed from Google's model card: Apache License 2.0. A copy of the licence and a note of where the model came from are published beside it.
+- **Alternatives considered:** Hosting with the domain's own host (Squarespace), which serves Squarespace sites, not arbitrary files. Netlify or Cloudflare Pages, which would work equally well but add another account. A path on the main domain, which waits on the website existing.
+- **What follows from it:** The repository has to stay public while it is hosted free on Pages. Visitors adding fish by QR code (stage 5) needs a live server, which Pages cannot be; that will need somewhere else, and the static site can stay here.
