@@ -27,6 +27,11 @@ export interface SavedFish {
   swimStyle?: string;
   /** Where in the list of fish the first member of its school is, if it keeps to one. */
   school?: number;
+  /** A visitor fish's look. Its coloured-in picture, if it had one, is too big for a link and is not saved. */
+  outline?: string;
+  secondHue?: number;
+  pattern?: string;
+  visitor?: boolean;
 }
 
 /** A tank's setup: its size, its fish and their settings, and the time, so routes carry on from where they were. */
@@ -62,6 +67,10 @@ export function saveTank(tank: Tank): SavedTank {
       ...(f.school !== undefined ? { school: tank.fish.findIndex((g) => g.school === f.school) } : {}),
       ...(f.species && f.swimStyle ? { species: f.species, swimStyle: f.swimStyle } : {}),
       ...(f.formation !== undefined ? { formation: tank.fish.findIndex((g) => g.formation === f.formation) } : {}),
+      ...(f.outline !== undefined ? { outline: f.outline } : {}),
+      ...(f.secondHue !== undefined ? { secondHue: f.secondHue } : {}),
+      ...(f.pattern !== undefined ? { pattern: f.pattern } : {}),
+      ...(f.visitor ? { visitor: true } : {}),
     })),
   };
 }
@@ -123,6 +132,12 @@ function addSavedFish(tank: Tank, saved: unknown): string | null {
     if (error) return `its equations do not work: ${error}`;
   }
   tank.setLook(fish.id, { name, hue });
+  // Outline and pattern names are only ever looked up when drawing, which ignores ones it does not know.
+  const { outline, secondHue, pattern, visitor } = saved;
+  if (typeof outline === 'string' && outline.length <= MAX_NAME) tank.setLook(fish.id, { outline });
+  if (typeof pattern === 'string' && pattern.length <= MAX_NAME) tank.setLook(fish.id, { pattern });
+  if (isNumber(secondHue)) tank.setLook(fish.id, { secondHue });
+  if (visitor === true) tank.setLook(fish.id, { visitor });
   const { species, swimStyle } = saved;
   if (typeof species === 'string' && typeof swimStyle === 'string' && species.length <= MAX_NAME && swimStyle.length <= MAX_NAME) {
     tank.setSpecies(fish.id, species, swimStyle);

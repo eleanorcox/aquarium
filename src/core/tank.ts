@@ -61,7 +61,18 @@ export interface Fish {
   species?: string;
   /** How its body bends as it swims, by the biologists' name for the style, if known. Used only for drawing. */
   swimStyle?: string;
+  /** For fish made by visitors: which outline it has, its second colour and its pattern. Used only for drawing. */
+  outline?: string;
+  secondHue?: number;
+  pattern?: string;
+  /** The id of a coloured-in picture of it, kept outside the tank because the simulation never needs it. */
+  picture?: string;
+  /** Made by a visitor on their phone. */
+  visitor?: boolean;
 }
+
+/** What a fish looks like, apart from its size. */
+export type Look = Partial<Pick<Fish, 'name' | 'hue' | 'outline' | 'secondHue' | 'pattern' | 'picture' | 'visitor'>>;
 
 /** Whether a tank holds real species only or anything, and which place's species it is limited to, if any. */
 export interface TankRules {
@@ -300,8 +311,8 @@ export class Tank {
     for (const fish of this.fish) fish.trail = [];
   }
 
-  /** Sets what a fish is called and its colour, as when a saved tank is loaded. */
-  setLook(id: number, look: { name?: string; hue?: number }): void {
+  /** Sets what a fish is called and how it looks, as when a saved tank is loaded or a visitor's fish arrives. */
+  setLook(id: number, look: Look): void {
     Object.assign(this.get(id), look);
   }
 

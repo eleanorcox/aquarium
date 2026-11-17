@@ -64,5 +64,6 @@ export function fishGroups(tank: Tank, justAdded: number[], speciesNames: Record
   }
   for (const formation of collect(all, (f) => f.formation)) offer(`Formation of ${tank.get(formation[0]!.formation!).name}`, formation);
   offer('Free-swimming fish', all.filter((f) => f.model === 'free'));
+  offer("Visitors' fish", all.filter((f) => f.visitor));
   return groups;
 }
