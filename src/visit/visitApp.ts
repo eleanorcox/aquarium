@@ -129,7 +129,7 @@ export function startVisitApp(root: HTMLElement, room: string): void {
     $<HTMLButtonElement>('#undo').disabled = choices.strokes.length === 0;
     $<HTMLButtonElement>('#clear').disabled = choices.strokes.length === 0;
     $<HTMLButtonElement>('#send').disabled = !canSend(choices);
-    drawColouring(sheetCtx, choices.outline, choices.strokes, sheetScale, true);
+    drawColouring(sheetCtx, choices.outline, choices.strokes, sheetScale);
     drawFish(artCtx, choices);
   }
 

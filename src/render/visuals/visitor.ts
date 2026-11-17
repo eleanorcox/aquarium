@@ -1,6 +1,6 @@
 // Visitor fish are drawn from their picture, cut into strips laid along the bending spine, so a coloured-in
 // fish swims with the same body wave as every other fish.
-import { PICTURE, pictureStrips } from '../../visitors/outlines';
+import { PICTURE, drawBent } from '../../visitors/outlines';
 import type { DrawnFish } from '../drawn';
 import { PICTURES } from '../pictures';
 import { faceFish, type Swimmers } from './body';
@@ -24,14 +24,7 @@ export function drawVisitorFish(
     ctx.shadowColor = options.glow;
     ctx.shadowBlur = 10;
   }
-  for (const strip of pictureStrips(body.spine, PICTURE.width)) {
-    ctx.save();
-    ctx.translate(strip.at.x, strip.at.y);
-    ctx.rotate(strip.angle);
-    // A hair longer than the strip, so no seam of water shows between strips.
-    ctx.drawImage(picture, strip.from, 0, strip.to - strip.from, PICTURE.height, -0.5, -height / 2, strip.length + 1, height);
-    ctx.restore();
-  }
+  drawBent(ctx, picture, body.spine, height);
   if (options.selected) {
     ctx.shadowBlur = 0;
     ctx.strokeStyle = options.ring;

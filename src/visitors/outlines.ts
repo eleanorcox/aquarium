@@ -135,6 +135,22 @@ export function paintChoices(ctx: CanvasRenderingContext2D, look: { outline: Out
   inkOutline(ctx, look.outline);
 }
 
+/**
+ * Draws a picture bent along a spine running nose to tail, `height` pixels tall. Used by the tank and the
+ * phone's preview, so a fish swims the same in both.
+ */
+export function drawBent(ctx: CanvasRenderingContext2D, picture: CanvasImageSource, spine: Vec2[], height: number): void {
+  for (const strip of pictureStrips(spine, PICTURE.width)) {
+    ctx.save();
+    ctx.translate(strip.at.x, strip.at.y);
+    ctx.rotate(strip.angle);
+    // Strips overlap by a fraction of a pixel: enough to hide seams, little enough that the ink line's soft edges
+    // drawn twice do not show as dark ticks.
+    ctx.drawImage(picture, strip.from, 0, strip.to - strip.from, PICTURE.height, -0.2, -height / 2, strip.length + 0.4, height);
+    ctx.restore();
+  }
+}
+
 /** One strip of a picture placed on the bent fish: picture columns `from` to `to`, laid from `at` towards the nose. */
 export interface Strip {
   from: number;

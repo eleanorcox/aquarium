@@ -2,7 +2,7 @@
 // Everything takes a canvas context and does not look at the page.
 import type { Vec2 } from '../core/motion';
 import { STYLES, amplitudeScale, bodyWave } from '../render/swimming';
-import { PICTURE, inkOutline, paintChoices, pictureStrips, traceWhole } from '../visitors/outlines';
+import { PICTURE, drawBent, inkOutline, paintChoices, traceWhole } from '../visitors/outlines';
 import type { Outline } from '../visitors/visitorFish';
 import type { Stroke } from './colouring';
 import type { Choices } from './fishState';
@@ -11,17 +11,18 @@ import type { Choices } from './fishState';
 export const HUES = [0, 28, 50, 90, 150, 180, 210, 250, 290, 325];
 export const paint = (hue: number) => `hsl(${hue} 72% 58%)`;
 
-/** The colouring layer, clipped to inside the lines, then the ink on top. `scale` is pixels per picture pixel. */
-export function drawColouring(ctx: CanvasRenderingContext2D, outline: Outline, strokes: readonly Stroke[], scale: number, sheet = false): void {
+/**
+ * The colouring layer on white paper, clipped to inside the lines, then the ink on top. `scale` is pixels per
+ * picture pixel. Parts left uncoloured stay white, as on a colouring sheet, so the fish shows up in dark water.
+ */
+export function drawColouring(ctx: CanvasRenderingContext2D, outline: Outline, strokes: readonly Stroke[], scale: number): void {
   const width = PICTURE.width * scale;
   ctx.clearRect(0, 0, width, PICTURE.height * scale);
   ctx.save();
   traceWhole(ctx, outline, width);
   ctx.clip('nonzero');
-  if (sheet) {
-    ctx.fillStyle = '#fbfdfe';
-    ctx.fillRect(0, 0, width, PICTURE.height * scale);
-  }
+  ctx.fillStyle = '#fbfdfe';
+  ctx.fillRect(0, 0, width, PICTURE.height * scale);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   for (const stroke of strokes) {
@@ -68,12 +69,6 @@ export function drawSwimming(ctx: CanvasRenderingContext2D, picture: CanvasImage
   const tall = (length * PICTURE.height) / PICTURE.width;
   ctx.save();
   ctx.translate(width / 2, height / 2);
-  for (const strip of pictureStrips(swimSpine(length, phase), PICTURE.width)) {
-    ctx.save();
-    ctx.translate(strip.at.x, strip.at.y);
-    ctx.rotate(strip.angle);
-    ctx.drawImage(picture, strip.from, 0, strip.to - strip.from, PICTURE.height, -0.5, -tall / 2, strip.length + 1, tall);
-    ctx.restore();
-  }
+  drawBent(ctx, picture, swimSpine(length, phase), tall);
   ctx.restore();
 }
