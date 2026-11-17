@@ -47,6 +47,12 @@ Pieces 1 to 6 are built (17 November 2026) and tried end to end on the laptop: a
 - Visitors following or nudging their fish afterwards.
 - Saving coloured-in fish in shared tank links: pictures are too big for a link.
 
+## Going live
+
+1. Make a free Cloudflare account.
+2. In a terminal in the project: `npx wrangler login` (opens the browser to allow it), then `npx wrangler deploy -c service/wrangler.toml`. It prints the service's address, something like `https://equatium-visitors.<name>.workers.dev`.
+3. On GitHub, in the repository's Settings → Secrets and variables → Actions → Variables, add `VISITOR_SERVICE` with that address. The next publish builds the site to send fish there.
+
 ## What the service can rely on
 
 Checked against Cloudflare's documentation on 17 November 2026:

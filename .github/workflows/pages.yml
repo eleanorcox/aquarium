@@ -29,7 +29,10 @@ jobs:
       # Installing also copies the hand-tracking runtime into public/, so it is part of the site.
       - run: npm ci
       - run: npm test
+      # Where phones send their fish: set as a repository variable once the service is on Cloudflare.
       - run: npm run build
+        env:
+          VITE_VISITOR_SERVICE: ${{ vars.VISITOR_SERVICE }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
