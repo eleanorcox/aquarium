@@ -7,6 +7,7 @@ import { VISUALS } from '../render/visuals';
 import { SCENES } from '../scenes/scenes';
 import { BIOMES, SPECIES } from '../species/catalogue';
 import { addSpecies } from '../species/stock';
+import { sceneAddress } from './remembered';
 import type { Display } from '../render/canvas2d';
 
 export interface Controls {
@@ -177,7 +178,7 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
     .add({ scene }, 'scene', sceneOptions)
     .name('Scene')
     .onChange((id: string) => {
-      location.search = `?scene=${id}`;
+      location.search = sceneAddress(location.search, id);
     });
   tankFolder.add(pointer, 'mode', POINTER_OPTIONS).name('Pointer');
   tankFolder.add(reach, 'pixels', 40, 400, 5).name('Pointer reach');

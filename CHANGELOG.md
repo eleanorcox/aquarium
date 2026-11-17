@@ -40,6 +40,7 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Changed
 
+- Choosing a scene keeps the webcam switches as they were, and keeps the visual mode. Hands and movement are remembered in this browser, so they come back on when the page is reopened.
 - The hand-tracking library loads only when hands are switched on, so the page starts faster.
 - Natural mode's swimming uses published measurements of real fish: the head moves a little, eels carry more than one wave along their bodies and tuna less than one.
 - Schooling fish follow their three nearest schoolmates, as real fish do, instead of everyone in sight.

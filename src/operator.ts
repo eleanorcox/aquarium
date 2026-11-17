@@ -17,6 +17,7 @@ import { SCENES, buildScene } from './scenes/scenes';
 import { addMadeUpFish } from './species/stock';
 import { setUpCorners } from './ui/corners';
 import { createPanel } from './ui/panel';
+import { rememberCameras, rememberedCameras } from './ui/remembered';
 
 /** Starts the operator window: the tank, its controls and its inputs. Called once by main.ts. */
 export async function startOperator(): Promise<void> {
@@ -174,18 +175,32 @@ export async function startOperator(): Promise<void> {
 
   const stats = { fish: 0, drawn: 0, stepMs: 0, drawMs: 0 };
 
+  // The camera switches outlast the page, so choosing another scene, which reloads it, leaves the webcam as it was.
+  // Reaching storage at all can fail in a private window, so it is only touched inside the remembering functions' checks.
+  const kept = { getItem: (key: string) => localStorage.getItem(key), setItem: (key: string, value: string) => localStorage.setItem(key, value) };
+  const keepCameras = () => rememberCameras(kept, { hands: handsState.on, motion: motionState.on });
+  const cameras = rememberedCameras(kept);
+  if (cameras.hands) {
+    handsState.on = true;
+    void setHands(true).then(keepCameras);
+  }
+  if (cameras.motion) {
+    motionState.on = true;
+    void setMotion(true).then(keepCameras);
+  }
+
   const controls = createPanel(tank, panelElements, {
     pointer,
     stats,
     hands: handsState,
     motion: motionState,
-    onMotion: (on) => void setMotion(on),
+    onMotion: (on) => void setMotion(on).then(keepCameras),
     corners: cornersState,
     display,
     onOpenDisplay: () => window.open('?display', 'equatium-display', 'popup,width=1280,height=720'),
     link,
     onCopyLink: () => void copyLink(),
-    onHands: (on) => void setHands(on),
+    onHands: (on) => void setHands(on).then(keepCameras),
     reach,
     scene,
     visual: renderer.visual.id,
