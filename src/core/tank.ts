@@ -9,6 +9,8 @@ import {
   REFERENCE_SIZE,
   SIGHT,
   Flock,
+  FREE_SCHOOLING,
+  freeForce,
   influenceForce,
   limitSpeed,
   routeForce,
@@ -142,8 +144,24 @@ export class Tank {
     this.fish.push(fish);
     this.places = null;
     if (model === 'custom') this.setEquations(id, DEFAULT_CUSTOM);
+    // A free fish has no route to start on, so it starts where its settings say, each new one heading a different way.
+    if (model === 'free') this.setFree(fish, { x: fish.params.x0! * this.width, y: fish.params.y0! }, id * GOLDEN_ANGLE, fish.params.v!);
     this.place(fish);
     return fish;
+  }
+
+  /** Points a free fish a new way at its cruising speed, as when a scene starts a school all heading one way. */
+  aim(id: number, heading: number): void {
+    const fish = this.get(id);
+    if (fish.model !== 'free') return;
+    this.setFree(fish, { x: fish.x, y: fish.y }, heading, fish.params.v!);
+    this.place(fish);
+  }
+
+  /** Lets a fish loose from where it is: with no route, its offset is simply where it is. */
+  private setFree(fish: Fish, at: Vec2, heading: number, speed: number): void {
+    fish.offset = { ...at };
+    fish.offsetVelocity = { x: speed * Math.cos(heading), y: speed * Math.sin(heading) };
   }
 
   setParam(id: number, key: string, value: number): void {
@@ -152,7 +170,10 @@ export class Tank {
     fish.trail = [];
   }
 
-  /** Switching to 'custom' starts from the current path written as equations, so you can edit it. */
+  /**
+   * Switching to 'custom' starts from the current path written as equations, so you can edit it. A fish set
+   * free, or given a route after swimming free, carries on from where it is instead of jumping.
+   */
   setModel(id: number, model: ModelId): void {
     // A fish given a different path leaves its formation.
     if (model !== 'custom') {
@@ -160,13 +181,20 @@ export class Tank {
       this.places = null;
     }
     const fish = this.get(id);
+    const wasFree = fish.model === 'free';
+    const at = { x: fish.x, y: fish.y };
     if (model === 'custom' && fish.model !== 'custom') {
-      const start = MODELS[fish.model].source(fish.params);
+      const start = fish.model === 'free' ? DEFAULT_CUSTOM : MODELS[fish.model].source(fish.params);
       if (this.setEquations(id, start) !== null) this.setEquations(id, DEFAULT_CUSTOM);
     }
     fish.model = model;
     fish.params = { ...defaultParams(model), x0: fish.params.x0 ?? 0 };
     fish.trail = [];
+    if (model === 'free') this.setFree(fish, at, fish.heading, fish.speed);
+    else if (wasFree) {
+      const route = this.positionAt(fish, this.t);
+      fish.offset = { x: at.x - route.x, y: at.y - route.y };
+    }
   }
 
   /**
@@ -313,7 +341,8 @@ export class Tank {
     const routePoint = (f: Fish) => ({ x: f.x - f.offset.x, y: f.y - f.offset.y });
     const routeKey = (f: Fish) => `${f.model} ${JSON.stringify({ ...f.params, x0: 0 })} ${f.equations?.x ?? ''} ${f.equations?.y ?? ''}`;
     for (const fish of this.fish) {
-      if (fish.formation !== undefined) continue;
+      // Free fish have no route to trade.
+      if (fish.formation !== undefined || fish.model === 'free') continue;
       const strayed = Math.hypot(fish.offset.x, fish.offset.y);
       if (fish.joining) {
         if (strayed < (STRAY_DISTANCE / 2) * fish.size) fish.joining = false;
@@ -326,7 +355,7 @@ export class Tank {
       let nearest: Fish | undefined;
       let best = Infinity;
       for (const other of this.fish) {
-        if (other === fish || other.formation !== undefined || routeKey(other) === own) continue;
+        if (other === fish || other.formation !== undefined || other.model === 'free' || routeKey(other) === own) continue;
         const point = routePoint(other);
         const d = Math.hypot(fish.x - point.x, fish.y - point.y);
         if (d < best) [nearest, best] = [other, d];
@@ -368,6 +397,7 @@ export class Tank {
   }
 
   private wrapsX(fish: Fish): boolean {
+    if (fish.model === 'free') return false;
     return fish.model === 'custom' || MODELS[fish.model].wraps;
   }
 
@@ -376,8 +406,24 @@ export class Tank {
   }
 
   private forceOn(fish: Fish, dt: number): Vec2 {
-    const force = routeForce(fish.offset, fish.offsetVelocity, fish.pathStrength);
-    if (fish.drift > 0) {
+    const free = fish.model === 'free';
+    if (free && fish.drift > 0) stepWander(fish.wander, this.random, dt);
+    const force = free
+      ? freeForce(
+          {
+            x: fish.x,
+            y: fish.y,
+            velocity: fish.offsetVelocity,
+            heading: fish.heading,
+            cruise: fish.params.v!,
+            depth: fish.params.y0!,
+            range: fish.params.A!,
+            turn: fish.drift * fish.wander.x,
+          },
+          this.width,
+        )
+      : routeForce(fish.offset, fish.offsetVelocity, fish.pathStrength);
+    if (!free && fish.drift > 0) {
       stepWander(fish.wander, this.random, dt);
       // A small fish wanders a small distance: drift is measured in fish sizes.
       const strength = (fish.drift * DRIFT_FORCE * fish.size) / REFERENCE_SIZE;
@@ -394,9 +440,11 @@ export class Tank {
       force.y += push.y;
     }
     if (fish.schools) {
+      // A free fish has no shared route helping to hold its school together, so schooling does all of it.
+      const strength = free ? FREE_SCHOOLING : 1;
       const push = this.schoolForce(fish);
-      force.x += push.x;
-      force.y += push.y;
+      force.x += strength * push.x;
+      force.y += strength * push.y;
     }
     return force;
   }
@@ -460,6 +508,8 @@ export class Tank {
   }
 
   private positionAt(fish: Fish, t: number): Vec2 {
+    // A free fish's route stays at the tank's corner, so its offset is where it is.
+    if (fish.model === 'free') return { x: 0, y: 0 };
     if (fish.model !== 'custom') return MODELS[fish.model].position(fish.params, t, this.width);
     const position = this.compiled.get(fish.id);
     if (!position) return { x: fish.x, y: fish.y };

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { MODELS } from '../core/motion';
 import { Tank } from '../core/tank';
-import { run } from '../core/testing';
+import { makeTank, run } from '../core/testing';
 import { DEFAULT_SCENE, SCENES, buildScene } from './scenes';
 
 const built = (id: string) => {
@@ -59,6 +59,14 @@ describe('scenes', () => {
     for (const f of tank.fish) coloursPerSchool.set(f.params.cx! * 10 + f.params.cy!, (coloursPerSchool.get(f.params.cx! * 10 + f.params.cy!) ?? new Set()).add(f.hue));
     expect([...coloursPerSchool.values()].filter((c) => c.size > 1).length).toBeGreaterThanOrEqual(2);
   }, 30_000);
+
+  it('the free swimming scene has schools and loners, none of them on a route', () => {
+    const tank = makeTank();
+    buildScene(tank, 'free');
+    expect(tank.fish.length).toBeGreaterThan(100);
+    expect(tank.fish.every((f) => f.model === 'free')).toBe(true);
+    expect(new Set(tank.fish.map((f) => f.school)).size).toBeGreaterThan(2);
+  });
 
   it('every scene is the same tank every time', () => {
     for (const id of Object.keys(SCENES)) {

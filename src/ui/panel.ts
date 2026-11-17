@@ -1,6 +1,6 @@
 // Control panel. It changes the tank only through Tank methods, never by drawing.
 import GUI from 'lil-gui';
-import { MODELS, MODEL_NAMES, paramSpecs, type ModelId } from '../core/motion';
+import { MODELS, MODEL_NAMES, describeFree, paramSpecs, type ModelId } from '../core/motion';
 import type { Tank } from '../core/tank';
 import type { PointerInput, PointerMode } from '../input/pointer';
 import { VISUALS } from '../render/visuals';
@@ -263,7 +263,8 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   function showEquation(): void {
     if (allChosen()) return;
     const fish = tank.get(controls.display.selected);
-    if (fish.model !== 'custom') el.equation.textContent = `${fish.name}\n${MODELS[fish.model].equation(fish.params)}`;
+    if (fish.model === 'free') el.equation.textContent = `${fish.name}\n${describeFree(fish.params)}`;
+    else if (fish.model !== 'custom') el.equation.textContent = `${fish.name}\n${MODELS[fish.model].equation(fish.params)}`;
   }
 
   function select(id: number): void {

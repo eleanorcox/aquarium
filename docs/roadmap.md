@@ -17,7 +17,7 @@ As of 27 October 2026:
 | 4b, with a projector | Needs a projector |
 | 5, visitors add fish | Sharing a tank as a link is done; the rest needs a hosted service |
 
-Side branches: formations, phone layout and the field-of-fish scene are done. Free swimming is put off by choice. 3D, describing a motion in words (which needs an AI service and a key), and discovering species (which needs decisions on what triggers a discovery) are not started.
+Side branches: formations, phone layout, the field-of-fish scene and free swimming are done. 3D, describing a motion in words (which needs an AI service and a key), and discovering species (which needs decisions on what triggers a discovery) are not started.
 
 Other facts that shape the order:
 

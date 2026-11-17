@@ -88,7 +88,7 @@ A fish swimming along a line does not hold it perfectly. It wanders a little abo
 
 A fish with no route at all, going where its own steering, its school and the people in front of it take it.
 
-- **Status:** wanted eventually, particularly for projection, where a tank of fish all on fixed loops may look too orderly. Put off on 13 October 2026.
+- **Status:** built on 17 November 2026 (decision 35). Put off on 13 October 2026, then asked for.
 - **Why it is not already there:** every fish today is its route plus an offset. Turning "holds its route" down to zero stops a fish returning to its route, but it still moves along with it.
 - **Smallest version:** a new kind of route, "none", for which the fish keeps a cruising speed and heading of its own, turns away from the tank's edges, and otherwise obeys the same influences, drift and schooling as any other fish.
 - **Unknown:** what a free fish does when nothing is happening, so that it still looks purposeful.

@@ -33,7 +33,7 @@ The forces live in [steering.ts](../src/core/steering.ts), each as a small funct
 
 Limits of what is built:
 
-- A fish with path strength zero never returns to its route but still moves with it. A fish with no route, swimming freely, does not exist yet.
+- A fish with path strength zero never returns to its route but still moves with it. A free-swimming fish has no route: its route stays at the tank's corner, so its offset is simply where it is, and instead of the spring it steers itself (`freeForce` in steering.ts). See decision 35.
 - A fish in a dense school still looks at every schoolmate in sight. That is fine for hundreds of fish and too slow for thousands.
 - Fish school with any other schooling fish. There are no species yet to keep schools apart.
 

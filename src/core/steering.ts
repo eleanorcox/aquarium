@@ -181,3 +181,75 @@ export function limitSpeed(velocity: Vec2, max: number): void {
     velocity.y *= max / speed;
   }
 }
+
+/** How quickly a free fish gets back to its cruising speed after being pushed faster or slower, per second. */
+const CRUISE_GRIP = 1.5;
+/** A free fish starts turning away from an edge this far from it, in tank heights. */
+const WALL_MARGIN = 0.15;
+/** Push away from an edge on a free fish touching it, fading to nothing at the margin. */
+const WALL_FORCE = 3;
+/** Pull back into its depth range on a free fish outside it, per tank height outside. */
+const DEPTH_PULL = 8;
+/** How strongly a free fish levels out when climbing or diving, per second. Fish mostly swim level. */
+const LEVELLING = 1.5;
+/** Fastest a fully drifting free fish turns of its own accord, in radians a second. */
+export const FREE_TURN = 1.5;
+
+/** How much harder free fish school than fish on routes, found by trying 1, 2, 3 and 5 on a free school of 30. */
+export const FREE_SCHOOLING = 2;
+
+/** What a free fish is doing now, and what it would like to do. */
+export interface FreeSwimmer {
+  x: number;
+  y: number;
+  velocity: Vec2;
+  /** The way it faces, used when it is not moving. */
+  heading: number;
+  /** Its cruising speed, preferred depth and how far either side of that depth it will go. */
+  cruise: number;
+  depth: number;
+  range: number;
+  /** How hard it is turning of its own accord, from -1 to 1: drift times its wander. */
+  turn: number;
+}
+
+/**
+ * The pushes a fish with no route gives itself: keep up its cruising speed in the way it is going, turn
+ * now and then as it wanders, turn away from the tank's edges, and keep to its depths.
+ */
+export function freeForce(fish: FreeSwimmer, width: number): Vec2 {
+  const speed = Math.hypot(fish.velocity.x, fish.velocity.y);
+  const ahead = speed > 1e-6 ? { x: fish.velocity.x / speed, y: fish.velocity.y / speed } : { x: Math.cos(fish.heading), y: Math.sin(fish.heading) };
+  const force = {
+    x: CRUISE_GRIP * (fish.cruise * ahead.x - fish.velocity.x),
+    y: CRUISE_GRIP * (fish.cruise * ahead.y - fish.velocity.y),
+  };
+  // Wandering turns the fish rather than pushing it sideways, so it curves at the same rate whatever its speed.
+  const sideways = FREE_TURN * fish.turn * Math.max(speed, fish.cruise);
+  force.x += -ahead.y * sideways;
+  force.y += ahead.x * sideways;
+  // Climbing or diving, it turns back towards level.
+  const level = -LEVELLING * fish.velocity.y * Math.sign(ahead.x || 1);
+  force.x += -ahead.y * level;
+  force.y += ahead.x * level;
+  // Edges and depth say which way the fish should be going. It turns that way rather than braking, as a
+  // fish does; heading straight at an edge, it turns left.
+  const away = (distance: number) => (distance < WALL_MARGIN ? WALL_FORCE * (1 - distance / WALL_MARGIN) : 0);
+  const keepIn = { x: away(fish.x) - away(width - fish.x), y: away(fish.y) - away(1 - fish.y) };
+  const above = fish.depth - fish.range - fish.y;
+  const below = fish.y - fish.depth - fish.range;
+  if (above > 0) keepIn.y += DEPTH_PULL * above;
+  if (below > 0) keepIn.y -= DEPTH_PULL * below;
+  const across = keepIn.x * -ahead.y + keepIn.y * ahead.x;
+  const towards = keepIn.x * ahead.x + keepIn.y * ahead.y;
+  if (towards < 0) {
+    // Going the wrong way: turn as hard as the whole push, in whichever direction it leans.
+    const turn = Math.hypot(keepIn.x, keepIn.y) * (across < 0 ? -1 : 1);
+    force.x += -ahead.y * turn;
+    force.y += ahead.x * turn;
+  } else {
+    force.x += -ahead.y * across;
+    force.y += ahead.x * across;
+  }
+  return force;
+}

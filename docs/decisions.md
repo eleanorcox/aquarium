@@ -426,3 +426,21 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - *Any fish far enough off its route.* Tried second. A school of 40 is naturally wider than that distance, so fish at the edge changed school with nobody touching them.
   - *All colours sharing one school.* Neighbouring schools pulled at each other's edges and swapped fish on their own.
 - **What follows from it:** Mixing is caused only by people, which tests check both ways: 30 seconds alone changes nothing, and a hand swept along one row sends more than ten fish to other schools.
+
+## 35. Free swimming: a fish with no route steers itself
+
+- **Date:** 17 November 2026
+- **Status:** Built
+- **What prompted it:** Eleanor asked for free-swimming fish, put off since 13 October. They suit projection, where fish all on fixed loops can look too orderly.
+- **Decision:**
+  - Free swimming is a motion like the others, so it is chosen in the same list, saved in links, and set for all fish at once with All fish.
+  - A free fish's route never moves from the tank's corner, so its offset is its position and everything that pushes offsets (pointers, hands, movement, schooling) works on it unchanged. In place of the spring back to a route it steers itself: it keeps up a cruising speed in the way it is going, drift turns it rather than shoving it sideways, it levels out when climbing or diving, and it turns away from edges and back into its depth range. Heading straight at an edge it turns rather than braking.
+  - Its settings are cruising speed, preferred depth and depth range.
+  - Free fish school twice as hard as fish on routes, because nothing else holds a free school together. Tried 1, 2, 3 and 5 on a school of 30: at 1 it thinned out over 20 seconds, 2 held it, more made it lumpy.
+  - Switching a fish to free swimming lets it go from where it is, still heading the same way. Giving a free fish a route makes the gap its offset, so it swims to the route instead of jumping.
+  - Free fish take no part in changing school (decision 34): they have no route to trade.
+- **Alternatives considered:** A separate kind of fish outside the route-and-offset model, which would have needed its own handling in every input and in schooling.
+- **What follows from it:**
+  - What a free fish does with nothing happening is cruise, meander and school. Whether that looks purposeful enough is for judging by eye in the Free swimming scene.
+  - The steering strengths are first guesses, as before.
+  - Real species still arrive on routes. Letting them arrive free is a small step if wanted.

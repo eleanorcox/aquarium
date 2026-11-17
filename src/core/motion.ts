@@ -233,7 +233,8 @@ export const MODELS = {
 } satisfies Record<string, MotionModel>;
 
 export type BuiltinId = keyof typeof MODELS;
-export type ModelId = BuiltinId | 'custom';
+/** 'free' has no route at all: the fish keeps a cruising speed and heading of its own. */
+export type ModelId = BuiltinId | 'custom' | 'free';
 
 /** Sliders available inside a typed equation as a, b and c. */
 export const CUSTOM_PARAMS: Record<string, ParamSpec> = {
@@ -241,6 +242,19 @@ export const CUSTOM_PARAMS: Record<string, ParamSpec> = {
   b: { symbol: 'b', label: 'slider b', min: -5, max: 5, step: 0.01, value: 2 },
   c: { symbol: 'c', label: 'slider c', min: -5, max: 5, step: 0.01, value: 0.5 },
 };
+
+/** A free fish's settings: how fast it cruises, and the depths it keeps to. */
+export const FREE_PARAMS: Record<string, ParamSpec> = {
+  v: { symbol: 'v', label: 'cruising speed', min: 0, max: 0.4, step: 0.01, value: 0.12 },
+  y0: { symbol: 'y₀', label: 'preferred depth', min: 0.1, max: 0.9, step: 0.01, value: 0.5 },
+  A: { symbol: 'A', label: 'depth range', min: 0, max: 0.5, step: 0.01, value: 0.4 },
+  x0: start,
+};
+
+/** What a free fish does, in words, since it has no equation to show. */
+export function describeFree(p: Params): string {
+  return `No route: swims at ${n(p.v)} tank heights a second, turns away from the edges,\nand keeps between depths ${n((p.y0 ?? 0) - (p.A ?? 0))} and ${n((p.y0 ?? 0) + (p.A ?? 0))}`;
+}
 
 export const DEFAULT_CUSTOM: EquationSource = {
   x: 'cx + 0.4 * sin(a * t / 2)',
@@ -250,9 +264,11 @@ export const DEFAULT_CUSTOM: EquationSource = {
 export const MODEL_NAMES: Record<ModelId, string> = {
   ...(Object.fromEntries(Object.entries(MODELS).map(([id, m]) => [id, m.name])) as Record<BuiltinId, string>),
   custom: 'Your own equation',
+  free: 'Free swimming (no route)',
 };
 
 export function paramSpecs(model: ModelId): Record<string, ParamSpec> {
+  if (model === 'free') return FREE_PARAMS;
   return model === 'custom' ? CUSTOM_PARAMS : MODELS[model].params;
 }
 

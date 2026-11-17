@@ -8,6 +8,8 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
+- Free swimming: a new Motion, "Free swimming (no route)". The fish keeps its own cruising speed and heading, wanders if it drifts, swims mostly level, turns away from the tank's edges and keeps to its depth range. Pushed fish carry on from where they end up instead of returning. Free fish school together, and a fish switched to or from free swimming carries on from where it is. Choose All fish to set every fish free at once.
+- A Free swimming scene (`?scene=free`): two schools and three loners, none on a route.
 - A Colour schools scene (`?scene=colours`): 320 fish in eight schools, each its own colour, circling apart. Knock fish out of a school with the pointer or a hand and they head for the nearest other school, keeping their colour, so the schools gradually become rainbows. Left alone, no fish changes school.
 - Pushed-out fish, in the Tank section: knocked-out fish either swim home to their own school or join the nearest other school.
 - Each real species schools only with its own kind, so a sardine school no longer merges with passing tuna.

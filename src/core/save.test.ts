@@ -43,6 +43,17 @@ describe('saving a tank', () => {
     expect(loners(loaded)).toEqual(loners(tank));
   });
 
+  it('keeps free-swimming fish free, with their cruising speed and depths', () => {
+    const tank = makeTank();
+    tank.addFish('free', { v: 0.2, y0: 0.3, A: 0.1 });
+    const loaded = loadTank(saveTank(tank));
+    if (typeof loaded === 'string') throw new Error(loaded);
+    expect(loaded.fish[0]!.model).toBe('free');
+    expect(loaded.fish[0]!.params).toMatchObject({ v: 0.2, y0: 0.3, A: 0.1 });
+    run(loaded, 2);
+    expect(loaded.fish[0]!.speed).toBeGreaterThan(0.1);
+  });
+
   it('survives the trip through a web address', async () => {
     const tank = variedTank();
     const text = await encodeTank(saveTank(tank));

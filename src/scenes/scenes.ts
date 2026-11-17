@@ -188,6 +188,47 @@ export const SCENES: Record<string, Scene> = {
       }
     },
   },
+  free: {
+    name: 'Free swimming',
+    lookFor: 'No fish has a route. Two schools roam the whole tank, turning as one, with a few loners about. Do they look as if they are going somewhere? Do they turn naturally at the edges?',
+    trails: false,
+    settle: 3,
+    build(tank) {
+      // Each school starts spread over an area roomy enough for its fish, so it does not burst apart.
+      const school = (count: number, hue: number, size: number, at: { x: number; y: number }, heading: number) => {
+        const side = Math.sqrt(count) * 2.5 * size;
+        let first: number | undefined;
+        for (let i = 0; i < count; i++) {
+          const fish = tank.addFish('free', {
+            v: 0.1 + 0.01 * spread(i + hue, 1),
+            y0: at.y + side * (spread(i + hue, 2) - 0.5),
+            A: 0.35,
+            x0: at.x + ((side * 1.5) / tank.width) * (spread(i + hue, 3) - 0.5),
+          });
+          first ??= fish.id;
+          tank.setLook(fish.id, { hue });
+          tank.setFishSize(fish.id, size);
+          tank.setBehaviour(fish.id, { schools: true, drift: 0.3, curiosity: -0.6 });
+          tank.joinSchool(fish.id, first);
+          tank.aim(fish.id, heading);
+        }
+      };
+      school(80, 200, 0.016, { x: 0.25, y: 0.35 }, 0.2);
+      school(30, 25, 0.024, { x: 0.7, y: 0.7 }, Math.PI - 0.3);
+      const loners: [number, number, number, number][] = [
+        // hue, size, temperament, cruising speed
+        [120, 0.04, 1, 0.08],
+        [300, 0.035, -1, 0.14],
+        [55, 0.05, 0.3, 0.05],
+      ];
+      loners.forEach(([hue, size, curiosity, v], i) => {
+        const fish = tank.addFish('free', { v, y0: 0.5, A: 0.4, x0: 0.2 + 0.3 * i });
+        tank.setLook(fish.id, { hue });
+        tank.setFishSize(fish.id, size);
+        tank.setBehaviour(fish.id, { curiosity, drift: 0.6 });
+      });
+    },
+  },
 };
 
 /** A repeatable number from 0 up to 1 for each fish, for spreading fish about without randomness. */

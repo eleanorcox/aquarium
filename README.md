@@ -45,6 +45,7 @@ Positions are in tank units: every tank is 1 unit tall and has a width of its ow
 | Spirograph | hypotrochoid: x = cₓ + (R − r)·cos θ + d·cos((R − r)/r·θ), y = c_y + (R − r)·sin θ − d·sin((R − r)/r·θ) |
 | Breathing spiral | r = R·(0.55 + 0.45·sin νt), θ = ωt |
 | Heart | x = cₓ + S·16·sin³s, y = c_y − S·(13cos s − 5cos 2s − 2cos 3s − cos 4s) |
+| Free swimming | no route: the fish keeps its own cruising speed and heading, wanders, turns away from the edges and keeps to its depth range |
 
 Each fish faces the way it is moving. y points down, as on screen.
 
@@ -101,7 +102,7 @@ The **Real fish** section of the panel sets the tank to **Real species only** or
 
 ### Scenes
 
-Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `colours` (eight coloured schools that you stir into rainbows), `pacific` and `river` (real species), `whirlpool` (one formation of 48 fish), `shoal` (500 fish in a tank wider than the screen) or `field` (700 fish in one school, filling the screen). They are for judging by eye how a change looks and feels.
+Add `?scene=name` to the address, or use the Scene list in the panel, to open a fixed tank that is the same every time: `mixed` (the default), `paths`, `temperaments`, `drift`, `school`, `colours` (eight coloured schools that you stir into rainbows), `pacific` and `river` (real species), `whirlpool` (one formation of 48 fish), `shoal` (500 fish in a tank wider than the screen) `field` (700 fish in one school, filling the screen) or `free` (schools and loners swimming freely, with no routes). They are for judging by eye how a change looks and feels.
 
 ### Your own equations
 
