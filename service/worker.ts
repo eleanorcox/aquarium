@@ -24,6 +24,12 @@ export class Room extends DurableObject<Env> {
   // Kept in memory only: if the room sleeps, it starts counting again, which is harmless.
   private limit = new SendLimit();
 
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
+    // The tank pings to keep its connection from being dropped as idle; Cloudflare answers without waking the room.
+    ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('ping', 'pong'));
+  }
+
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === '/init') {
@@ -55,10 +61,8 @@ export class Room extends DurableObject<Env> {
     return new Response('not found', { status: 404 });
   }
 
-  // The tank sends nothing that needs an answer except a check that the connection is alive.
-  webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): void {
-    if (message === 'ping') ws.send('pong');
-  }
+  // The tank sends nothing else that needs an answer.
+  webSocketMessage(): void {}
 
   webSocketClose(ws: WebSocket, code: number): void {
     ws.close(code, 'closing');
