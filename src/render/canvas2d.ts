@@ -3,6 +3,7 @@
 import type { Vec2 } from '../core/motion';
 import type { Tank } from '../core/tank';
 import type { DrawnTank } from './drawn';
+import { drawInvite } from './invite';
 import { paintTank, type Display } from './paint';
 import type { Size, View } from './view';
 import type { Visual } from './visuals/types';
@@ -10,6 +11,8 @@ import type { Visual } from './visuals/types';
 export type { Display } from './paint';
 
 export class Canvas2DRenderer {
+  /** The invitation to add fish from a phone, drawn in the corner when visitors are being taken. */
+  invite: { pattern: boolean[][]; caption: string } | null = null;
   private ctx: CanvasRenderingContext2D;
   private screen: Size = { width: 0, height: 0 };
   private lastFrame = 0;
@@ -52,5 +55,6 @@ export class Canvas2DRenderer {
     const dt = this.lastFrame ? Math.min(0.1, (now - this.lastFrame) / 1000) : 0;
     this.lastFrame = now;
     paintTank(this.ctx, this.screen, tank, view, display, this.visual, dt);
+    if (this.invite) drawInvite(this.ctx, this.screen, this.invite.pattern, this.invite.caption);
   }
 }

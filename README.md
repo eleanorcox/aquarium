@@ -72,6 +72,23 @@ The pointer can also attract or scatter every fish whatever its temperament, and
 
 Tick **Movement (webcam)** to have the webcam watch the room instead of hands. Anything moving in the picture, such as someone walking past a projection, becomes a presence the fish react to, each by its own temperament. It compares each camera picture with the one before, so it needs no tracking model, and it ignores the whole picture getting lighter or darker, as when a projector flickers.
 
+### Visitors' fish
+
+Visitors scan a QR code on the tank with their phones, make a fish and send it in. On the phone they pick a slim, round or tall fish, then either choose two colours and a pattern or colour it in with a finger, set how shy or curious it is, and name it. Fish made from choices swim straight in. Coloured-in fish wait in a queue in the operator window until you press **Let in**, since anything can be coloured inside an outline. Visitor fish swim freely and stay until you clear them.
+
+Tick **Take fish from phones** in the **Visitors' fish** section of the panel, or add `?visitors` to the address. That opens a room for this tank on the visitor service and shows the QR code in the bottom right corner of the tank, and of the display window. The room is remembered in this browser, so a reloaded page keeps the same code. **Clear visitors' fish** removes them all.
+
+To try it at home, with a phone on the same wifi as the laptop:
+
+```sh
+npm run service        # the visitor service, in one terminal
+npm run dev -- --host  # the site, in another; it prints the laptop's network address
+```
+
+Open the operator page at the network address it prints (such as `http://192.168.1.20:5173/`), not `localhost`, so the QR code leads phones to the laptop.
+
+The service is a Cloudflare Worker in `service/`. Until it is published to Cloudflare, it only runs on the laptop.
+
 ### Projecting
 
 **Open display window** in the panel's **Projector** section opens a second window showing only the tank. Drag it onto the projector's screen and click it for full screen. The window you opened it from keeps the controls and runs the tank; keep it visible, not minimised, or the projection freezes. Touching or pointing at the projection works like the pointer, and with hands switched on, the camera picture is spread across the projected tank.

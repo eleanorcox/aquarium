@@ -20,7 +20,7 @@ Run `npm test` and `npm run typecheck` before calling anything done. [docs/testi
 
 ## Code rules
 
-- `src/main.ts` only chooses the window: `src/operator.ts` is the app, `src/display/` the projector window that draws frames sent to it.
+- `src/main.ts` only chooses the window: `src/operator.ts` is the app, `src/display/` the projector window that draws frames sent to it. The visitors' phone page is a separate page, `visit.html` with `src/visit/`, kept small for phones.
 - `src/core/` is the simulation, and is "the core" in the shared rules. No DOM, no browser APIs, no real clock, no `Math.random` except through the function passed in.
 - `src/render/` only reads the tank. `src/ui/` and `src/input/` only change it through its methods. Input adapters take positions in tank units and times in seconds, and never touch the page, so they can be tested.
 - The simulation advances on a fixed 1/60 s timestep. The same starting tank and steps must always give the same result.

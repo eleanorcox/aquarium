@@ -9,6 +9,7 @@ import { createVisual } from '../render/visuals';
 import { setUpCorners } from '../ui/corners';
 import { CHANNEL, isFrameMessage, isLooksMessage, isPictureMessage, lookMap, unpackFrame, type DisplayMessage, type FrameMessage, type VisitorLook } from './frames';
 import { PICTURES } from '../render/pictures';
+import { qrPattern } from '../visitors/invite';
 
 /** How far a touch on the display reaches, in pixels. */
 const REACH = 180;
@@ -34,12 +35,18 @@ export function runDisplay(canvas: HTMLCanvasElement): void {
 
   // Visitor fish's looks and pictures arrive separately from frames, only when they change.
   let looks = new Map<number, VisitorLook>();
+  let invited = '';
   channel.addEventListener('message', (e: MessageEvent<unknown>) => {
     if (isLooksMessage(e.data)) looks = lookMap(e.data);
     if (isPictureMessage(e.data)) PICTURES.add(e.data.id, e.data.dataUrl);
     if (!isFrameMessage(e.data)) return;
     frame = e.data;
     tank = unpackFrame(frame, looks);
+    // The QR code is worked out again only when the address changes.
+    if ((frame.invite ?? '') !== invited) {
+      invited = frame.invite ?? '';
+      renderer.invite = invited ? { pattern: qrPattern(invited), caption: 'Scan to add a fish' } : null;
+    }
     if (renderer.visual.id !== frame.visual) renderer.visual = createVisual(frame.visual);
     // A new view only when the tank or how it should be shown changes, so dragging the view is kept.
     const next = `${frame.width} ${frame.fill} ${tank.fish.length > 0}`;

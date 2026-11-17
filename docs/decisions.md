@@ -483,3 +483,19 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - Visitor fish swim freely, not on routes.
 - **Alternatives considered:** Fixed choices first and drawing later, which needs no moderation; fish that leave after a while or when the tank is full; a link to follow your fish.
 - **What follows from it:** The operator has an approval queue to watch while drawn fish are coming in. A busy event may need a limit on how many visitor fish a tank holds, for drawing speed.
+
+## 39. How the visitor pieces fit together
+
+- **Date:** 17 November 2026
+- **Status:** Built; carries out 38
+- **What prompted it:** Building the phone page, the service and the operator's side.
+- **Decision:**
+  - The phone page is a page of its own, `visit.html`, with its own small code (about 15 KB), so phones do not download the operator's maths library. The main page still chooses between operator and display (decision 31).
+  - The service is a Cloudflare Worker with one Durable Object per room. It only checks fish, limits each phone to three a minute, and passes fish to the tank over a live connection; it keeps no fish and no pictures. If no tank is connected, the phone is told so instead of the fish being lost.
+  - The operator holds the queue of coloured-in fish and decides on its own, so letting a fish in needs no reply to the service.
+  - The tank checks every fish again on arrival, trusting nothing that came over the network.
+  - A room's code and key are remembered in the operator's browser, so a reloaded page keeps the same QR code. A room that keeps refusing the tank is given up and a new one opened.
+  - The QR code is drawn on the canvas after the tank, so corner correction straightens it with everything else.
+  - Coloured-in fish keep white paper where they were not coloured, so a lightly coloured fish still shows up in dark water.
+- **Alternatives considered:** The phone page inside the main page, which would make phones download everything; the service holding fish until approved, which needs more storage and messages and gains nothing while the operator is present.
+- **What follows from it:** Going live needs a Cloudflare account; the site is then built with the service's address. Testing on a phone at home needs the laptop's network address, not localhost.

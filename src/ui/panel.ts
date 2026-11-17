@@ -17,6 +17,8 @@ export interface Controls {
   /** Keep the selected fish on screen when the tank is bigger than the screen. */
   follow: boolean;
   select(id: number): void;
+  /** Brings the Fish list up to date after fish arrive or leave from outside the panel, keeping the choice if it can. */
+  refresh(): void;
 }
 
 export interface PanelElements {
@@ -64,6 +66,10 @@ export interface PanelOptions {
   display: { status: string };
   onOpenDisplay: () => void;
   onCopyLink: () => void;
+  /** Visitors adding fish from their phones: whether a room is open, how it is going, and the operator's choices. */
+  visitors: { on: boolean; status: string; showCode: boolean; askFirst: boolean };
+  onVisitors: (on: boolean) => void;
+  onClearVisitors: () => void;
   /** Adds this many made-up fish, arriving this way, and returns their ids, or the reason they could not be added. */
   onAddFish: (count: number, kind: GroupKind) => number[] | string;
 }
@@ -93,6 +99,10 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
     paused: false,
     follow: false,
     select,
+    refresh: () => {
+      const still = controls.display.selected < 0 || tank.fish.some((f) => f.id === controls.display.selected);
+      select(still ? controls.display.selected : tank.fish[0]!.id);
+    },
   };
 
   const fishController = gui.add(state, 'fish', fishOptions()).name('Fish').onChange((id: number) => select(id));
@@ -222,6 +232,14 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   tankFolder.add(controls, 'follow').name('Follow selected fish');
   tankFolder.add(controls.display, 'trails').name('Trails');
   tankFolder.add(controls, 'paused').name('Pause');
+
+  // Visitors: a room on the visitor service, the QR code that leads phones to it, and the fish they send.
+  const visitorsFolder = gui.addFolder("Visitors' fish");
+  visitorsFolder.add(options.visitors, 'on').name('Take fish from phones').listen().onChange(options.onVisitors);
+  visitorsFolder.add(options.visitors, 'status').name('Room').listen().disable();
+  visitorsFolder.add(options.visitors, 'showCode').name('Show QR code');
+  visitorsFolder.add(options.visitors, 'askFirst').name('Ask before letting coloured-in fish in');
+  visitorsFolder.add({ clear: options.onClearVisitors }, 'clear').name("Clear visitors' fish");
 
   const projector = gui.addFolder('Projector').close();
   projector.add({ open: options.onOpenDisplay }, 'open').name('Open display window');

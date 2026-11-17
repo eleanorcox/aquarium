@@ -31,6 +31,8 @@ phone page ──POST fish──> service (one "room" per tank) ──live conne
 
 ## Built in pieces, each working on its own
 
+Pieces 1 to 6 are built (17 November 2026) and tried end to end on the laptop: a phone page sending fish from choices and coloured in, the queue, letting in, and the QR code decoding to the right address. Piece 7 waits for a Cloudflare account.
+
 1. **The visitor fish format.** What a phone sends, checked strictly, since anyone can send anything. Shared by phone, service and tank.
 2. **Visitor fish in the tank.** Adding one, a Visitors' fish group in the Fish list, and Clear visitors' fish.
 3. **Fish outlines and colouring.** A few outlines; two colours, stripes and spots on them; and a coloured-in outline as a picture that bends as the fish swims, in all three visual modes. The outlines are the same idea as the paper colouring sheet, so they are drawn to serve both.

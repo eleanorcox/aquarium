@@ -184,3 +184,56 @@ body.bare #camera {
     width: 120px;
   }
 }
+/* Coloured-in fish waiting to be let in, in the operator window only. */
+#waiting {
+  position: fixed;
+  left: 16px;
+  top: 60px;
+  max-height: 50vh;
+  overflow-y: auto;
+  width: min(320px, calc(100vw - 32px));
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(11, 34, 51, 0.94);
+  border: 1px solid rgba(138, 164, 177, 0.3);
+  z-index: 5;
+}
+.waiting-title {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+.waiting-fish {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  grid-template-areas: 'picture name' 'picture buttons';
+  gap: 4px 10px;
+  align-items: center;
+  padding: 6px 0;
+  border-top: 1px solid rgba(138, 164, 177, 0.15);
+}
+.waiting-fish img {
+  grid-area: picture;
+  width: 96px;
+  height: 48px;
+  object-fit: contain;
+  background: #0b2233;
+  border-radius: 6px;
+}
+.waiting-fish span {
+  grid-area: name;
+  overflow-wrap: anywhere;
+}
+.waiting-actions {
+  grid-area: buttons;
+  display: flex;
+  gap: 6px;
+}
+.waiting-fish button {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(138, 164, 177, 0.4);
+  background: #12364d;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}

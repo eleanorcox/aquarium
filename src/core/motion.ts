@@ -253,7 +253,7 @@ export const FREE_PARAMS: Record<string, ParamSpec> = {
 
 /** What a free fish does, in words, since it has no equation to show. */
 export function describeFree(p: Params): string {
-  return `No route: swims at ${n(p.v)} tank heights a second, turns away from the edges,\nand keeps between depths ${n((p.y0 ?? 0) - (p.A ?? 0))} and ${n((p.y0 ?? 0) + (p.A ?? 0))}`;
+  return `No route: swims at ${n(p.v)} tank heights a second, turns away from the edges,\nand keeps between depths ${n(Math.max(0, (p.y0 ?? 0) - (p.A ?? 0)))} and ${n(Math.min(1, (p.y0 ?? 0) + (p.A ?? 0)))}`;
 }
 
 export const DEFAULT_CUSTOM: EquationSource = {

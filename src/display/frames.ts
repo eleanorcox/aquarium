@@ -20,6 +20,8 @@ export interface FrameMessage {
   fill: boolean;
   selected: number;
   trails: boolean;
+  /** The phone page's address for the QR code in the corner, when visitors are being taken. */
+  invite?: string;
 }
 
 /** What a visitor fish looks like beyond what each frame carries. Sent when visitor fish come or go. */
@@ -43,7 +45,7 @@ export type DisplayMessage =
   | { type: 'shown'; area: { x: number; y: number; width: number; height: number } }
   | { type: 'pointer'; influence: Influence | null };
 
-export function packFrame(tank: DrawnTank, details: Pick<FrameMessage, 'visual' | 'fill' | 'selected' | 'trails'>): FrameMessage {
+export function packFrame(tank: DrawnTank, details: Pick<FrameMessage, 'visual' | 'fill' | 'selected' | 'trails' | 'invite'>): FrameMessage {
   const fish = new Float64Array(tank.fish.length * PER_FISH);
   tank.fish.forEach((f, i) => fish.set([f.id, f.x, f.y, f.heading, f.speed, f.size, f.hue, SWIMMING_STYLES.indexOf(f.swimStyle as never)], i * PER_FISH));
   return { type: 'frame', width: tank.width, t: tank.t, fish, influences: tank.influences, ...details };

@@ -18,6 +18,7 @@ import { addMadeUpGroup } from './species/stock';
 import { setUpCorners } from './ui/corners';
 import { createPanel } from './ui/panel';
 import { rememberCameras, rememberedCameras } from './ui/remembered';
+import { setUpVisitorDesk } from './ui/visitorDesk';
 
 /** Starts the operator window: the tank, its controls and its inputs. Called once by main.ts. */
 export async function startOperator(): Promise<void> {
@@ -197,7 +198,13 @@ export async function startOperator(): Promise<void> {
     void setMotion(true).then(keepCameras);
   }
 
+  // Visitors adding fish from their phones, through a room on the visitor service.
+  const desk = setUpVisitorDesk(tank, kept, () => controls.refresh(), address.has('visitors'));
+
   const controls = createPanel(tank, panelElements, {
+    visitors: desk.state,
+    onVisitors: (on) => desk.setOn(on),
+    onClearVisitors: () => desk.clear(),
     pointer,
     stats,
     hands: handsState,
@@ -296,6 +303,9 @@ export async function startOperator(): Promise<void> {
     const drawStart = performance.now();
     const followed = tank.fish.find((f) => f.id === controls.display.selected);
     if (controls.follow && followed) view.follow(followed);
+    desk.update();
+    const invite = desk.invite();
+    renderer.invite = invite ? { pattern: invite.pattern, caption: 'Scan to add a fish' } : null;
     renderer.render(tank, view, controls.display);
     display.status = displayOpen() ? 'Open' : 'Not open';
     if (displayOpen()) {
@@ -311,7 +321,7 @@ export async function startOperator(): Promise<void> {
           displayChannel.postMessage({ type: 'picture', id: picture, dataUrl });
         }
       }
-      displayChannel.postMessage(packFrame(tank, { visual: renderer.visual.id, fill: SCENES[scene]?.fill ?? false, selected: controls.display.selected, trails: false }));
+      displayChannel.postMessage(packFrame(tank, { visual: renderer.visual.id, fill: SCENES[scene]?.fill ?? false, selected: controls.display.selected, trails: false, ...(invite ? { invite: invite.address } : {}) }));
     }
     showSpeed(drawStart - stepStart, performance.now() - drawStart);
     requestAnimationFrame(frame);

@@ -8,6 +8,8 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
+- Visitors add fish from their phones. The tank shows a QR code; the phone page lets a visitor pick a slim, round or tall fish, choose colours and a pattern or colour it in with a finger, set how shy or curious it is, name it, watch it swim in a preview, and send it. Fish from choices swim straight in; coloured-in ones wait for the operator to let them in. All in the new Visitors' fish section of the panel, or with `?visitors` in the address. Runs on the laptop for now; going live needs a Cloudflare account.
+- Visitor fish show in the projector's display window too, with the QR code.
 - Visitor fish, the first part of visitors adding fish from their phones: three outlines (slim, round, tall), each in two colours with plain, stripes or spots, drawn as pictures that bend as they swim in every visual mode. See them in the Visitors' fish scene (`?scene=visitors`).
 - The aquarium is published at https://aquarium.eleanorcox.rocks on every push, once the tests pass.
 - Add many fish at once: set How many (up to 300) and Add as separate fish, a school on one route, or a free-swimming school. A big school gets smaller fish so it fits. The new fish are chosen together as Just added, ready to change.
