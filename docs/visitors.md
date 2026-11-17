@@ -44,3 +44,13 @@ phone page ──POST fish──> service (one "room" per tank) ──live conne
 - Paper colouring sheets scanned by a camera. They will use the same route into the tank.
 - Visitors following or nudging their fish afterwards.
 - Saving coloured-in fish in shared tank links: pictures are too big for a link.
+
+## What the service can rely on
+
+Checked against Cloudflare's documentation on 17 November 2026:
+
+- Durable Objects are on the free plan if they use Cloudflare's SQLite storage. The free plan allows 100,000 Durable Object requests and 100,000 Worker requests a day, which is far beyond one event. [Pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/), [Worker limits](https://developers.cloudflare.com/workers/platform/limits/)
+- A room whose tank is connected but quiet can hibernate, and is not charged while it does. [WebSockets](https://developers.cloudflare.com/durable-objects/best-practices/websockets/)
+- `wrangler dev` runs Durable Objects on the laptop. [Development](https://developers.cloudflare.com/workers/development-testing/)
+- A Worker on our own subdomain would need the whole domain moved to Cloudflare, which is not wanted. Cloudflare Pages can serve a subdomain with only a CNAME record, as GitHub Pages does. So the service lives at its Cloudflare address and the site calls it there. [Pages custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/), [Workers custom domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/)
+- Limiting how often a phone can send is done inside the room, which is exact; Cloudflare's own rate-limiting feature is approximate. [Rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)
