@@ -12,6 +12,7 @@ npm test           # all tests, once
 npm run speed      # time the simulation; run before and after changing how it steps
 npm run typecheck  # type check only
 npm run build      # type check, then build into dist/
+npm run service    # the visitor service on this laptop, at port 8787 (Cloudflare's Wrangler)
 ```
 
 ## How we work
@@ -31,6 +32,7 @@ npm run build      # type check, then build into dist/
 ## Code rules
 
 - `src/main.ts` only chooses the window: `src/operator.ts` is the app, `src/display/` the projector window that draws frames sent to it.
+- `service/` is the visitor service, a Cloudflare Worker. Its rules are in `room.ts`, plain and tested; `worker.ts` only connects them to the network.
 - `src/core/` is the simulation. No DOM, no browser APIs, no real clock, no `Math.random` except through the function passed in.
 - `src/render/` only reads the tank. `src/ui/` and `src/input/` only change it through its methods. Input adapters take positions in tank units and times in seconds, and never touch the page, so they can be tested.
 - The simulation advances on a fixed 1/60 s timestep. The same starting tank and steps must always give the same result.

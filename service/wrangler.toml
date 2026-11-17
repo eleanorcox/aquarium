@@ -1,0 +1,13 @@
+# The visitor service. Run on the laptop with `npm run service`; publish with `npx wrangler deploy -c service/wrangler.toml`.
+name = "equatium-visitors"
+main = "worker.ts"
+compatibility_date = "2026-11-01"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+
+# The free plan needs rooms stored in SQLite.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]

@@ -9,17 +9,20 @@
   "scripts": {
     "postinstall": "node scripts/copy-mediapipe.mjs",
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run typecheck && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "speed": "vitest run --config vitest.speed.config.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p service",
+    "service": "wrangler dev -c service/wrangler.toml --ip 0.0.0.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "5.20261117.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.3",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.3",
+    "wrangler": "4.164.0"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "1.1.0",
