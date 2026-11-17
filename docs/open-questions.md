@@ -39,13 +39,4 @@ Decisions that shape the plan. Roughly in order of how much they change it.
 
 ## Visitors and their fish
 
-20. **Free drawing or fixed choices on the phone?** Free drawing is more personal and needs moderation. Fixed choices are safe and quicker to build.
-21. **How long does a visitor's fish live?** Until the tank is full, for the day, for ever. Can a visitor find their fish again later on their own phone?
-22. **Accounts or not?** Saving by link needs none. Accounts only become necessary if people should keep an aquarium across devices without holding on to a link.
-
 23. **What triggers a discovery?** Time watching, time of day, biome, rarity, visiting an exhibition. And is it for real species only?
-
-## Technical
-
-24. **Is running a hosted service acceptable?** Stage 5 needs one, with a small running cost and something to look after. Everything before it stays static files.
-25. **Where does the site live?** The README mentions hosting on a subdomain or subpath of a larger site, which affects where a server function could go.

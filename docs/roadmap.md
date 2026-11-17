@@ -103,7 +103,7 @@ In two parts, with a purchase between them.
 
 ### Stage 5: visitors add fish
 
-*Status, 27 October 2026: saving a tank to a link is built (entry 28 in the decision log). The rest needs a hosted service.*
+*Status, 17 November 2026: saving a tank to a link is built (entry 28 in the decision log). The phone page and service are being built to the plan in [visitors.md](visitors.md); visitors choose and draw, drawn fish need approval, and fish stay until cleared (entry 38).*
 
 Save and load tanks; a phone page for choosing a fish; the real-time service; then colouring on the phone; then paper scanning.
 

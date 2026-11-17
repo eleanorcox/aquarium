@@ -468,3 +468,18 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - The hand-tracking model's licence is confirmed from Google's model card: Apache License 2.0. A copy of the licence and a note of where the model came from are published beside it.
 - **Alternatives considered:** Hosting with the domain's own host (Squarespace), which serves Squarespace sites, not arbitrary files. Netlify or Cloudflare Pages, which would work equally well but add another account. A path on the main domain, which waits on the website existing.
 - **What follows from it:** The repository has to stay public while it is hosted free on Pages. Visitors adding fish by QR code (stage 5) needs a live server, which Pages cannot be; that will need somewhere else, and the static site can stay here.
+
+## 38. How visitors make fish, and how long they stay
+
+- **Date:** 17 November 2026
+- **Status:** Decided; being built (plan in [visitors.md](visitors.md))
+- **What prompted it:** Eleanor wanted to work on visitors adding fish by QR code while hosting waits on GitHub. Answers open questions 20, 21, 22 and 24.
+- **Decision:**
+  - Visitors pick one of a few fish outlines, then either choose colours and a pattern or colour the outline in with a finger, both from the start. Colouring in is kept inside the outline, like a colouring sheet, rather than free drawing; Eleanor's refinement of drawing, and the same idea as the paper sheets planned later.
+  - Fish made from choices appear at once. Coloured-in fish wait for the operator to approve them, since a word or rude shape can still be coloured inside an outline. This part is a default chosen by Claude for Eleanor to change if she wants.
+  - Visitor fish stay until the operator clears them.
+  - No accounts: a visitor makes a fish and sends it, and nothing about them is kept.
+  - A hosted service is acceptable. It will be a Cloudflare Worker with one Durable Object per tank, checked against Cloudflare's documentation before building.
+  - Visitor fish swim freely, not on routes.
+- **Alternatives considered:** Fixed choices first and drawing later, which needs no moderation; fish that leave after a while or when the tank is full; a link to follow your fish.
+- **What follows from it:** The operator has an approval queue to watch while drawn fish are coming in. A busy event may need a limit on how many visitor fish a tank holds, for drawing speed.
