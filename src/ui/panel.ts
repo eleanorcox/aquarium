@@ -6,7 +6,8 @@ import type { PointerInput, PointerMode } from '../input/pointer';
 import { VISUALS } from '../render/visuals';
 import { SCENES } from '../scenes/scenes';
 import { BIOMES, SPECIES } from '../species/catalogue';
-import { addSpecies } from '../species/stock';
+import { addSpecies, type GroupKind } from '../species/stock';
+import { fishGroups, type FishGroup } from './groups';
 import { sceneAddress } from './remembered';
 import type { Display } from '../render/canvas2d';
 
@@ -26,8 +27,9 @@ export interface PanelElements {
   error: HTMLElement;
 }
 
-/** Stands for every fish at once in the Fish list. No fish has this id. */
+/** Stands for every fish at once in the Fish list. Other groups follow it as -2, -3 and so on; no fish has a negative id. */
 export const ALL_FISH = -1;
+const groupId = (index: number) => -1 - index;
 
 const MODEL_OPTIONS = Object.fromEntries(Object.entries(MODEL_NAMES).map(([id, name]) => [name, id]));
 const POINTER_OPTIONS: Record<string, PointerMode> = {
@@ -62,8 +64,8 @@ export interface PanelOptions {
   display: { status: string };
   onOpenDisplay: () => void;
   onCopyLink: () => void;
-  /** Adds a fish and returns its id, or the reason it could not be added. */
-  onAddFish: () => number | string;
+  /** Adds this many made-up fish, arriving this way, and returns their ids, or the reason they could not be added. */
+  onAddFish: (count: number, kind: GroupKind) => number[] | string;
 }
 
 export interface Stats {
@@ -81,6 +83,11 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   const state = { fish: first, model: 'sine' as ModelId };
   // The selected fish's behaviour, copied here for the sliders and written back through the tank.
   const behaviour = { pathStrength: 1, curiosity: 0, drift: 0, schools: false };
+  const look = { hue: 0, size: 0.04 };
+  // The groups on offer the last time the Fish list was refreshed, and the fish added most recently.
+  let groups: FishGroup[] = [];
+  let justAdded: number[] = [];
+  const speciesNames = Object.fromEntries(Object.entries(SPECIES).map(([id, s]) => [id, s.commonName]));
   const controls: Controls = {
     display: { selected: first, trails: options.trails },
     paused: false,
@@ -108,16 +115,34 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   behaviourFolder.add(behaviour, 'drift', 0, 1, 0.01).name('Drift').onChange(setBehaviour('drift'));
   behaviourFolder.add(behaviour, 'schools').name('Schools').onChange(setBehaviour('schools'));
 
+  const lookFolder = gui.addFolder('Look');
+  lookFolder.add(look, 'hue', 0, 360, 1).name('Colour').onChange((hue: number) => {
+    for (const id of chosen()) tank.setLook(id, { hue });
+  });
+  lookFolder.add(look, 'size', 0.005, 0.12, 0.001).name('Size').onChange((size: number) => {
+    for (const id of chosen()) tank.setFishSize(id, size);
+  });
+
+  const adding = { count: 1, kind: 'mixed' as GroupKind };
   const actions = {
     addFish: () => {
-      const added = onAddFish();
-      if (typeof added === 'string') stocking.message = added;
-      else select(added);
+      const added = onAddFish(adding.count, adding.kind);
+      if (typeof added === 'string') {
+        stocking.message = added;
+        return;
+      }
+      justAdded = added;
+      // Several fish arrive chosen together, so they can be changed at once straight away.
+      if (added.length === 1) select(added[0]!);
+      else {
+        refreshGroups();
+        select(groupId(groups.findIndex((g) => g.name.startsWith('Just added'))));
+      }
     },
     removeFish: () => {
-      // The panel always shows one fish, so the last one stays. With All fish chosen, nothing is removed.
-      if (tank.fish.length < 2 || allChosen()) return;
-      tank.removeFish(controls.display.selected);
+      // The tank always keeps at least one fish, so the panel has one to show.
+      const going = chosen();
+      for (const id of going.slice(0, Math.min(going.length, tank.fish.length - 1))) tank.removeFish(id);
       select(tank.fish[0]!.id);
     },
     editAsEquation: () => {
@@ -164,6 +189,10 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   };
   gui.add(formation, 'size', 2, 60, 1).name('Formation size');
   gui.add(formation, 'make').name('Make a formation');
+  gui.add(adding, 'count', 1, 300, 1).name('How many');
+  gui
+    .add(adding, 'kind', { 'Separate fish': 'mixed', 'A school on one route': 'school', 'A free-swimming school': 'free' })
+    .name('Add as');
   gui.add(actions, 'addFish').name('Add fish');
   gui.add(actions, 'removeFish').name('Remove fish');
 
@@ -214,29 +243,54 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
     if (error === null) showEquation();
   });
 
+  /** Whether a group, such as All fish or a school, is chosen instead of one fish. */
   function allChosen(): boolean {
-    return controls.display.selected === ALL_FISH;
+    return controls.display.selected < 0;
   }
 
-  /** The ids of the fish the panel is changing: the selected one, or every fish. */
+  function chosenGroup(): FishGroup | undefined {
+    return groups[-1 - controls.display.selected];
+  }
+
+  /** The ids of the fish the panel is changing: the selected one, or every fish still in the chosen group. */
   function chosen(): number[] {
-    return allChosen() ? tank.fish.map((f) => f.id) : [controls.display.selected];
+    if (!allChosen()) return [controls.display.selected];
+    const ids = new Set(tank.fish.map((f) => f.id));
+    return (chosenGroup()?.ids ?? []).filter((id) => ids.has(id));
+  }
+
+  function refreshGroups(): void {
+    groups = fishGroups(tank, justAdded, speciesNames);
   }
 
   function fishOptions(): Record<string, number> {
-    return { 'All fish': ALL_FISH, ...Object.fromEntries(tank.fish.map((f) => [f.name, f.id])) };
+    refreshGroups();
+    return { ...Object.fromEntries(groups.map((g, i) => [g.name, groupId(i)])), ...Object.fromEntries(tank.fish.map((f) => [f.name, f.id])) };
   }
 
   function buildParams(): void {
     // Empty the folder instead of replacing it, so it keeps its place in the panel.
     for (const controller of [...params.controllers]) controller.destroy();
     if (allChosen()) {
-      // Fish on different paths have different settings, so path settings are only shown for one fish.
       editButton.show(false);
       el.editor.hidden = true;
       el.error.hidden = true;
       el.equation.hidden = false;
-      el.equation.textContent = `All ${tank.fish.length} fish\nMotion and Behaviour changes apply to every fish.`;
+      const members = chosen().map((id) => tank.get(id));
+      const model = members[0]?.model;
+      // Path settings are only shown when every fish in the group is on the same kind of path; moving one moves it for all.
+      const shared = model !== undefined && model !== 'custom' && members.every((f) => f.model === model);
+      el.equation.textContent = `${chosenGroup()?.name ?? 'No fish'}\nChanges apply to all of them.${shared ? '' : '\nThey are on different kinds of path, so path settings are hidden.'}`;
+      if (!shared) return;
+      const values = { ...members[0]!.params };
+      for (const [key, spec] of Object.entries(paramSpecs(model))) {
+        params
+          .add(values, key, spec.min, spec.max, spec.step)
+          .name(`${spec.symbol}  ${spec.label}`)
+          .onChange((value: number) => {
+            for (const fish of members) tank.setParam(fish.id, key, value);
+          });
+      }
       return;
     }
     const fish = tank.get(controls.display.selected);
@@ -269,13 +323,18 @@ export function createPanel(tank: Tank, el: PanelElements, options: PanelOptions
   }
 
   function select(id: number): void {
+    // Groups are numbered by their place in the list, which can change as fish change school, so find it again by name.
+    const wanted = id < 0 ? groups[-1 - id]?.name.replace(/ \(\d+\)$/, '') : undefined;
+    fishController.options(fishOptions());
+    if (wanted !== undefined) id = groupId(Math.max(0, groups.findIndex((g) => g.name.replace(/ \(\d+\)$/, '') === wanted)));
     controls.display.selected = id;
     state.fish = id;
-    // With All fish chosen, the controls start from the first fish's settings.
-    const fish = id === ALL_FISH ? tank.fish[0]! : tank.get(id);
+    fishController.updateDisplay();
+    // With a group chosen, the controls start from its first fish's settings.
+    const fish = id < 0 ? tank.get(chosen()[0] ?? tank.fish[0]!.id) : tank.get(id);
     state.model = fish.model;
     Object.assign(behaviour, { pathStrength: fish.pathStrength, curiosity: fish.curiosity, drift: fish.drift, schools: fish.schools });
-    fishController.options(fishOptions());
+    Object.assign(look, { hue: fish.hue, size: Math.round(fish.size * 1000) / 1000 });
     gui.controllersRecursive().forEach((c) => c.updateDisplay());
     buildParams();
   }

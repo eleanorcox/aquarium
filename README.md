@@ -53,7 +53,9 @@ Each fish faces the way it is moving. y points down, as on screen.
 
 **Pushed-out fish** in the **Tank** section decides what a fish does after you knock it well off its route: swim home, or join the nearest other school, keeping its colour. Only fish you have disturbed change school.
 
-Choose **All fish** at the top of the **Fish** list to change Motion or a Behaviour setting for every fish at once.
+The top of the **Fish** list offers groups as well as single fish: **All fish**, **Just added**, each school (named by its colour or species), each formation, and all free-swimming fish. Choose one to change Motion, Behaviour or Look for the whole group at once; when they are all on the same kind of path, its path settings change for all of them too. **Remove fish** removes the whole group.
+
+To add lots of fish at once, set **How many** and **Add as**: separate fish on a mix of routes, a school sharing one route, or a free-swimming school. They arrive chosen as **Just added**.
 
 The equation gives each fish its route. Its position is the route plus an offset, which a spring pulls back to zero, so a fish left alone is exactly on its route. Four settings per fish decide what moves it off:
 

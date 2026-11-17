@@ -1,4 +1,3 @@
-import { MODELS, type BuiltinId } from './core/motion';
 import { decodeTank, encodeTank, loadTank, saveTank } from './core/save';
 import { Tank } from './core/tank';
 import type { HandCamera } from './input/camera';
@@ -14,7 +13,7 @@ import { View } from './render/view';
 import { CHANNEL, isDisplayMessage, packFrame } from './display/frames';
 import type { Influence } from './core/steering';
 import { SCENES, buildScene } from './scenes/scenes';
-import { addMadeUpFish } from './species/stock';
+import { addMadeUpGroup } from './species/stock';
 import { setUpCorners } from './ui/corners';
 import { createPanel } from './ui/panel';
 import { rememberCameras, rememberedCameras } from './ui/remembered';
@@ -211,16 +210,8 @@ export async function startOperator(): Promise<void> {
       history.replaceState(null, '', `?${address}`);
     },
     trails: SCENES[scene]?.trails ?? true,
-    onAddFish: () => {
-      const ids = Object.keys(MODELS) as BuiltinId[];
-      const model = ids[Math.floor(Math.random() * ids.length)] ?? 'sine';
-      // A real-fish tank refuses made-up fish, and says why.
-      const added = addMadeUpFish(tank, model);
-      if (typeof added === 'string') return added;
-      tank.setParam(added, 'phi', Math.random() * 6.28);
-      tank.setBehaviour(added, { curiosity: Math.random() * 2 - 1, drift: 0.3, pathStrength: 0.5 });
-      return added;
-    },
+    // A real-fish tank refuses made-up fish, and says why.
+    onAddFish: (count, kind) => addMadeUpGroup(tank, count, kind, Math.random),
   });
 
   canvas.addEventListener('click', (e) => {

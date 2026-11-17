@@ -8,6 +8,9 @@ Versions are numbered v1, v2 and so on, each with a git tag of the same name. Ne
 
 ### Added
 
+- Add many fish at once: set How many (up to 300) and Add as separate fish, a school on one route, or a free-swimming school. A big school gets smaller fish so it fits. The new fish are chosen together as Just added, ready to change.
+- Change many fish at once: the Fish list offers groups as well as All fish: Just added, each school (named by its colour or species), each formation and all free-swimming fish. Motion, Behaviour and Look changes apply to the whole group, and when the whole group is on the same kind of path its path settings can be changed for all of them together. Remove fish removes the whole group.
+- A Look section in the panel: Colour and Size, for one fish or a whole group.
 - Free swimming: a new Motion, "Free swimming (no route)". The fish keeps its own cruising speed and heading, wanders if it drifts, swims mostly level, turns away from the tank's edges and keeps to its depth range. Pushed fish carry on from where they end up instead of returning. Free fish school together, and a fish switched to or from free swimming carries on from where it is. Choose All fish to set every fish free at once.
 - A Free swimming scene (`?scene=free`): two schools and three loners, none on a route.
 - A Colour schools scene (`?scene=colours`): 320 fish in eight schools, each its own colour, circling apart. Knock fish out of a school with the pointer or a hand and they head for the nearest other school, keeping their colour, so the schools gradually become rainbows. Left alone, no fish changes school.

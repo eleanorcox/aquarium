@@ -444,3 +444,15 @@ Entries 1 to 5 were written on 13 October 2026, looking back. Their dates come f
   - What a free fish does with nothing happening is cruise, meander and school. Whether that looks purposeful enough is for judging by eye in the Free swimming scene.
   - The steering strengths are first guesses, as before.
   - Real species still arrive on routes. Letting them arrive free is a small step if wanted.
+
+## 36. Groups of fish in the Fish list
+
+- **Date:** 17 November 2026
+- **Status:** Built; extends All fish
+- **What prompted it:** Eleanor wanted to add lots of fish at once and to edit lots of fish at once.
+- **Decision:**
+  - The Fish list offers groups above the single fish: All fish, the fish just added, each school, each formation and all free swimmers. Groups are worked out afresh from the tank whenever the list is refreshed, so they need no upkeep and are never saved. Schools are named by species, or else by a colour word from their hue, since colour is how they are told apart on screen.
+  - A group changes Motion, Behaviour and the new Look settings (colour and size) for all its fish. Path settings appear for a group only when all its fish are on the same kind of path, and then a moved slider sets that one value on every fish.
+  - Adding takes a number and a way of arriving: separate fish on a mix of routes, a school sharing a route, or a free-swimming school. More than 20 in a school makes the fish smaller, so a school of 300 still fits the tank.
+- **Alternatives considered:** Selecting fish by dragging a box round them on screen. It would be good on a big tank but clashes with dragging to look around, and groups by school cover the common case.
+- **What follows from it:** A group chosen in the list is not highlighted on screen yet.

@@ -1,6 +1,6 @@
 // Stocking a tank with real species: each species arrives as a lone fish or a school, sized, coloured and
 // behaving from its facts, on a route in its usual depth band. Tank rules decide what may be added.
-import type { BuiltinId } from '../core/motion';
+import { MODELS, type BuiltinId, type Params } from '../core/motion';
 import type { Tank } from '../core/tank';
 import type { Species, SwimmingStyle } from './catalogue';
 
@@ -85,7 +85,60 @@ export function addSpecies(tank: Tank, species: Species): number[] | string {
 }
 
 /** Adds a fish that is not a real species, on a built-in path. A real-fish tank refuses it, saying why. */
+const MADE_UP_REFUSED = 'This is a real-fish tank, which only takes real species. Switch it to made-up to add any fish.';
+
 export function addMadeUpFish(tank: Tank, model: BuiltinId): number | string {
-  if (tank.rules.kind === 'real') return 'This is a real-fish tank, which only takes real species. Switch it to made-up to add any fish.';
+  if (tank.rules.kind === 'real') return MADE_UP_REFUSED;
   return tank.addFish(model).id;
+}
+
+/** How made-up fish added together arrive: each on its own route, as one school on a shared route, or as a free-swimming school. */
+export type GroupKind = 'mixed' | 'school' | 'free';
+
+/** The fish size for a school this big: the usual size for up to 20, smaller beyond, so a big school still fits. */
+const schoolFishSize = (count: number) => Math.max(0.012, 0.04 / Math.sqrt(Math.max(1, count / 20)));
+
+/**
+ * Adds many made-up fish at once. Returns their ids, or why a tank refused them. `random` decides routes,
+ * colours and temperaments, so passing a seeded one gives the same fish every time.
+ */
+export function addMadeUpGroup(tank: Tank, count: number, kind: GroupKind, random: () => number): number[] | string {
+  const models = Object.keys(MODELS) as BuiltinId[];
+  const pick = () => models[Math.floor(random() * models.length)] ?? 'sine';
+  if (tank.rules.kind === 'real') return MADE_UP_REFUSED;
+  const ids: number[] = [];
+  if (kind === 'mixed') {
+    for (let i = 0; i < count; i++) {
+      const id = tank.addFish(pick()).id;
+      tank.setParam(id, 'phi', random() * 6.28);
+      tank.setBehaviour(id, { curiosity: random() * 2 - 1, drift: 0.3, pathStrength: 0.5 });
+      ids.push(id);
+    }
+    return ids;
+  }
+  // A school shares one route, or one cruising speed and depth if free, one colour and one temperament.
+  const model = kind === 'free' ? 'free' : pick();
+  const shared: Params = kind === 'free' ? {} : { phi: random() * 6.28 };
+  const hue = Math.floor(random() * 360);
+  const curiosity = random() * 1.6 - 0.8;
+  const size = schoolFishSize(count);
+  const start = random();
+  for (let i = 0; i < count; i++) {
+    // Starting spread over a patch about as big as the school will be, so it does not burst apart.
+    const patch = Math.sqrt(count) * 2.5 * size;
+    const place: Params = kind === 'free'
+      ? { x0: (start + (patch / tank.width) * (random() - 0.5) + 1) % 1, y0: 0.5 + patch * (random() - 0.5) }
+      : { x0: (start + 0.05 * random()) % 1 };
+    const fish = tank.addFish(model, { ...shared, ...place });
+    tank.setLook(fish.id, { hue });
+    tank.setFishSize(fish.id, size);
+    tank.setBehaviour(fish.id, { schools: true, curiosity, drift: 0.3, pathStrength: 0.3 });
+    tank.joinSchool(fish.id, ids[0] ?? fish.id);
+    ids.push(fish.id);
+  }
+  if (kind === 'free') {
+    const heading = random() * Math.PI * 2;
+    for (const id of ids) tank.aim(id, heading);
+  }
+  return ids;
 }

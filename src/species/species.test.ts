@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { loadTank, saveTank } from '../core/save';
 import { makeTank, run } from '../core/testing';
 import { BIOMES, SPECIES, parseSpecies } from './catalogue';
-import { addMadeUpFish, addSpecies, groupCount, sizeFor } from './stock';
+import { addMadeUpFish, addMadeUpGroup, addSpecies, groupCount, sizeFor } from './stock';
+import { seededRandom } from '../core/random';
 
 const sardine = SPECIES['pacific-sardine']!;
 const pike = SPECIES['northern-pike']!;
@@ -126,5 +127,49 @@ describe('tank rules', () => {
     if (typeof loaded === 'string') throw new Error(loaded);
     expect(loaded.rules).toEqual(tank.rules);
     expect(loaded.fish.map((f) => [f.species, f.swimStyle])).toEqual(tank.fish.map((f) => [f.species, f.swimStyle]));
+  });
+});
+
+describe('adding many made-up fish at once', () => {
+  it('adds as many separate fish as asked, on a mix of routes', () => {
+    const tank = makeTank();
+    const ids = addMadeUpGroup(tank, 50, 'mixed', seededRandom(2));
+    if (typeof ids === 'string') throw new Error(ids);
+    expect(ids).toHaveLength(50);
+    expect(new Set(tank.fish.map((f) => f.model)).size).toBeGreaterThan(3);
+  });
+
+  it('adds a school on one shared route, one colour, schooling only with each other', () => {
+    const tank = makeTank();
+    tank.addFish('sine');
+    const ids = addMadeUpGroup(tank, 100, 'school', seededRandom(3));
+    if (typeof ids === 'string') throw new Error(ids);
+    const school = ids.map((id) => tank.get(id));
+    expect(new Set(school.map((f) => f.model)).size).toBe(1);
+    expect(new Set(school.map((f) => f.hue)).size).toBe(1);
+    expect(new Set(school.map((f) => f.school)).size).toBe(1);
+    expect(school.every((f) => f.schools && f.school !== undefined)).toBe(true);
+  });
+
+  it('adds a free-swimming school', () => {
+    const tank = makeTank();
+    const ids = addMadeUpGroup(tank, 40, 'free', seededRandom(4));
+    if (typeof ids === 'string') throw new Error(ids);
+    expect(ids.every((id) => tank.get(id).model === 'free' && tank.get(id).schools)).toBe(true);
+  });
+
+  it('makes the fish of a big school smaller, so it does not fill the tank', () => {
+    const tank = makeTank();
+    const few = addMadeUpGroup(tank, 10, 'school', seededRandom(5));
+    const many = addMadeUpGroup(tank, 300, 'school', seededRandom(5));
+    if (typeof few === 'string' || typeof many === 'string') throw new Error('refused');
+    expect(tank.get(many[0]!).size).toBeLessThan(tank.get(few[0]!).size);
+  });
+
+  it('is refused in a real-fish tank, adding nothing', () => {
+    const tank = makeTank();
+    tank.setRules({ kind: 'real', biome: null });
+    expect(typeof addMadeUpGroup(tank, 20, 'school', seededRandom(6))).toBe('string');
+    expect(tank.fish).toHaveLength(0);
   });
 });
